@@ -43,17 +43,16 @@ Before you begin, ensure you have the following installed:
      cd whatnext
      ```
 
-3. **Build the Docker Image**
-   - Build a Docker image using the provided Dockerfile. This will set up both the frontend and backend environments in the container.
+3. **Pull the Docker Image**
+   - You can pull the pre-built Docker image from GitHub Container Registry:
      ```
-     docker build -t your-custom-image-name .
+     docker pull ghcr.io/eugenekim3107/whatnext-docker-image:latest
      ```
-     Replace `your-custom-image-name` with any name you prefer for your Docker image. This name is used to tag and identify your Docker image.
 
 4. **Run the Docker Container**
-   - Once the image is built, start a container from the image:
+   - Once the image is pulled, start a container from the image:
      ```
-     docker run -p 8000:8000 whatnext-app
+     docker run --rm -it -p 8000:8000 ghcr.io/eugenekim3107/whatnext-docker-image:latest
      ```
      The `-p` flag maps a port on your local machine to a port in the Docker container (format: `local_port:container_port`). In this example, we're mapping port 8000 on the local machine to port 8000 in the container, which is the default port for FastAPI applications.
 
