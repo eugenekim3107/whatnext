@@ -3,22 +3,33 @@ import PackageDescription
 
 let package = Package(
     name: "whatnext",
+    platforms: [
+        .iOS(.v14) // Specify the minimum iOS version you are targeting
+    ],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .executable(
             name: "whatnext",
             targets: ["whatnext"]),
     ],
     dependencies: [
-        // List your project dependencies here, if any.
+        // Add your project dependencies here, if any.
         // .package(url: "https://github.com/some/Dependency.git", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "whatnext",
-            dependencies: []),
+            dependencies: [],
+            path: "whatnext"
+        ),
         .testTarget(
             name: "whatnextTests",
-            dependencies: ["whatnext"]),
+            dependencies: ["whatnext"],
+            path: "Tests"
+        ),
+        .testTarget(
+            name: "whatnextUITests",
+            dependencies: ["whatnext"],
+            path: "UITests"
+        ),
     ]
 )
