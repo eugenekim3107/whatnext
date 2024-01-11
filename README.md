@@ -7,6 +7,7 @@ WhatNext? is an innovative web application designed to streamline the process of
 - Eugene Kim
 - Nicholas Lyu
 - Mike Dong
+- Jingbo Shang (Professor)
 
 ## Broad Problem Statement
 In today's fast-paced world, finding suitable leisure activities can be time-consuming and overwhelming. WhatNext? addresses this issue by providing a user-friendly platform that offers real-time, personalized recommendations, reducing decision-making time and enhancing user experiences.
