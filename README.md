@@ -5,7 +5,7 @@ WhatNext? is an innovative web application designed to streamline the process of
 
 ## Team Members
 - Eugene Kim
-- Wenzhou Lyu
+- Nicholas Lyu
 - Mike Dong
 
 ## Broad Problem Statement
