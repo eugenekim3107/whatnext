@@ -1,7 +1,7 @@
 # WhatNext?
 
 ## Introduction
-WhatNext? is an innovative web application designed to streamline the process of planning outings and activities. Leveraging the capabilities of GPT-4 and real-time location data, WhatNext? offers personalized and efficient recommendations for leisure activities, tailored to user preferences and current context.
+WhatNext? is an innovative mobile application designed to streamline the process of planning outings and activities. Leveraging the capabilities of GPT-4 and real-time location data, WhatNext? offers personalized and efficient recommendations for leisure activities, tailored to user preferences and current context.
 
 ## Team Members
 - Eugene Kim
