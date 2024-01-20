@@ -16,8 +16,8 @@ profile
 .build/
 Packages/
 Package.resolved
-*.xcodeproj
-*.xcworkspace
+# *.xcodeproj
+# *.xcworkspace
 xcuserdata/
 DerivedData/
 
