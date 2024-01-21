@@ -66,6 +66,10 @@ Before you begin, ensure you have the following installed:
 
 
 ### Yelp API
+**general_info.json** is the scraped basic information restaurants in San Diego, you can use their business id to test functions.
+
+
+
 Below is my yelp API, you can register a yelp api account and use yours.
 `api_key = "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"`
 
