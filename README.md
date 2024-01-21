@@ -70,13 +70,13 @@ Below is my yelp API, you can register a yelp api account and use yours.
 `api_key = "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"`
 
 
-If you want to use Serapi, below is my api key 
+If you want to use Serpapi, below is my api key 
 `api_key = 'f7e8aa3da4f9e3df7389bf69b090ff50762319c0a8a8c954a967dcdcfdf59f41'`
 
-Make sure to install the package first
+Make sure to install the package first if you want to use it. 
 `pip install google-search-results`
 
-The `get_newest_reviews_by_id` is commented currently, if you want to use it then just uncomment it and uncomment `from serpapi import GoogleSearch` at the top
+The `get_newest_reviews_by_id` function (with serpAPI) is commented currently, if you want to use it then just uncomment it and uncomment `from serpapi import GoogleSearch` at the top
 
 Note: Each api key can only request 500 calls per day. When you set search_nearby_restaurants(include_reviews=True), it will execute up to 50 api calls when retrieving the reviews. So be careful to use it, or you can change the `limit` parameter to a smaller value if you want to find a limited amount of business nearby (the number of api calls is equal to the `limit`).
 
