@@ -62,3 +62,13 @@ Before you begin, ensure you have the following installed:
 
 ### Stopping the Container
 - To stop the running Docker container, you can press `CTRL+C` in the terminal if it's running in the foreground, or use the `docker stop [CONTAINER ID]` command if it's running in the background.
+
+### Accessing the SwiftUI Project on XCode
+1. **Navigate to the Frontend Directory**
+   - Change into the frontend directory:
+    ```
+    cd whatnext/frontend
+    ```
+2. **Open Folder on XCode**
+   - Open the Folder 'whatnext' on XCode
+  
