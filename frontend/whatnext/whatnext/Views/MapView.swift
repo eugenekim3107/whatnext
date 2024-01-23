@@ -6,15 +6,21 @@
 //
 
 import SwiftUI
+import MapKit
 
-struct MapView: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct MapView: UIViewRepresentable {
+    func makeUIView(context: Context) -> MKMapView {
+        print("makeUIView called")
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+        return mapView
     }
-}
 
-struct MapView_Previews: PreviewProvider {
-    static var previews: some View {
-        MapView()
+    func updateUIView(_ uiView: MKMapView, context: Context) {
+        // Perform any updates to the UI here.
+    }
+
+    func makeCoordinator() -> MapViewCoordinator {
+        MapViewCoordinator()
     }
 }
