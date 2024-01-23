@@ -8,15 +8,45 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab = 2 // Default to the "Explore" tab
+
     var body: some View {
-        ZStack {
-            // The MapView is now directly instantiated without a ViewModel.
+        TabView(selection: $selectedTab) {
             MapView()
-                .ignoresSafeArea(edges: .all)
+                .tabItem {
+                    // Change image based on selection
+                    Image(selectedTab == 0 ? "map-icon-selected" : "map-icon-unselected")
+                    Text("Maps")
+                }
+                .tag(0)
             
-//            Text("ContentView")
-//                .foregroundColor(.white)
-//                .font(.system(size: 30))
+            SearchView()
+                .tabItem {
+                    Image(selectedTab == 1 ? "search-icon-selected" : "search-icon-unselected")
+                    Text("Search")
+                }
+                .tag(1)
+            
+            ExploreView()
+                .tabItem {
+                    Image(selectedTab == 2 ? "explore-icon-selected" : "explore-icon-unselected")
+                    Text("Explore")
+                }
+                .tag(2)
+            
+            ProfileView()
+                .tabItem {
+                    Image(selectedTab == 3 ? "profile-icon-selected" : "profile-icon-unselected")
+                    Text("Profile")
+                }
+                .tag(3)
+            
+            MoreView()
+                .tabItem {
+                    Image(selectedTab == 4 ? "more-icon-selected" : "more-icon-unselected")
+                    Text("More")
+                }
+                .tag(4)
         }
     }
 }
