@@ -9,12 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedTab = 2 // Default to the "Explore" tab
+    
+    let customSymbol = UIImage(named: "map.selected")
 
     var body: some View {
         TabView(selection: $selectedTab) {
             MapView()
                 .tabItem {
-                    // Change image based on selection
                     Image(selectedTab == 0 ? "map-icon-selected" : "map-icon-unselected")
                     Text("Maps")
                 }
