@@ -20,28 +20,24 @@ struct ContentView: View {
                     Text("Maps")
                 }
                 .tag(0)
-
             SearchView()
                 .tabItem {
                     Image(selectedTab == 1 ? "search-icon-selected" : "search-icon-unselected")
                     Text("Search")
                 }
                 .tag(1)
-
             ExploreView()
                 .tabItem {
                     Image(selectedTab == 2 ? "explore-icon-selected" : "explore-icon-unselected")
                     Text("Explore")
                 }
                 .tag(2)
-
             ProfileView()
                 .tabItem {
                     Image(selectedTab == 3 ? "profile-icon-selected" : "profile-icon-unselected")
                     Text("Profile")
                 }
                 .tag(3)
-
             MoreView()
                 .tabItem {
                     Image(selectedTab == 4 ? "more-icon-selected" : "more-icon-unselected")
@@ -57,3 +53,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
