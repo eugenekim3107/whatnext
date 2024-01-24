@@ -39,7 +39,6 @@ struct ContentView: View {
                         .animation(nil, value: selectedTab)
                         .tag(Tab.more)
                 }
-                .edgesIgnoringSafeArea(.bottom)
             }
 
             VStack {
