@@ -24,3 +24,9 @@ struct MapView: UIViewRepresentable {
         MapViewCoordinator()
     }
 }
+
+struct MapView_Previews: PreviewProvider {
+    static var previews: some View {
+        MapView().edgesIgnoringSafeArea(.bottom)
+    }
+}

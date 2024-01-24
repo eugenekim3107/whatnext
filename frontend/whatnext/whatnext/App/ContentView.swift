@@ -8,43 +8,45 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = 2 // Default to the "Explore" tab
-    
-    let customSymbol = UIImage(named: "map.selected")
+    @State private var selectedTab = Tab.map
+
+    init() {
+        UITabBar.appearance().isHidden = true
+    }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            MapView()
-                .tabItem {
-                    Image(selectedTab == 0 ? "map-icon-selected" : "map-icon-unselected")
-                    Text("Maps")
+        ZStack {
+            VStack {
+                TabView(selection: $selectedTab) {
+                    MapView()
+                        .edgesIgnoringSafeArea(.bottom)
+                        .animation(nil, value: selectedTab)
+                        .tag(Tab.map)
+                    
+                    SearchView()
+                        .animation(nil, value: selectedTab)
+                        .tag(Tab.search)
+                    
+                    ExploreView()
+                        .animation(nil, value: selectedTab)
+                        .tag(Tab.explore)
+                    
+                    ProfileView()
+                        .animation(nil, value: selectedTab)
+                        .tag(Tab.profile)
+                    
+                    MoreView()
+                        .animation(nil, value: selectedTab)
+                        .tag(Tab.more)
                 }
-                .tag(0)
-            SearchView()
-                .tabItem {
-                    Image(selectedTab == 1 ? "search-icon-selected" : "search-icon-unselected")
-                    Text("Search")
-                }
-                .tag(1)
-            ExploreView()
-                .tabItem {
-                    Image(selectedTab == 2 ? "explore-icon-selected" : "explore-icon-unselected")
-                    Text("Explore")
-                }
-                .tag(2)
-            ProfileView()
-                .tabItem {
-                    Image(selectedTab == 3 ? "profile-icon-selected" : "profile-icon-unselected")
-                    Text("Profile")
-                }
-                .tag(3)
-            MoreView()
-                .tabItem {
-                    Image(selectedTab == 4 ? "more-icon-selected" : "more-icon-unselected")
-                    Text("More")
-                }
-                .tag(4)
-        }
+                .edgesIgnoringSafeArea(.bottom)
+            }
+
+            VStack {
+                Spacer()
+                TabBarView(selectedTab: $selectedTab)
+            }
+        }.edgesIgnoringSafeArea(.bottom)
     }
 }
 
@@ -53,4 +55,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-

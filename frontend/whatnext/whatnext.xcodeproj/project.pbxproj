@@ -29,6 +29,7 @@
 		8A87046E2B5E050F00183191 /* MoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A87046D2B5E050F00183191 /* MoreViewModel.swift */; };
 		8A8704702B5E051800183191 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A87046F2B5E051800183191 /* ProfileViewModel.swift */; };
 		8A8704722B5E051F00183191 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8704712B5E051F00183191 /* SearchViewModel.swift */; };
+		8AFF980B2B60EA98008E8425 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AFF980A2B60EA97008E8425 /* TabBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,7 @@
 		8A87046D2B5E050F00183191 /* MoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreViewModel.swift; sourceTree = "<group>"; };
 		8A87046F2B5E051800183191 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8A8704712B5E051F00183191 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		8AFF980A2B60EA97008E8425 /* TabBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TabBarView.swift; path = ../../../../../../.Trash/TabBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -166,6 +168,7 @@
 		8A8704542B5E036900183191 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				8AFF980A2B60EA97008E8425 /* TabBarView.swift */,
 				8A87045B2B5E041100183191 /* ExploreView.swift */,
 				8A87045D2B5E042200183191 /* LoadingView.swift */,
 				8A87045F2B5E042B00183191 /* MapView.swift */,
@@ -356,6 +359,7 @@
 				8A8704602B5E042B00183191 /* MapView.swift in Sources */,
 				8A8704722B5E051F00183191 /* SearchViewModel.swift in Sources */,
 				8A8704702B5E051800183191 /* ProfileViewModel.swift in Sources */,
+				8AFF980B2B60EA98008E8425 /* TabBarView.swift in Sources */,
 				8A87045A2B5E03B900183191 /* color_hex.swift in Sources */,
 				8A87046E2B5E050F00183191 /* MoreViewModel.swift in Sources */,
 				8A8704682B5E04F000183191 /* ExploreViewModel.swift in Sources */,
