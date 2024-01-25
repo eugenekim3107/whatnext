@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = Tab.map
+    @State private var selectedTab = Tab.explore
 
     init() {
         UITabBar.appearance().isHidden = true
@@ -39,7 +39,6 @@ struct ContentView: View {
                         .animation(nil, value: selectedTab)
                         .tag(Tab.more)
                 }
-                .edgesIgnoringSafeArea(.bottom)
             }
 
             VStack {

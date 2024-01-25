@@ -10,7 +10,7 @@ struct LoadingView: View {
     @State private var isActive = false
     @State private var size = 0.8
     @State private var opacity = 0.5
-    @State private var selectedTab: Tab = .map
+    @State private var selectedTab: Tab = .explore
     
     var body: some View {
         if isActive {
