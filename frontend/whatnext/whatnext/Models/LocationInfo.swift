@@ -11,4 +11,5 @@ struct LocationInfo: Codable, Identifiable {
     let id: String
     let name: String
     let imageUrl: String
+    let rating: Double
 }

@@ -35,7 +35,7 @@ import Foundation
 // testing file
 class LocationService {
     func fetchLocations(completion: @escaping ([LocationInfo]) -> Void) {
-        if let url = Bundle.main.url(forResource: "TestData", withExtension: "json"),
+        if let url = Bundle.main.url(forResource: "example", withExtension: "json"),
            let data = try? Data(contentsOf: url) {
             do {
                 let locations = try JSONDecoder().decode([LocationInfo].self, from: data)

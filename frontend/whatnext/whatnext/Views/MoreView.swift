@@ -33,6 +33,7 @@ struct MoreView: View {
                         }
                     }
                 }
+                .foregroundColor(Color.black)
                 
                 Section("Feedback") {
                     ForEach(feedbacks, id: \.name) { feedback in
@@ -42,7 +43,7 @@ struct MoreView: View {
                                 .id(feedback.name)
                         }
                     }
-                }
+                }.foregroundColor(Color.black)
                 
                 Section("Terms And Conditions") {
                     ForEach(terms, id: \.name) { term in
@@ -52,7 +53,8 @@ struct MoreView: View {
                                 .id(term.name)
                         }
                     }
-                }
+                }.foregroundColor(Color.black)
+                
                 Spacer().listRowBackground(Color.clear)
             }
             .navigationTitle("More")
