@@ -11,17 +11,11 @@ class LocationRowViewModel: ObservableObject {
     @Published var locations: [LocationInfo] = []
     private let locationService = LocationService()
 
-//    func fetchLocations() {
-//        locationService.fetchLocations { [weak self] fetchedLocations in
-//            DispatchQueue.main.async {
-//                self?.locations = fetchedLocations
-//            }
-//        }
-//    }
-    
-    func fetchLocations() {
-        locationService.fetchLocations { [weak self] fetchedLocations in
-            self?.locations = fetchedLocations
+    func fetchLocations(latitude: Double, longitude: Double, categories: String, radius: Int = 10000, cur_open: Bool = false, sort_by: String = "rating", limit: Int = 10, api_key: String) {
+        locationService.fetchLocations(latitude: latitude, longitude: longitude, categories: categories, radius: radius, cur_open: cur_open, sort_by: sort_by, limit: limit, api_key: api_key) { [weak self] fetchedLocations in
+                    DispatchQueue.main.async {
+                self?.locations = fetchedLocations
+            }
         }
     }
 }

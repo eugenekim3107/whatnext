@@ -35,8 +35,6 @@
 		8ACD17BE2B61F4C50029487A /* LocationRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */; };
 		8ACD17C02B61F75D0029487A /* example.json in Resources */ = {isa = PBXBuildFile; fileRef = 8ACD17BF2B61F75D0029487A /* example.json */; };
 		8ACD17C42B6200860029487A /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17C32B6200860029487A /* TabBarView.swift */; };
-		8ACD17C62B6218F90029487A /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17C52B6218F90029487A /* ImageLoader.swift */; };
-		8ACD17C82B62195D0029487A /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17C72B62195D0029487A /* AsyncImageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,8 +88,6 @@
 		8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowViewModel.swift; sourceTree = "<group>"; };
 		8ACD17BF2B61F75D0029487A /* example.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = example.json; sourceTree = "<group>"; };
 		8ACD17C32B6200860029487A /* TabBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
-		8ACD17C52B6218F90029487A /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
-		8ACD17C72B62195D0029487A /* AsyncImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,7 +188,6 @@
 				8A8704632B5E043C00183191 /* ProfileView.swift */,
 				8A8704652B5E044500183191 /* SearchView.swift */,
 				8ACD17C32B6200860029487A /* TabBarView.swift */,
-				8ACD17C72B62195D0029487A /* AsyncImageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -207,7 +202,6 @@
 				8A87046D2B5E050F00183191 /* MoreViewModel.swift */,
 				8A87046F2B5E051800183191 /* ProfileViewModel.swift */,
 				8A8704712B5E051F00183191 /* SearchViewModel.swift */,
-				8ACD17C52B6218F90029487A /* ImageLoader.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -390,12 +384,10 @@
 				8A8704602B5E042B00183191 /* MapView.swift in Sources */,
 				8A8704722B5E051F00183191 /* SearchViewModel.swift in Sources */,
 				8A8704702B5E051800183191 /* ProfileViewModel.swift in Sources */,
-				8ACD17C82B62195D0029487A /* AsyncImageView.swift in Sources */,
 				8ACD17BE2B61F4C50029487A /* LocationRowViewModel.swift in Sources */,
 				8ACD17C42B6200860029487A /* TabBarView.swift in Sources */,
 				8A87045A2B5E03B900183191 /* color_hex.swift in Sources */,
 				8A87046E2B5E050F00183191 /* MoreViewModel.swift in Sources */,
-				8ACD17C62B6218F90029487A /* ImageLoader.swift in Sources */,
 				8A8704682B5E04F000183191 /* ExploreViewModel.swift in Sources */,
 				8A87045C2B5E041100183191 /* ExploreView.swift in Sources */,
 				8A87045E2B5E042200183191 /* LoadingView.swift in Sources */,
