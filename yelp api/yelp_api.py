@@ -41,7 +41,8 @@ def search_business_details(api_key,business_id):
 # search nearby restaurants by geo location,sorted by rating, and only return places are currently open
 
 
-def search_nearby_restaurants(api_key, latitude, longitude, categories='restaurants',radius=20000,cur_open=True,sort_by="rating",include_reviews=True,limit=50):
+
+def search_nearby(api_key, latitude, longitude, categories='restaurants',radius=20000,cur_open=True,sort_by="rating",include_reviews=True,limit=10):
     headers = {'Authorization': f'Bearer {api_key}'}
     url = 'https://api.yelp.com/v3/businesses/search'
     params = {'latitude': latitude, 'longitude': -1*longitude,"categories": categories,"radius":radius,"limit":limit,'open_now':cur_open,"sort_by":sort_by}
@@ -49,30 +50,37 @@ def search_nearby_restaurants(api_key, latitude, longitude, categories='restaura
     response = requests.get(url, headers=headers, params=params)
     data = response.json()
     if include_reviews:
-        res = [{"rating":d["rating"],
-            "id":d["id"],
-            "image":d['image_url'],
-            "name":d["name"],
-            "latitude":d["coordinates"]['latitude'],
-            "longitude":d["coordinates"]['longitude'],
-            "address":d['location']['address1'],
-            "transactions":d['transactions'],
-            "tag":[alias["alias"] for alias in d['categories']],
-            "contact":d["phone"],
-           "reviews":get_reviews(api_key,d["id"])} for d in data['businesses']]
+        res = [{"rating":d["rating"] if "rating" in d else None,
+               "id":d["id"] if "id" in d else None,
+               "image":d['image_url'] if 'image_url' in d else None,
+                "review_count":d["review_count"] if "review_count" in d else None,
+                "name":d["name"] if "name" in d else None,
+                "latitude":d["coordinates"]['latitude'] if "coordinates" in d and 'latitude' in d["coordinates"] else None,
+                "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
+                "transactions":d['transactions'] if "transactions" in d else None,
+                "tag":[alias["alias"] for alias in d['categories']],
+                "contact":d["phone"] if "contact" in d else None,
+                "distance":d["distance"] if "distance" in d else None,
+                "price":str(d["price"]) if "price" in d else None,
+                "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None,
+                "reviews":get_reviews(api_key,d["id"])} for d in data['businesses']]
     else:
-        res = [{"rating":d["rating"],
-               "id":d["id"],
-               "image":d['image_url'],
-            "name":d["name"],
-            "latitude":d["coordinates"]['latitude'],
-            "longitude":d["coordinates"]['longitude'],
-            "address":d['location']['address1'],
-            "transactions":d['transactions'],
-            "tag":[alias["alias"] for alias in d['categories']],
-            "contact":d["phone"]} for d in data['businesses']]
+        res = [{"rating":d["rating"] if "rating" in d else None,
+               "id":d["id"] if "id" in d else None,
+               "image":d['image_url'] if 'image_url' in d else None,
+                "review_count":d["review_count"] if "review_count" in d else None,
+                "name":d["name"] if "name" in d else None,
+                "latitude":d["coordinates"]['latitude'] if "coordinates" in d and 'latitude' in d["coordinates"] else None,
+                "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
+                "transactions":d['transactions'] if "transactions" in d else None,
+                "tag":[alias["alias"] for alias in d['categories']],
+                "contact":d["phone"] if "contact" in d else None,
+                "distance":d["distance"] if "distance" in d else None,
+                "price":str(d["price"]) if "price" in d else None,
+                "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None} for d in data['businesses']]
 
     return res
+
 
 
 
