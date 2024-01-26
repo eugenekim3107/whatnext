@@ -52,32 +52,32 @@ def search_nearby_restaurants(api_key, latitude, longitude, categories='restaura
     if include_reviews:
         res = [{"rating":d["rating"] if "rating" in d else None,
                "id":d["id"] if "id" in d else None,
-               "image":d['image_url'] if 'image_url' in d else None,
+               "image_url":d['image_url'] if 'image_url' in d else None,
+                "is_closed":d["is_closed"] if "is_closed" in d else None,
                 "review_count":d["review_count"] if "review_count" in d else None,
                 "name":d["name"] if "name" in d else None,
                 "latitude":d["coordinates"]['latitude'] if "coordinates" in d and 'latitude' in d["coordinates"] else None,
                 "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
-                "transactions":d['transactions'] if "transactions" in d else None,
                 "tag":[alias["alias"] for alias in d['categories']],
-                "contact":d["phone"] if "phone" in d else None,
+                "contact":d["phone"] if "contact" in d else None,
                 "distance":d["distance"] if "distance" in d else None,
                 "price":str(d["price"]) if "price" in d else None,
-                "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None,
+                "address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None,
                 "reviews":get_reviews(api_key,d["id"])} for d in data['businesses']]
     else:
         res = [{"rating":d["rating"] if "rating" in d else None,
                "id":d["id"] if "id" in d else None,
-               "image":d['image_url'] if 'image_url' in d else None,
+               "image_url":d['image_url'] if 'image_url' in d else None,
                 "review_count":d["review_count"] if "review_count" in d else None,
+                "is_closed":d["is_closed"] if "is_closed" in d else None,
                 "name":d["name"] if "name" in d else None,
                 "latitude":d["coordinates"]['latitude'] if "coordinates" in d and 'latitude' in d["coordinates"] else None,
                 "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
-                "transactions":d['transactions'] if "transactions" in d else None,
                 "tag":[alias["alias"] for alias in d['categories']],
                 "contact":d["phone"] if "phone" in d else None,
                 "distance":d["distance"] if "distance" in d else None,
                 "price":str(d["price"]) if "price" in d else None,
-                "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None} for d in data['businesses']]
+                "address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None} for d in data['businesses']]
 
     return res
 
