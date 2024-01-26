@@ -6,6 +6,9 @@ app = FastAPI()
 YELP_API_KEY = 'sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx'
 OPENAI_API_KEY = 'your_openai_api_key'
 
+
+
+
 async def fetch_yelp_data(latitude: float, longitude: float):
     url = "https://api.yelp.com/v3/businesses/search"
     headers = {"Authorization": f"Bearer {YELP_API_KEY}"}

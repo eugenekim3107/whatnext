@@ -42,7 +42,7 @@ def search_business_details(api_key,business_id):
 
 
 
-def search_nearby(api_key, latitude, longitude, categories='restaurants',radius=20000,cur_open=True,sort_by="rating",include_reviews=True,limit=10):
+def search_nearby_restaurants(api_key, latitude, longitude, categories='restaurants',radius=20000,cur_open=True,sort_by="rating",include_reviews=True,limit=10):
     headers = {'Authorization': f'Bearer {api_key}'}
     url = 'https://api.yelp.com/v3/businesses/search'
     params = {'latitude': latitude, 'longitude': -1*longitude,"categories": categories,"radius":radius,"limit":limit,'open_now':cur_open,"sort_by":sort_by}
@@ -59,7 +59,7 @@ def search_nearby(api_key, latitude, longitude, categories='restaurants',radius=
                 "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
                 "transactions":d['transactions'] if "transactions" in d else None,
                 "tag":[alias["alias"] for alias in d['categories']],
-                "contact":d["phone"] if "contact" in d else None,
+                "contact":d["phone"] if "phone" in d else None,
                 "distance":d["distance"] if "distance" in d else None,
                 "price":str(d["price"]) if "price" in d else None,
                 "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None,
@@ -74,7 +74,7 @@ def search_nearby(api_key, latitude, longitude, categories='restaurants',radius=
                 "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
                 "transactions":d['transactions'] if "transactions" in d else None,
                 "tag":[alias["alias"] for alias in d['categories']],
-                "contact":d["phone"] if "contact" in d else None,
+                "contact":d["phone"] if "phone" in d else None,
                 "distance":d["distance"] if "distance" in d else None,
                 "price":str(d["price"]) if "price" in d else None,
                 "display_address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None} for d in data['businesses']]
