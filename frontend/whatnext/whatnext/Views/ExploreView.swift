@@ -9,18 +9,18 @@ import SwiftUI
 
 struct ExploreView: View {
     var body: some View {
-        let viewModel1 = LocationRowViewModel()
-        let viewModel2 = LocationRowViewModel()
-        let viewModel3 = LocationRowViewModel()
-        let viewModel4 = LocationRowViewModel()
+//        let viewModel1 = LocationRowViewModel()
+//        let viewModel2 = LocationRowViewModel()
+//        let viewModel3 = LocationRowViewModel()
+//        let viewModel4 = LocationRowViewModel()
 
         NavigationView {
             ScrollView {
                 VStack (spacing: 0) {
-                    LocationRowView(viewModel: viewModel1, title: "Picks For You")
-                    LocationRowView(viewModel: viewModel2, title: "Food and Drinks")
-                    LocationRowView(viewModel: viewModel3, title: "Trending Spots")
-                    LocationRowView(viewModel: viewModel4, title: "Outdoor Activites")
+//                    LocationRowView(viewModel: viewModel1, title: "Picks For You")
+//                    LocationRowView(viewModel: viewModel2, title: "Food and Drinks")
+//                    LocationRowView(viewModel: viewModel3, title: "Trending Spots")
+//                    LocationRowView(viewModel: viewModel4, title: "Outdoor Activites")
                 }
                 .navigationBarTitle("Explore", displayMode: .large)
                 .padding(.top)
