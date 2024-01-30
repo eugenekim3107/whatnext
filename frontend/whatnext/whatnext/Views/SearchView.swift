@@ -1,20 +1,44 @@
-//
-//  SearchView.swift
-//  whatnext
-//
-//  Created by Eugene Kim on 1/21/24.
-//
-
 import SwiftUI
 
 struct SearchView: View {
+    @State private var searchText = ""
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TabView {
+            NavigationView {
+                VStack {
+                    Spacer()
+                    Image("logo-icon") // Replace with your logo image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 100)
+                    Text("Let's find your next favorite spot!")
+                        .font(.headline)
+                    Text("What are you in the mood for?")
+                        .font(.headline)
+                    Image("openai-icon")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 120, height: 120,alignment:.top)
+                    Spacer(minLength:270)
+                    TextField("Type your message here...", text: $searchText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(.horizontal, 50)
+                    Spacer()
+                }
+                .navigationBarTitle("Search", displayMode: .large)
+                .padding(.top)
+                .padding(.bottom, 50)
+            }
+
+            // Add other tabs here...
+        }
     }
 }
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchView()
+        ContentView()
     }
 }
+
