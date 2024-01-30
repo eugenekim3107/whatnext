@@ -17,6 +17,5 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
         locationManager.requestWhenInUseAuthorization()
     }
 
-    // Implement CLLocationManagerDelegate methods here.
 }
 

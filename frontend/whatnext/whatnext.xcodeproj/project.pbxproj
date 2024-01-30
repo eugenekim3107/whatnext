@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		78F048122B5FEC0F0072AAFA /* MapViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F048112B5FEC0F0072AAFA /* MapViewCoordinator.swift */; };
 		78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F048132B5FEC710072AAFA /* LocationManager.swift */; };
 		8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3938132B61E80900B29646 /* LocationRowView.swift */; };
 		8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8704292B5E022800183191 /* whatnextApp.swift */; };
@@ -56,7 +55,6 @@
 
 /* Begin PBXFileReference section */
 		78F0480A2B5FE4A00072AAFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		78F048112B5FEC0F0072AAFA /* MapViewCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewCoordinator.swift; sourceTree = "<group>"; };
 		78F048132B5FEC710072AAFA /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8A3938132B61E80900B29646 /* LocationRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowView.swift; sourceTree = "<group>"; };
 		8A8704262B5E022800183191 /* whatnext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = whatnext.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -183,7 +181,6 @@
 				8A87045D2B5E042200183191 /* LoadingView.swift */,
 				8A3938132B61E80900B29646 /* LocationRowView.swift */,
 				8A87045F2B5E042B00183191 /* MapView.swift */,
-				78F048112B5FEC0F0072AAFA /* MapViewCoordinator.swift */,
 				8A8704612B5E043300183191 /* MoreView.swift */,
 				8A8704632B5E043C00183191 /* ProfileView.swift */,
 				8A8704652B5E044500183191 /* SearchView.swift */,
@@ -373,7 +370,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				78F048122B5FEC0F0072AAFA /* MapViewCoordinator.swift in Sources */,
 				78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */,
 				8A87046A2B5E04FE00183191 /* LoadingViewModel.swift in Sources */,
 				8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */,
@@ -549,7 +545,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"whatnext/Preview Content\"";
-				DEVELOPMENT_TEAM = 3G7VVNP57S;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -592,7 +588,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"whatnext/Preview Content\"";
-				DEVELOPMENT_TEAM = 3G7VVNP57S;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -633,7 +629,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3G7VVNP57S;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
@@ -656,7 +652,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 3G7VVNP57S;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;

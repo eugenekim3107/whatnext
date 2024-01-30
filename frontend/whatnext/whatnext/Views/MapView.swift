@@ -3,30 +3,56 @@
 //  whatnext
 //
 //  Created by Eugene Kim on 1/21/24.
-//
+//  updated by Mike on 1/28/24
 
 import SwiftUI
 import MapKit
 
-struct MapView: UIViewRepresentable {
-    func makeUIView(context: Context) -> MKMapView {
-        print("makeUIView called")
-        let mapView = MKMapView()
-        mapView.delegate = context.coordinator
-        return mapView
-    }
+struct MapView: View {
+    @StateObject private var viewModel = MapViewModel()
+    @State private var trackingMode: MapUserTrackingMode = .follow // State to track user location
 
-    func updateUIView(_ uiView: MKMapView, context: Context) {
-        // Perform any updates to the UI here.
-    }
+    var body: some View {
+            Map(coordinateRegion: $viewModel.region,
+                interactionModes: .all,
+                showsUserLocation: true,
+                userTrackingMode: $trackingMode,
+                annotationItems: viewModel.locations) { location in
+                                MapAnnotation(coordinate: location.coordinate) {
+                                    AnnotationView(imageUrl: location.imageUrl)
+                                }
+                            }
+                .ignoresSafeArea(edges: .all)
+        }
+}
 
-    func makeCoordinator() -> MapViewCoordinator {
-        MapViewCoordinator()
+struct AnnotationView: View {
+    let imageUrl: String
+
+    var body: some View {
+        if let url = URL(string: imageUrl) {
+            AsyncImage(url: url) { image in
+                image.resizable()
+                     .scaledToFit()
+                     .frame(width: 60, height: 60) // Customize the size as needed
+                     .clipShape(Rectangle())
+            } placeholder: {
+                ProgressView()
+            }
+        } else {
+            // Provide a fallback view in case the URL is invalid
+            Image(systemName: "photo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 30, height: 30)
+                .clipShape(Rectangle())
+        }
     }
 }
 
+
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
-        MapView().edgesIgnoringSafeArea(.bottom)
+        MapView()
     }
 }
