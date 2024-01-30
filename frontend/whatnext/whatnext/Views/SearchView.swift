@@ -1,5 +1,8 @@
 import SwiftUI
 
+
+
+//Created by Wenzhou Lyu
 struct SearchView: View {
     @State private var searchText = ""
 
@@ -26,9 +29,6 @@ struct SearchView: View {
                         .padding(.horizontal, 50)
                     Spacer()
                 }
-                .navigationBarTitle("Search", displayMode: .large)
-                .padding(.top)
-                .padding(.bottom, 50)
             }
 
             // Add other tabs here...
