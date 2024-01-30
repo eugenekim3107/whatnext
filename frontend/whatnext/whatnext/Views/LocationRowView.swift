@@ -13,6 +13,10 @@ struct LocationRowView: View {
     let latitude: Double
     let longitude: Double
     let categories: String
+    let radius: Double
+    let cur_open: Bool
+    let sort_by: String
+    let limit: Int
     let api_key: String
     @State private var scrollIndex = 0
     @State private var timer: Timer?
@@ -25,68 +29,76 @@ struct LocationRowView: View {
                 .foregroundColor(.black)
                 .padding(.leading)
             
-            ScrollViewReader { scrollView in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 5) {
-                        ForEach(viewModel.locations, id: \.id) { location in
-                            VStack(spacing: 0) {
-                                ZStack(alignment: .topLeading) {
-                                    if let url = URL(string: location.image_url ?? "") {
-                                        ZStack{
-                                            AsyncImage(url: url) { image in
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                            } placeholder: {
-                                                ProgressView()
+            if viewModel.isLoading {
+                PlaceholderView()
+            } else {
+                ScrollViewReader { scrollView in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 5) {
+                            ForEach(viewModel.locations, id: \.id) { location in
+                                VStack(spacing: 0) {
+                                    ZStack(alignment: .topLeading) {
+                                        if let url = URL(string: location.image_url ?? "") {
+                                            ZStack{
+                                                AsyncImage(url: url) { image in
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                } placeholder: {
+                                                    ProgressView()
+                                                }
                                             }
+                                            .frame(width: 110, height: 110)
+                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        } else {
+                                            Color.gray.opacity(0.3)
                                         }
-                                        .frame(width: 110, height: 110)
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        
+                                        HStack(spacing: 2) {
+                                            Image(systemName: "star.fill")
+                                                .resizable()
+                                                .frame(width: 10, height: 10)
+                                                .foregroundColor(.yellow)
+                                            Text(String(format: "%.1f", location.rating ))
+                                                .font(.system(size: 10))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(3)
+                                        .background(Color.gray)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                        .padding([.top, .leading], 5)
                                     }
-                                    
-                                    HStack(spacing: 2) {
-                                        Image(systemName: "star.fill")
-                                            .resizable()
-                                            .frame(width: 10, height: 10)
-                                            .foregroundColor(.yellow)
-                                        Text(String(format: "%.1f", location.rating ))
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.white)
-                                    }
-                                    .padding(3)
-                                    .background(Color.gray)
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    .padding([.top, .leading], 5)
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    Text(location.name )
+                                        .font(.system(size: 14))
+                                        .lineLimit(2)
+                                        .multilineTextAlignment(.center)
+                                        .truncationMode(.tail)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .frame(height: 50)
+                                        .frame(width: 110)
                                 }
-                                Text(location.name )
-                                    .font(.system(size: 14))
-                                    .lineLimit(2)
-                                    .multilineTextAlignment(.center)
-                                    .truncationMode(.tail)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .frame(height: 50)
-                                    .frame(width: 110)
                             }
                         }
+                        .gesture(
+                            DragGesture().onChanged { _ in
+                                isManuallyScrolling = true
+                                timer?.invalidate()
+                            }
+                                .onEnded { _ in
+                                    isManuallyScrolling = false
+                                    startTimer(scrollView: scrollView)
+                                }
+                        )
                     }
-                    .gesture(
-                        DragGesture().onChanged { _ in
-                            isManuallyScrolling = true
-                            timer?.invalidate()
-                        }
-                        .onEnded { _ in
-                            isManuallyScrolling = false
-                            startTimer(scrollView: scrollView)
-                        }
-                    )
-                }
-                .padding([.leading, .trailing])
-                .onAppear {
-                    startTimer(scrollView: scrollView)
-                }
-                .onDisappear {
-                    timer?.invalidate()
+                    .padding([.leading, .trailing])
+                    .onAppear {
+                        startTimer(scrollView: scrollView)
+                    }
+                    .onDisappear {
+                        timer?.invalidate()
+                    }
                 }
             }
         }
@@ -105,16 +117,30 @@ struct LocationRowView: View {
         }
     }
 }
+    
+struct PlaceholderView: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 150)
+            .padding(.horizontal)
+            .redacted(reason: .placeholder)
+    }
+}
 
 struct LocationRowView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = LocationRowViewModel()
         return LocationRowView(
             viewModel: viewModel,
-            title: "Food And Drinks",
+            title: "Let's Workout!",
             latitude: 32.88088,
             longitude: 117.23790,
-            categories: "fitness",
+            categories: "gyms",
+            radius: 10000,
+            cur_open: true,
+            sort_by: "review_count",
+            limit: 15,
             api_key: "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"
         )
     }
