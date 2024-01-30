@@ -1,10 +1,3 @@
-//
-//  SearchView.swift
-//  whatnext
-//
-//  Created by Eugene Kim on 1/21/24.
-//
-
 import SwiftUI
 
 //Created by Wenzhou Lyu
@@ -43,6 +36,7 @@ struct SearchView: View {
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {
-        SearchView()
+        ContentView()
     }
 }
+
