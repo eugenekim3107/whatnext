@@ -39,7 +39,6 @@ class LocationService {
             do {
                 let jsonResponse = try JSONDecoder().decode(YelpResponse.self, from: data)
                 let locations = jsonResponse.businesses
-
                 DispatchQueue.main.async {
                     completion(locations)
                 }
