@@ -1,133 +1,104 @@
-from fastapi import FastAPI, HTTPException
-import httpx
-import requests
-from typing import List
+from fastapi import FastAPI, Security, HTTPException, Depends
+from fastapi.security.api_key import APIKeyHeader
+from starlette.status import HTTP_403_FORBIDDEN
+from pymongo import MongoClient
+from typing import List, Optional, Dict
 from pydantic import BaseModel
+from datetime import datetime, timedelta
+import pytz
+
+# API key credentials
+API_KEY = "whatnext"
+API_KEY_NAME = "whatnext_token"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+# MongoDB (make sure to change the ip address to match the ec2 instance ip address)
+client = MongoClient("mongodb://eugenekim:whatnext@localhost:8000/")
+db = client["locationDatabase"]
+
+class GeoJSON(BaseModel):
+    type: str
+    coordinates: List[float]
+
+class Location(BaseModel):
+    business_id: str
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    location: GeoJSON
+    stars: Optional[float] = None
+    review_count: int = 0
+    attributes: Optional[Dict[str, str]] = None
+    categories: Optional[str] = None
+    hours: Optional[Dict[str, str]] = None
 
 app = FastAPI()
 
-YELP_API_KEY = 'sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx'
-OPENAI_API_KEY = 'your_openai_api_key'
-
-#model for each bussiness instance
-class bussiness(BaseModel):
-    rating: str
-    id:str
-    image_url:str
-    review_count:str
-    is_closed:str
-    name:str
-    latitude:str
-    longitude:str
-    tag:List
-    contact:str
-    distance:str
-    price:str
-    address:str
-
-# model for location input as json
-class Coordinates(BaseModel):
-    latitude: float
-    longitude: float
-    
-
-
-@app.get("/")
-def root():
-    return "Welcome To WhatNext API Home"
-
-async def fetch_yelp_data(latitude: float, longitude: float):
-    url = "https://api.yelp.com/v3/businesses/search"
-    headers = {"Authorization": f"Bearer {YELP_API_KEY}"}
-    params = {"latitude": latitude, "longitude": longitude}
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers, params=params)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Error in Yelp API call")
-    
-    return response.json()
-
-async def get_sorted_recommendations(yelp_data, user_preference):
-    prompt = f"Sort these businesses based on the user preference '{user_preference}': {yelp_data}"
-    url = "https://api.openai.com/v1/engines/davinci-codex/completions"
-    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
-    json_data = {"prompt": prompt, "max_tokens": 500}
-
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, json=json_data)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Error in OpenAI API call")
-
-    return response.json()
-
-# search nearby restaurants by geo location,sorted by rating, and only return places are currently open
-@app.post("/recommendations/")
-async def recommendations(latitude: float, longitude: float, user_preference: str):
-    yelp_data = await fetch_yelp_data(latitude, longitude)
-    sorted_recommendations = await get_sorted_recommendations(yelp_data, user_preference)
-    return sorted_recommendations
-
-
-@app.post("/search_near/")
-async def recommendations(coord:Coordinates)-> List[bussiness]:
-    yelp_data = await search_nearby_restaurants(YELP_API_KEY,coord.latitude,coord.longitude,include_reviews=False)
-    return yelp_data
-    
-
-
-async def search_nearby_restaurants(api_key, latitude, longitude, categories='restaurants',radius=20000,cur_open=True,sort_by="rating",include_reviews=True,limit=10):
-    headers = {'Authorization': f'Bearer {api_key}'}
-    url = 'https://api.yelp.com/v3/businesses/search'
-    params = {'latitude': latitude, 'longitude': -1*longitude,"categories": categories,"radius":radius,"limit":limit,'open_now':cur_open,"sort_by":sort_by}
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers, params=params)
-    if response.status_code!=200:
-        raise HTTPException(status_code=400, detail="Error in Yelp API search call")
-    data = response.json()
-    if include_reviews:
-        res = [{"rating":d["rating"] if "rating" in d else None,
-               "id":d["id"] if "id" in d else None,
-               "image_url":d['image_url'] if 'image_url' in d else None,
-                "is_closed":d["is_closed"] if "is_closed" in d else None,
-                "review_count":d["review_count"] if "review_count" in d else None,
-                "name":d["name"] if "name" in d else None,
-                "latitude":d["coordinates"]['latitude'] if "coordinates" in d and 'latitude' in d["coordinates"] else None,
-                "longitude":d["coordinates"]['longitude'] if "coordinates" in d and 'longitude' in d["coordinates"] else None,
-                "tag":str([alias["alias"] for alias in d['categories']]),
-                "contact":d["phone"] if "contact" in d else None,
-                "distance":d["distance"] if "distance" in d else None,
-                "price":str(d["price"]) if "price" in d else None,
-                "address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else None,
-                "reviews":get_reviews(api_key,d["id"])} for d in data['businesses']]
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
     else:
-        res = [{"rating":str(d["rating"]) if "rating" in d else "",
-               "id":str(d["id"]) if "id" in d else "",
-               "image_url":str(d['image_url']) if 'image_url' in d else "",
-                "review_count":str(d["review_count"]) if "review_count" in d else "",
-                "is_closed":str(d["is_closed"]) if "is_closed" in d else "",
-                "name":str(d["name"]) if "name" in d else "",
-                "latitude":str(d["coordinates"]['latitude']) if "coordinates" in d and 'latitude' in d["coordinates"] else "",
-                "longitude":str(d["coordinates"]['longitude']) if "coordinates" in d and 'longitude' in d["coordinates"] else "",
-                "tag":[alias["alias"] for alias in d['categories']],
-                "contact":str(d["phone"]) if "phone" in d else "",
-                "distance":str(d["distance"]) if "distance" in d else "",
-                "price":str(d["price"]) if "price" in d else "",
-                "address":' ,'.join(d['location']['display_address']) if "location" in d and "display_address" in d['location'] else ""} for d in data['businesses']]
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key"
+        )
 
-    return res
+def is_within_hours(now, hours_str):
+    if not hours_str or hours_str == "0:0-0:0":
+        return False
+    open_time_str, close_time_str = hours_str.split('-')
+    open_hour, open_minute = map(int, open_time_str.split(':'))
+    close_hour, close_minute = map(int, close_time_str.split(':'))
 
-
-async def get_reviews(api_key, business_id):
-    headers = {'Authorization': f'Bearer {api_key}'}
-    url = f'https://api.yelp.com/v3/businesses/{business_id}/reviews'
+    open_time = now.replace(hour=open_hour, minute=open_minute, second=0, microsecond=0)
+    close_time = now.replace(hour=close_hour, minute=close_minute, second=0, microsecond=0)
     
-    response = requests.get(url, headers=headers)
-    if response.status_code !=200:
-        raise HTTPException(status_code=400, detail="Error in Yelp API Review Call")
-    data = response.json()
-    res = [r["text"] for r in data["reviews"]]
-    return res
+    if close_time < open_time:
+        close_time = close_time + timedelta(days=1)
+    
+    return open_time <= now <= close_time
+
+@app.get("/nearby_locations", response_model=List[Location])
+async def nearby_locations(latitude: float=36.1513871523,
+                           longitude: float=-86.7966029393,
+                           limit: int=1,
+                           radius: float=10000.0,
+                           categories: str="any", # 'any' is all categories
+                           cur_open: int=1,
+                           sort_by: str="review_count",
+                           api_key: str = Depends(get_api_key)):
+    
+    query = {
+        "location": {
+            "$nearSphere": {
+                "$geometry": {
+                    "type": "Point",
+                    "coordinates": [longitude, latitude]
+                },
+                "$maxDistance": radius
+            }
+        },
+        "is_open": 1,
+    }
+
+    if categories.lower() != "any":
+        query["categories"] = {"$regex": categories, "$options": "i"} 
+
+    now = datetime.now()
+
+    try:
+        items = db.locations.find(query).sort(sort_by, -1).limit(limit)
+        open_businesses = []
+
+        for item in items:
+            day_of_week = now.strftime('%A')
+            hours_str = item.get('hours', {}).get(day_of_week, "")
+
+            if cur_open != 1 or (cur_open == 1 and is_within_hours(now, hours_str)):
+                open_businesses.append(Location(**item))
+
+        return open_businesses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    

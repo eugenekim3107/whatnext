@@ -6,6 +6,9 @@
 Below is my yelp API, you can register a yelp api account and use yours.
 `api_key = "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"`
 
+Eugene's API:
+`api_key = "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"`
+
 
 If you want to use Serpapi, below is my api key 
 `api_key = 'f7e8aa3da4f9e3df7389bf69b090ff50762319c0a8a8c954a967dcdcfdf59f41'`
