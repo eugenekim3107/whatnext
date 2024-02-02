@@ -74,11 +74,11 @@ curl -k -H "whatnext_token: whatnext" "https://whatnext.live/api/nearby_location
 
 ## Important Notes
 
-**Official Website**: whatnext.live
+**Official Website**: [whatnext.live](https://whatnext.live)
 
 ### Website and API Integration
 
-whatnext.live is designed to fulfill dual roles:
+[whatnext.live](https://whatnext.live) is designed to fulfill dual roles:
 
 1. **Web Hosting (Frontend)**: Serving as the primary access point for users to interact with our platform. The front-end is built with user experience in mind, offering intuitive navigation and responsive design.
 
