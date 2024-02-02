@@ -50,17 +50,53 @@ Ensure MongoDB is running on the EC2 instance. It should run automatically upon 
 ```
 systemctl status mongod
 ```
-To run the Docker container:
+If MongoDB is not running, initialize the database using:
 ```
-docker run -p 80:8000 whatnext-image:latest
+sudo systemctl start mongod
+sudo systemctl enable mongod
 ```
-- `80`: Port to accept HTTP requests.
-- `8000`: Specifies the port for the FastAPI server.
-- `whatnext-image:latest`: The Docker image name.
+Ensure the Docker container is running on the EC2 instance. It should run automatically upon initialization. To check the status of the Docker container:
+```
+docker ps
+```
+If the Docker conatiner is not running, initialize the database using:
+```
+docker run -d --restart=always --name whatnext-container -p 8000:8000 whatnext-image
+```
+- `whatnext-container`: The name of the container.
+- `whatnext-image`: The name of the image.
 
 ### Testing Endpoints
 To test an endpoint in production, use the following command:
 ```
-curl -X 'GET' 'http://<Elastic-IP>/nearby_locations' -H 'accept: application/json' -H 'whatnext_token: whatnext'
+curl -k -H "whatnext_token: whatnext" "https://whatnext.live/api/nearby_locations"
 ```
-Replace `Elastic-IP` with the actual Elastic IP address of your EC2 instance.
+
+## Important Notes
+
+**Official Website**: whatnext.live
+
+### Website and API Integration
+
+whatnext.live is designed to fulfill dual roles:
+
+1. **Web Hosting (Frontend)**: Serving as the primary access point for users to interact with our platform. The front-end is built with user experience in mind, offering intuitive navigation and responsive design.
+
+2. **API Endpoint (Backend)**: Powering the back-end services, WhatNext.live also acts as the gateway for API access, handling data requests and responses that drive the platform's functionality.
+
+### API Usage Guidelines
+
+To ensure clarity and maintain a structured approach to API interactions, all API endpoints adhere to a specific path convention:
+
+**Endpoint Prefix**: All API endpoints begin with `/api/`. This prefix is crucial for routing requests to the appropriate back-end services.
+Examples of API Endpoint Structures:
+- **GET Requests**: To retrieve data from our platform, you'll use the GET method with endpoints structured as follows:
+```
+https://whatnext.live/api/[endpoint-name]
+```
+- **POST Requests**: For submitting data to our platform, POST requests follow a similar structure:
+
+```
+https://whatnext.live/api/[endpoint-name]
+```
+By adhering to these guidelines, we ensure that API requests are efficiently processed and correctly directed to the back-end services, facilitating a robust and reliable platform for all users.
