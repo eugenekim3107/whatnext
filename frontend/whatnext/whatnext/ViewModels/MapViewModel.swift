@@ -43,9 +43,9 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         // Will be modified later to populate actual locations
         // critical
         self.locations = [
-            LocationInfo(id: "0", name: "Place One", imageUrl: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=2449&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude + 0.002, longitude: center.longitude + 0.002),
-            LocationInfo(id: "0", name: "Place Two", imageUrl: "https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude - 0.002, longitude: center.longitude - 0.002)
-            // Add more sample locations or implement your data fetching logic
+//            LocationInfo(id: "0", name: "Place One", imageUrl: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=2449&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude + 0.002, longitude: center.longitude + 0.002),
+//            LocationInfo(id: "0", name: "Place Two", imageUrl: "https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude - 0.002, longitude: center.longitude - 0.002)
+//            // Add more sample locations or implement your data fetching logic
         ]
     }
 

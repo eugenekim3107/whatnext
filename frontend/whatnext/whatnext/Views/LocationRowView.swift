@@ -10,39 +10,138 @@ import SwiftUI
 struct LocationRowView: View {
     @ObservedObject var viewModel: LocationRowViewModel
     let title: String
+    let latitude: Double
+    let longitude: Double
+    let categories: String
+    let radius: Double
+    let cur_open: Bool
+    let sort_by: String
+    let limit: Int
+    let api_key: String
+    @State private var scrollIndex = 0
+    @State private var timer: Timer?
+    @State private var isManuallyScrolling = false
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .font(.system(size: 25, weight: .bold))
                 .foregroundColor(.black)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(viewModel.locations, id: \.id) { location in
-                        VStack {
-                            // Replace with AsyncImageView if needed
-                            Image(location.imageUrl)
-                                .resizable()
-                                .frame(width: 120, height: 120)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                            Text(location.name)
+                .padding(.leading)
+            
+            if viewModel.isLoading {
+                PlaceholderView()
+            } else {
+                ScrollViewReader { scrollView in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 5) {
+                            ForEach(viewModel.locations, id: \.id) { location in
+                                VStack(spacing: 0) {
+                                    ZStack(alignment: .topLeading) {
+                                        if let url = URL(string: location.image_url ?? "") {
+                                            ZStack{
+                                                AsyncImage(url: url) { image in
+                                                    image
+                                                        .resizable()
+                                                        .scaledToFill()
+                                                } placeholder: {
+                                                    ProgressView()
+                                                }
+                                            }
+                                            .frame(width: 110, height: 110)
+                                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        } else {
+                                            Color.gray.opacity(0.3)
+                                        }
+                                        
+                                        HStack(spacing: 2) {
+                                            Image(systemName: "star.fill")
+                                                .resizable()
+                                                .frame(width: 10, height: 10)
+                                                .foregroundColor(.yellow)
+                                            Text(String(format: "%.1f", location.rating ))
+                                                .font(.system(size: 10))
+                                                .foregroundColor(.white)
+                                        }
+                                        .padding(3)
+                                        .background(Color.gray)
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                        .padding([.top, .leading], 5)
+                                    }
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    Text(location.name )
+                                        .font(.system(size: 14))
+                                        .lineLimit(2)
+                                        .multilineTextAlignment(.center)
+                                        .truncationMode(.tail)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                        .frame(height: 50)
+                                        .frame(width: 110)
+                                }
+                            }
                         }
+                        .gesture(
+                            DragGesture().onChanged { _ in
+                                isManuallyScrolling = true
+                                timer?.invalidate()
+                            }
+                                .onEnded { _ in
+                                    isManuallyScrolling = false
+                                    startTimer(scrollView: scrollView)
+                                }
+                        )
+                    }
+                    .padding([.leading, .trailing])
+                    .onAppear {
+                        startTimer(scrollView: scrollView)
+                    }
+                    .onDisappear {
+                        timer?.invalidate()
                     }
                 }
-                .padding(.horizontal, 5)
             }
         }
         .onAppear {
-            viewModel.fetchLocations()
+            viewModel.fetchLocations(latitude: latitude, longitude: longitude, categories: categories, api_key: api_key)
         }
+    }
+    
+    private func startTimer(scrollView: ScrollViewProxy) {
+        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
+            withAnimation {
+                guard !isManuallyScrolling, viewModel.locations.count > 0 else { return }
+                scrollIndex = (scrollIndex + 1) % viewModel.locations.count
+                scrollView.scrollTo(viewModel.locations[scrollIndex].id, anchor: .leading)
+            }
+        }
+    }
+}
+    
+struct PlaceholderView: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 150)
+            .padding(.horizontal)
+            .redacted(reason: .placeholder)
     }
 }
 
 struct LocationRowView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = LocationRowViewModel()
-        // Add mock locations to viewModel.locations if needed
-        return LocationRowView(viewModel: viewModel, title: "Favorites")
+        return LocationRowView(
+            viewModel: viewModel,
+            title: "Let's Workout!",
+            latitude: 32.88088,
+            longitude: 117.23790,
+            categories: "gyms",
+            radius: 10000,
+            cur_open: true,
+            sort_by: "review_count",
+            limit: 15,
+            api_key: "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"
+        )
     }
 }

@@ -18,8 +18,8 @@ struct MapView: View {
                 showsUserLocation: true,
                 userTrackingMode: $trackingMode,
                 annotationItems: viewModel.locations) { location in
-                                MapAnnotation(coordinate: location.coordinate) {
-                                    AnnotationView(imageUrl: location.imageUrl)
+                MapAnnotation(coordinate: location.coordinates.CLLocation) {
+                                    AnnotationView(imageUrl: location.image_url ?? "")
                                 }
                             }
                 .ignoresSafeArea(edges: .all)
