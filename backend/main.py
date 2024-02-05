@@ -1,40 +1,104 @@
-from fastapi import FastAPI, HTTPException
-import httpx
+from fastapi import FastAPI, Security, HTTPException, Depends
+from fastapi.security.api_key import APIKeyHeader
+from starlette.status import HTTP_403_FORBIDDEN
+from pymongo import MongoClient
+from typing import List, Optional, Dict
+from pydantic import BaseModel
+from datetime import datetime, timedelta
+import pytz
+
+# API key credentials
+API_KEY = "whatnext"
+API_KEY_NAME = "whatnext_token"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+# MongoDB (make sure to change the ip address to match the ec2 instance ip address)
+client = MongoClient("mongodb://eugenekim:whatnext@localhost:8000/")
+db = client["locationDatabase"]
+
+class GeoJSON(BaseModel):
+    type: str
+    coordinates: List[float]
+
+class Location(BaseModel):
+    business_id: str
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    location: GeoJSON
+    stars: Optional[float] = None
+    review_count: int = 0
+    attributes: Optional[Dict[str, str]] = None
+    categories: Optional[str] = None
+    hours: Optional[Dict[str, str]] = None
 
 app = FastAPI()
 
-YELP_API_KEY = 'your_yelp_api_key'
-OPENAI_API_KEY = 'your_openai_api_key'
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if api_key == API_KEY:
+        return api_key
+    else:
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key"
+        )
 
-async def fetch_yelp_data(latitude: float, longitude: float):
-    url = "https://api.yelp.com/v3/businesses/search"
-    headers = {"Authorization": f"Bearer {YELP_API_KEY}"}
-    params = {"latitude": latitude, "longitude": longitude}
+def is_within_hours(now, hours_str):
+    if not hours_str or hours_str == "0:0-0:0":
+        return False
+    open_time_str, close_time_str = hours_str.split('-')
+    open_hour, open_minute = map(int, open_time_str.split(':'))
+    close_hour, close_minute = map(int, close_time_str.split(':'))
+
+    open_time = now.replace(hour=open_hour, minute=open_minute, second=0, microsecond=0)
+    close_time = now.replace(hour=close_hour, minute=close_minute, second=0, microsecond=0)
     
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers, params=params)
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Error in Yelp API call")
+    if close_time < open_time:
+        close_time = close_time + timedelta(days=1)
     
-    return response.json()
+    return open_time <= now <= close_time
 
-async def get_sorted_recommendations(yelp_data, user_preference):
-    prompt = f"Sort these businesses based on the user preference '{user_preference}': {yelp_data}"
-    url = "https://api.openai.com/v1/engines/davinci-codex/completions"
-    headers = {"Authorization": f"Bearer {OPENAI_API_KEY}"}
-    json_data = {"prompt": prompt, "max_tokens": 500}
+@app.get("/nearby_locations", response_model=List[Location])
+async def nearby_locations(latitude: float=36.1513871523,
+                           longitude: float=-86.7966029393,
+                           limit: int=1,
+                           radius: float=10000.0,
+                           categories: str="any", # 'any' is all categories
+                           cur_open: int=1,
+                           sort_by: str="review_count",
+                           api_key: str = Depends(get_api_key)):
+    
+    query = {
+        "location": {
+            "$nearSphere": {
+                "$geometry": {
+                    "type": "Point",
+                    "coordinates": [longitude, latitude]
+                },
+                "$maxDistance": radius
+            }
+        },
+        "is_open": 1,
+    }
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, headers=headers, json=json_data)
+    if categories.lower() != "any":
+        query["categories"] = {"$regex": categories, "$options": "i"} 
 
-    if response.status_code != 200:
-        raise HTTPException(status_code=400, detail="Error in OpenAI API call")
+    now = datetime.now()
 
-    return response.json()
+    try:
+        items = db.locations.find(query).sort(sort_by, -1).limit(limit)
+        open_businesses = []
 
-@app.post("/recommendations")
-async def recommendations(latitude: float, longitude: float, user_preference: str):
-    yelp_data = await fetch_yelp_data(latitude, longitude)
-    sorted_recommendations = await get_sorted_recommendations(yelp_data, user_preference)
-    return sorted_recommendations
+        for item in items:
+            day_of_week = now.strftime('%A')
+            hours_str = item.get('hours', {}).get(day_of_week, "")
+
+            if cur_open != 1 or (cur_open == 1 and is_within_hours(now, hours_str)):
+                open_businesses.append(Location(**item))
+
+        return open_businesses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    

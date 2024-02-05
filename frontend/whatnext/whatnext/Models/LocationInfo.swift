@@ -12,12 +12,16 @@ struct YelpResponse: Codable {
     let businesses: [LocationInfo]
 }
 
-struct LocationInfo: Codable, Identifiable {
+struct YelpResponse: Codable {
+    let businesses: [LocationInfo]
+}
+
+struct LocationInfo: Codable {
     let id: String
     let name: String
     let image_url: String?
     let is_closed: Bool
-    let url: String
+    let url: String?
     let review_count: Int
     let categories: [Category]
     let rating: Double

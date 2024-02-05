@@ -3,6 +3,15 @@
 ## Introduction
 WhatNext? is an innovative mobile application designed to streamline the process of planning outings and activities. Leveraging the capabilities of GPT-4 and real-time location data, WhatNext? offers personalized and efficient recommendations for leisure activities, tailored to user preferences and current context.
 
+## Official Website
+**Domain URL**: [whatnext.live](https://whatnext.live)
+
+[whatnext.live](https://whatnext.live) is designed to fulfill dual roles:
+
+1. **Web Hosting (Frontend)**: Serving as the primary access point for users to interact with our platform. The front-end is built with user experience in mind, offering intuitive navigation and responsive design.
+
+2. **API Endpoint (Backend)**: Powering the back-end services, WhatNext.live also acts as the gateway for API access, handling data requests and responses that drive the platform's functionality.
+
 ## Team Members
 - Eugene Kim
 - Nicholas Lyu
@@ -62,6 +71,11 @@ Before you begin, ensure you have the following installed:
 
 ### Stopping the Container
 - To stop the running Docker container, you can press `CTRL+C` in the terminal if it's running in the foreground, or use the `docker stop [CONTAINER ID]` command if it's running in the background.
+
+
+
+
+
 
 ### Accessing the SwiftUI Project on XCode
 1. **Navigate to the Frontend Directory**
