@@ -11,18 +11,55 @@ import MapKit
 struct MapView: View {
     @StateObject private var viewModel = MapViewModel()
     @State private var trackingMode: MapUserTrackingMode = .follow // State to track user location
+    @State private var selectedLocation: LocationInfo?
+    @GestureState private var magnification: CGFloat = 1.0
 
     var body: some View {
-            Map(coordinateRegion: $viewModel.region,
-                interactionModes: .all,
-                showsUserLocation: true,
-                userTrackingMode: $trackingMode,
-                annotationItems: viewModel.locations) { location in
-                MapAnnotation(coordinate: location.coordinates.CLLocation) {
-                                    AnnotationView(imageUrl: location.image_url ?? "")
-                                }
+        let magnifyGesture = MagnificationGesture()
+            .updating($magnification) { (currentState, gestureState, transaction) in
+                gestureState = currentState
+            }
+            .onEnded { value in
+                let delta = value - 1
+                zoomMap(by: delta)
+            }
+
+        
+        Map(coordinateRegion: $viewModel.region,
+            interactionModes: .all,
+            showsUserLocation: true,
+            userTrackingMode: $trackingMode,
+            annotationItems: viewModel.locations) { location in
+            MapAnnotation(coordinate: location.coordinates.CLLocation) {
+                Image("food.pin") // Using a custom image from assets
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20) // Adjust size as needed
+                    .onTapGesture {
+                        self.selectedLocation = location
+                    }
+            }
+        }            
+            .overlay(
+                Group {
+                    if let selectedLocation = selectedLocation {
+                        LocationDetailView(location: selectedLocation)
+                            .transition(.slide)
+                            .onTapGesture {
+                                self.selectedLocation = nil
                             }
-                .ignoresSafeArea(edges: .all)
+                    }
+                },
+                alignment: .center
+            )
+            .gesture(magnifyGesture)
+            .ignoresSafeArea(edges: .all)
+    }
+    private func zoomMap(by delta: CGFloat) {
+            let span = viewModel.region.span
+            let newLatDelta = max(0.002, min(100, span.latitudeDelta / Double(delta)))
+            let newLonDelta = max(0.002, min(100, span.longitudeDelta / Double(delta)))
+            viewModel.region.span = MKCoordinateSpan(latitudeDelta: newLatDelta, longitudeDelta: newLonDelta)
         }
 }
 
@@ -41,7 +78,7 @@ struct AnnotationView: View {
             }
         } else {
             // Provide a fallback view in case the URL is invalid
-            Image(systemName: "photo")
+            Image(systemName: "logo-icon")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 30, height: 30)

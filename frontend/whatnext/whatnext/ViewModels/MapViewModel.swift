@@ -13,17 +13,19 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     var region: MKCoordinateRegion
     @Published var locations: [LocationInfo] = []
     private let locationManager = CLLocationManager()
+    //private let locationRowViewModel = LocationRowViewModel()
+    //private var api_key = "6gBEOb7SjVVCNw2U9c2ovx64w-oSiYyKFR5KUvKehWjMEhFJUJXf9fOje43DHmr6KaXk5kncQDfgLAgSacdkbjdlgvhJ53h8iHxdM0BP-myzMEhagzs7pEQeui_AZXYx" // Replace with your actual API key
 
     override init() {
-        // Set an initial region (can be a default or dummy value)
         self.region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.startUpdatingLocation()
+        
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -34,19 +36,16 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
         }
-        loadLocations(center: location.coordinate)
+        loadDummyLocations()
+        // Fetch locations using LocationRowViewModel
+        //locationRowViewModel.fetchLocations(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, categories: "restaurants", api_key: "api_key")
     }
     
-    // Example function to load locations based on the current center
-    // Might have a conflict with fetchlocations, we will decide
-    func loadLocations(center: CLLocationCoordinate2D) {
-        // Will be modified later to populate actual locations
-        // critical
+    func loadDummyLocations() {
+        // Directly assign dummy data to locations
         self.locations = [
-//            LocationInfo(id: "0", name: "Place One", imageUrl: "https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?q=80&w=2449&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude + 0.002, longitude: center.longitude + 0.002),
-//            LocationInfo(id: "0", name: "Place Two", imageUrl: "https://images.unsplash.com/photo-1494253109108-2e30c049369b?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", latitude: center.latitude - 0.002, longitude: center.longitude - 0.002)
-//            // Add more sample locations or implement your data fetching logic
+            LocationInfo(id: "1", name: "Coffee Shop", image_url: nil, is_closed: false, url: nil, review_count: 100, categories: [Category(alias: "coffee", title: "Coffee Shop")], rating: 4.5, coordinates: Coordinates(latitude: 32.880, longitude: -117.237), transactions: ["pickup", "delivery"], location: Location(address1: "123 Main St", address2: nil, address3: nil, city: "San Francisco", zip_code: "94103", country: "US", state: "CA", display_address: ["123 Main St", "San Francisco, CA 94103"]), phone: "+14155552671", display_phone: "(415) 555-2671", distance: 500.0),
+            LocationInfo(id: "2", name: "Best Pizza", image_url: nil, is_closed: false, url: nil, review_count: 250, categories: [Category(alias: "pizza", title: "Pizza")], rating: 4.8, coordinates: Coordinates(latitude: 32.882, longitude: -117.235), transactions: ["pickup"], location: Location(address1: "456 Market St", address2: nil, address3: nil, city: "San Francisco", zip_code: "94105", country: "US", state: "CA", display_address: ["456 Market St", "San Francisco, CA 94105"]), phone: "+14155559876", display_phone: "(415) 555-9876", distance: 600.0)
         ]
     }
-
 }

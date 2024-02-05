@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7830FCDB2B70F29E00B31394 /* LocationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7830FCDA2B70F29E00B31394 /* LocationDetailView.swift */; };
 		78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78F048132B5FEC710072AAFA /* LocationManager.swift */; };
 		8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A3938132B61E80900B29646 /* LocationRowView.swift */; };
 		8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8704292B5E022800183191 /* whatnextApp.swift */; };
@@ -53,6 +54,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7830FCDA2B70F29E00B31394 /* LocationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationDetailView.swift; sourceTree = "<group>"; };
 		78F0480A2B5FE4A00072AAFA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		78F048132B5FEC710072AAFA /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		8A3938132B61E80900B29646 /* LocationRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowView.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 				8A8704632B5E043C00183191 /* ProfileView.swift */,
 				8A8704652B5E044500183191 /* SearchView.swift */,
 				8ACD17C32B6200860029487A /* TabBarView.swift */,
+				7830FCDA2B70F29E00B31394 /* LocationDetailView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 			files = (
 				78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */,
 				8A87046A2B5E04FE00183191 /* LoadingViewModel.swift in Sources */,
+				7830FCDB2B70F29E00B31394 /* LocationDetailView.swift in Sources */,
 				8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */,
 				8A8704642B5E043C00183191 /* ProfileView.swift in Sources */,
 				8A8704662B5E044500183191 /* SearchView.swift in Sources */,

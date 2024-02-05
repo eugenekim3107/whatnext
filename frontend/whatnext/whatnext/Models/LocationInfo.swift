@@ -12,11 +12,7 @@ struct YelpResponse: Codable {
     let businesses: [LocationInfo]
 }
 
-struct YelpResponse: Codable {
-    let businesses: [LocationInfo]
-}
-
-struct LocationInfo: Codable {
+struct LocationInfo: Codable, Identifiable{
     let id: String
     let name: String
     let image_url: String?
