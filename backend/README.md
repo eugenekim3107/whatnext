@@ -9,7 +9,8 @@
 ## Local Development and Testing
 To develop and test locally while connecting to MongoDB hosted on the EC2 instance, follow these steps:
 
-### SSH Port Forwarding
+### MongoDB SSH Port Forwarding
+
 Set up SSH port forwarding to connect to MongoDB on the EC2 instance:
 1. Secure the SSH key:
 ```
@@ -19,8 +20,23 @@ chmod 400 whatnext/backend/WhatNextAdminKey.pem
 ```
 ssh -i whatnext/backend/WhatNextAdminKey.pem -L 8000:localhost:27017 ubuntu@<Elastic-IP>
 ```
-- `8000`: Local port on your machine.
+- `8000`: Local port on your machine for MongoDB.
 - `localhost:27017`: Remote destination (MongoDB port on EC2 instance).
+- `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance.
+
+### Redis-server SSH Port Forwarding
+
+Set up SSH port forwarding to connect to Redis-server on the EC2 instance:
+1. Secure the SSH key:
+```
+chmod 400 whatnext/backend/WhatNextAdminKey.pem
+```
+2. Establish an SSH tunnel for Redis-server access:
+```
+ssh -i whatnext/backend/WhatNextAdminKey.pem -L 8001:localhost:6379 ubuntu@<Elastic-IP>
+```
+- `8001`: Local port on your machine for Redis-server.
+- `localhost:6379`: Remote destination (Redis-server port on EC2 instance).
 - `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance.
 
 ### Running FastAPI Server
@@ -45,7 +61,7 @@ For setting up your environment for production, follow these steps:
 ### SSH Port Forwarding
 Repeat the steps for SSH port forwarding as in the local development and testing section to connect to MongoDB on the EC2 instance.
 
-### Running Docker Container
+### Running Docker Container and Databases
 Ensure MongoDB is running on the EC2 instance. It should run automatically upon initialization. To check the status of MongoDB:
 ```
 systemctl status mongod
@@ -55,6 +71,17 @@ If MongoDB is not running, initialize the database using:
 sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
+
+Ensure Redis-server is running on the EC2 instance. It should run automatically upon initalization. To check the status of MongoDB:
+```
+systemctl status redis-server.service
+```
+If Redis-server is not running, initalize the database using:
+```
+sudo systemctl start redis-server.service
+sudo systemctl enable redis-server.service
+```
+
 Ensure the Docker container is running on the EC2 instance. It should run automatically upon initialization. To check the status of the Docker container:
 ```
 docker ps
