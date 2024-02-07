@@ -43,11 +43,12 @@ struct MapView: View {
             .overlay(
                 Group {
                     if let selectedLocation = selectedLocation {
-                        LocationDetailView(location: selectedLocation)
-                            .transition(.slide)
-                            .onTapGesture {
-                                self.selectedLocation = nil
-                            }
+                        LocationDetailView(location: selectedLocation) {
+                            // Define what should happen when the view is dismissed
+                            self.selectedLocation = nil
+                        }
+                        .transition(.scale)
+                        .animation(.easeInOut, value: selectedLocation != nil)
                     }
                 },
                 alignment: .center
