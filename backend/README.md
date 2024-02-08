@@ -72,7 +72,7 @@ sudo systemctl start mongod
 sudo systemctl enable mongod
 ```
 
-Ensure Redis-server is running on the EC2 instance. It should run automatically upon initalization. To check the status of MongoDB:
+Ensure Redis-server is running on the EC2 instance. It should run automatically upon initalization. To check the status of the Redis-server:
 ```
 systemctl status redis-server.service
 ```

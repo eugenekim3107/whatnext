@@ -55,6 +55,7 @@ class Location(BaseModel):
     review_count: Optional[int] = 0
     cur_open: Optional[int] = 0
     categories: Optional[str] = None
+    tag: Optional[List[str]] = None
     hours: Optional[Dict[str, List[str]]] = None
     location: GeoJSON
     price: Optional[str] = None
@@ -130,8 +131,8 @@ async def fetch_nearby_locations(latitude: float,
 
 # Retrieve nearby businesses based on location, time, category, and radius
 @app.get("/nearby_locations", response_model=List[Location])
-async def nearby_locations(latitude: float=40.3381827,
-                           longitude: float=-75.4716585,
+async def nearby_locations(latitude: float=32.8723812680163,
+                           longitude: float=-117.21242234341588,
                            limit: int=20,
                            radius: float=10000.0,
                            categories: str="any", # 'any' is all categories
@@ -151,21 +152,37 @@ async def nearby_locations(latitude: float=40.3381827,
 #########################
 
 # Retrieves chat context
-def retrieve_chat_history(session_id):
-    chat_history = redis_client.lrange(session_id, 0 , -1)
-    return chat_history
+def retrieve_thread_id(session_id):
+    thread_id = redis_client.get(session_id)
+    return thread_id
 
 # Updates chat context
-def update_chat_history(session_id, message):
-    redis_client.rpush(session_id, message)
-    chat_context = redis_client.lrange(session_id, 0 , -1)
-    return chat_context
+def update_thread_id(session_id, thread_id):
+    redis_client.set(session_id, thread_id)
+    return thread_id
 
-# Returns user preference
+# Retrieves user preference
 def retrieve_user_preference(user_id):
-    # In a list format
     user_preference = redis_client.lrange(user_id, 0, -1)
     return user_preference
+
+# Updates user preference
+def update_user_preference(user_id, new_preferences):
+    key_type = redis_client.type(user_id)
+    current_preferences = set()
+    if key_type == b'list':
+        current_preferences = set(redis_client.lrange(user_id, 0, -1).decode('utf-8'))
+    elif key_type != b'none':
+        redis_client.delete(user_id)
+
+    new_preferences_set = set(new_preferences)
+    updated_preferences = current_preferences.union(new_preferences_set)
+    if updated_preferences:
+        updated_preferences = [pref.decode('utf-8') if isinstance(pref, bytes) else pref for pref in updated_preferences]
+        redis_client.delete(user_id)  # Clear existing data
+        redis_client.rpush(user_id, *updated_preferences)
+    
+    return updated_preferences
 
 # User initial inference
 async def user_inference(chat_history):
@@ -235,8 +252,18 @@ async def user_inference(chat_history):
 
 async def fetch_nearby_locations_inferred(latitude:float, 
                                           longitude:float,
-                                          chat_history:list[dict]):
-    parameters = await user_inference(chat_history)
+                                          thread_id:str):
+    
+    chat_history = openai_client.beta.threads.messages.list(
+        thread_id=thread_id,
+        order="asc"
+    )
+
+    chat_history_contents = []
+    for message in chat_history:
+        chat_history_contents.append({"role": message.role, "content": message.content[0].text.value})
+
+    parameters = await user_inference(chat_history_contents)
     potential_locations = await fetch_nearby_locations(
         latitude=latitude,
         longitude=longitude,
@@ -258,120 +285,50 @@ def retrieve_complete_prompt(chat_context, user_preference, nearby_locations, re
 async def chatgpt_response(user_id: str="1234", 
                            session_id: str="1234",
                            message: str="asflaj",
-                           latitude: float=36.1513871523,
-                           longitude: float=-86.7966029393,
+                           latitude: float=32.8723812680163,
+                           longitude: float=-117.21242234341588,
                            api_key: str = Depends(get_api_key)):
+
     
-    chat_history = [{"role":"user","content":"I'm currently with my girlfriend and we wanted some recommendations on what to do."},
-                    {"role":"assistant","content":"Have you all eaten yet, or do you all prefer an activity?"},
-                    {"role":"user","content":"We finished eating but are open to some coffee!"}]
-    return await fetch_nearby_locations_inferred(latitude=latitude, longitude=longitude, chat_history=chat_history)
-    # message_thread = openai_client.beta.threads.create(
-    # messages=[
-    #     {
-    #     "role": "user",
-    #     "content": "I'm currently with my girlfriend and we wanted some recommendations on what to do.",
-    #     },
-    #     {
-    #     "role": "user",
-    #     "content": "We finished eating but are open to some coffee!"
-    #     },
-    # ]
-    # )
-    # thread = openai_client.beta.threads.create(
-    #     messages=[
-    #         {
-    #             "role": "user", 
-    #             "content": "I'm currently with my girlfriend and we wanted some recommendations on what to do."
-    #         }
-    #     ]
-    # )
-    # thread_message = openai_client.beta.threads.messages.create(
-    #     thread_id=thread.id,
-    #     role="user",
-    #     content="We finished eating but are open to some coffee!"
-    # )
+    # thread_id = retrieve_thread_id(session_id)
+    # user_preferences = retrieve_user_preference(user_id)
+    # return await fetch_nearby_locations_inferred(latitude=latitude, longitude=longitude, thread_id=thread_id)
 
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "fetch_nearby_locations_inferred",
+                "description": "Retrieve the locations of potential places for users to visit",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "latitude": {
+                            "type": "float",
+                            "description": "The latitude of a specified location, e.g. 36.1513871523."
+                        },
+                        "longitude": {
+                            "type": "float",
+                            "description": "The longitude of a specified location, e.g. -86.7966029393."
+                        },
+                        "thread_id": {
+                            "type": "string",
+                            "description": "The thread id between ChatGPT and the user, e.g. 'thread_6FZiR5M0XbgysqRDZIM9S8RU'."
+                        }
+                    },
+                    "required": ["latitude", "longitude", "thread_id"],
+                },
+            },
+        }
+    ]
 
-    # chat_history = openai_client.beta.threads.messages.list(
-    #     thread_id=thread.id,
-    #     order="asc"
-    # )
-
-    # chat_history_contents = [{"role": message.role, "content": message.content[0].text.value} for message in chat_history.data]
-
-    # chat_history = update_chat_history(session_id)
-    # user_preference = retrieve_user_preference(user_id)
-    # return await user_inference(chat_history)
-
-    # tools = [
-    #     {
-    #         "type": "function",
-    #         "function": {
-    #             "name": "user_inference",
-    #             "description": "Predicts the parameters for fetch_nearby_locations based on chat history",
-    #             "parameters": {
-    #                 "type": "object",
-    #                 "properties": {
-    #                     "chat_history": {
-    #                         "type": "string",
-    #                         "description": "The full chat history between ChatGPT and the user."
-    #                     }
-    #                 },
-    #                 "required": ["chat_history"],
-    #             }
-    #         }
-    #     },
-    #     {
-    #         "type": "function",
-    #         "function": {
-    #             "name": "fetch_nearby_locations",
-    #             "description": "Retrieve the locations of potential places for users to visit",
-    #             "parameters": {
-    #                 "type": "object",
-    #                 "properties": {
-    #                     "latitude": {
-    #                         "type": "float",
-    #                         "description": "The latitude of a specified location, e.g. 36.1513871523."
-    #                     },
-    #                     "longitude": {
-    #                         "type": "float",
-    #                         "description": "The longitude of a specified location, e.g. -86.7966029393."
-    #                     },
-    #                     "limit": {
-    #                         "type": "int",
-    #                         "description": "The maximum number of locations to return, e.g. 10."
-    #                     },
-    #                     "radius": {
-    #                         "type": "float",
-    #                         "description": "The radial distance in meters from the latitude and longitude that the recommended locations must be within, e.g. 10000."
-    #                     },
-    #                     "categories": {
-    #                         "type": "string",
-    #                         "description": "The type of location to recommend for the user, e.g. shopping."
-    #                     },
-    #                     "cur_open": {
-    #                         "type": "int",
-    #                         "description": "Binary value that determines whether the business is currently open (0=closed and 1=open), e.g. 1."
-    #                     },
-    #                     "sort_by": {
-    #                         "type": "string",
-    #                         "description": "The sorting algorithm to use when extracting potential locations, e.g. distance"
-    #                     }
-    #                 },
-    #                 "required": ["latitude", "longitude", "limit", "radius", "categories", "cur_open", "sort_by"],
-    #             },
-    #         },
-    #     }
-    # ]
-
-    # instructions = "You are an intelligent assistant for the WhatNext? app, designed to suggest places to visit, eat, and things to do based on user preferences. Your goal is to understand user requests and provide personalized recommendations. Follow these steps when interacting with users:\n1. Listen for user messages indicating they are seeking suggestions for places to visit, eat, or activities. Look for keywords like 'looking for', 'suggest', or specific types of places or activities mentioned.\n2. Once you detect a request for suggestions, trigger the user_inference function using the input 'chat_history' (already defined).\n3. After obtaining the inferred preferences from user_inference, use these parameters to trigger the fetch_nearby_locations function. Fetch and present the user with a list of recommended places or activities based on their inferred preferences. 4. Provide detailed information about the recommendations, including names, locations, and why they match the user's preferences. Encourage the user to ask more questions or refine their preferences for more tailored suggestions. Remember, your primary role is to assist users in discovering new experiences that align with their interests and preferences. Use the tools at your disposal to create a responsive and personalized service."
+    instructions = "You are an intelligent assistant for the WhatNext? app, designed to suggest places to visit, eat, and things to do based on user preferences. Your goal is to understand user requests and provide personalized recommendations. Follow these steps when interacting with users:\n1. Listen for user messages indicating they are seeking suggestions for places to visit, eat, or activities. Look for keywords like 'looking for', 'suggest', or specific types of places or activities mentioned.\n2. Once you detect a request for suggestions, trigger fetch_nearby_locations_inferred. The inputs latitude, longitude, and thread_id are defined in the code. Fetch and present the user with a list of recommended places or activities based on their inferred preferences. 4. Provide detailed information about the recommendations, including names, locations, and why they match the user's preferences. Encourage the user to ask more questions or refine their preferences for more tailored suggestions. Remember, your primary role is to assist users in discovering new experiences that align with their interests and preferences. Use the tools at your disposal to create a responsive and personalized service."
     
-    # assistant = openai_client.beta.assistants.create(
-    #     instructions="You are a location recommendation system. ",
-    #     model="gpt-4-turbo-preview",
-    #     tools=tools
-    # )
+    assistant = openai_client.beta.assistants.create(
+        instructions="You are a location recommendation system. ",
+        model="gpt-4-1106-preview",
+        tools=tools
+    )
 
     # thread = openai_client.beta.threads.create()
     # message = openai_client.beta.threads.messages.create(
