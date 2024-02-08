@@ -13,17 +13,18 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     var region: MKCoordinateRegion
     @Published var locations: [LocationInfo] = []
     private let locationManager = CLLocationManager()
-    //private let locationRowViewModel = LocationRowViewModel()
-    //private var api_key = "6gBEOb7SjVVCNw2U9c2ovx64w-oSiYyKFR5KUvKehWjMEhFJUJXf9fOje43DHmr6KaXk5kncQDfgLAgSacdkbjdlgvhJ53h8iHxdM0BP-myzMEhagzs7pEQeui_AZXYx" // Replace with your actual API key
+    private let locationService = LocationService()
+    private var api_key = "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
 
     override init() {
         self.region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+            center: CLLocationCoordinate2D(latitude: 32.880977, longitude: -117.237853),
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
         super.init()
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
         
     }
@@ -38,8 +39,30 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
         loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-        //locationRowViewModel.fetchLocations(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, categories: "restaurants", api_key: "api_key")
+        //fetchNearbyLocations(from: location.coordinate)
     }
+    
+    private func fetchNearbyLocations(from coordinate: CLLocationCoordinate2D) {
+            // Here you call the fetchLocations function of your LocationService
+            locationService.fetchLocations(
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                categories: "coffee",
+                radius: 30000,
+                cur_open: false,
+                sort_by: "rating",
+                limit: 10,
+                api_key: api_key
+            ) { [weak self] fetchedLocations in
+                DispatchQueue.main.async {
+                    self?.locations = fetchedLocations
+                }
+                print("Fetched locations: \(fetchedLocations)")
+                print(coordinate.latitude)
+                print(coordinate.longitude)
+                print("Number of Locations: ", fetchedLocations.count)
+            }
+        }
     
     func loadDummyLocations() {
         // Directly assign dummy data to locations

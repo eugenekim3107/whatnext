@@ -34,7 +34,7 @@ struct MapView: View {
                 Image("food.pin") // Using a custom image from assets
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 20, height: 20) // Adjust size as needed
+                    .frame(width: 40, height: 40) // Adjust size as needed
                     .onTapGesture {
                         self.selectedLocation = location
                     }
