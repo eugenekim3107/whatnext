@@ -4,13 +4,17 @@ from starlette.status import HTTP_403_FORBIDDEN
 from pymongo import MongoClient
 import motor.motor_asyncio
 from typing import List, Optional, Dict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 from datetime import datetime, timedelta
 import pytz
 from openai import OpenAI
 import requests
 import redis
 import json
+import uuid
+import time
+import re
 
 ##############################
 ### Setup and requirements ###
@@ -37,6 +41,13 @@ app = FastAPI()
 ##########################
 ### Location retrieval ###
 ##########################
+
+class ChatRequest(BaseModel):
+    user_id: str
+    session_id: Optional[str] = Field(None, description="The session ID for the chat session, if available.")
+    message: str
+    latitude: float = Field(..., description="Latitude for the location-based query.")
+    longitude: float = Field(..., description="Longitude for the location-based query.")
 
 class GeoJSON(BaseModel):
     type: str
@@ -88,11 +99,12 @@ def is_within_hours(now, hours):
 
 async def fetch_nearby_locations(latitude: float, 
                                  longitude: float, 
-                                 limit: int, 
-                                 radius: float, 
-                                 categories: str, 
-                                 cur_open: int, 
-                                 sort_by: str) -> List[Location]:
+                                 limit: int=10, 
+                                 radius: float=10000, 
+                                 categories: str="all", 
+                                 cur_open: int=1, 
+                                 sort_by: str="best_match") -> List[Location]:
+
     query = {
         "location": {
             "$nearSphere": {
@@ -106,8 +118,15 @@ async def fetch_nearby_locations(latitude: float,
         "is_open": 1,
     }
 
-    if categories.lower() != "any":
-        query["categories"] = {"$regex": categories, "$options": "i"} 
+    if "," in categories:
+        categories_list = [cat.strip() for cat in categories.split(",")]
+    else:
+        categories_list = [categories.strip()]
+
+    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories_list)
+
+    if categories_list != ["any"]:
+        query["categories"] = {"$regex": regex_pattern, "$options": "i"}
 
     now = datetime.now()
 
@@ -151,15 +170,75 @@ async def nearby_locations(latitude: float=32.8723812680163,
 ### Message retrieval ###
 #########################
 
-# Retrieves chat context
-def retrieve_thread_id(session_id):
-    thread_id = redis_client.get(session_id)
-    return thread_id
+# Generate new session id
+def generate_unique_session_id():
+    return str(uuid.uuid4())
 
-# Updates chat context
-def update_thread_id(session_id, thread_id):
-    redis_client.set(session_id, thread_id)
-    return thread_id
+# Generate new thread id
+def generate_thread_id():
+    thread = openai_client.beta.threads.create()
+    return thread.id
+
+# Generate new assistant id
+def generate_assistant_id():
+    valid_limit = [1, 50, 10]
+    valid_radius = [1000, 100000, 10000]
+    valid_cur_open = [0, 1, 1] 
+    valid_categories = ["restaurant", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
+    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "fetch_nearby_locations",
+                "description": "Retrieve the locations of potential places for users to visit",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "limit": {
+                            "type": "string",
+                            "description": f"Specifies the number of locations to retrieve. Range: {valid_limit[0]}-{valid_limit[1]}, Default: {valid_limit[2]}."
+                        },
+                        "radius": {
+                            "type": "string",
+                            "description": f"Defines the search radius in meters. Range: {valid_radius[0]}-{valid_radius[1]}, Default: {valid_radius[2]}."
+                        },
+                        "categories": {
+                            "type": "string",
+                            "description": f"Categories to filter the search. Options: {', '.join(valid_categories[:-1])}, or {valid_categories[-1]}."
+                        },
+                        "cur_open": {
+                            "type": "string",
+                            "description": f"Filter based on current open status. 0 for closed, 1 for open. Default: {valid_cur_open[2]}."
+                        },
+                        "sort_by": {
+                            "type": "string",
+                            "description": f"Sorts the results by the specified criteria. Options: {', '.join(valid_sort_by[:-1])}, or {valid_sort_by[-1]}."
+                        }
+                    },
+                },
+            },
+        }
+    ]
+    instructions = "You are an intelligent assistant for the WhatNext? app, designed to suggest places to visit, eat, and things to do based on user preferences. Your goal is to understand user requests and provide personalized recommendations. Follow these steps when interacting with users:\n1. Listen for user messages indicating they are seeking suggestions for places to visit, eat, or activities. Look for keywords like 'looking for', 'suggest', or specific types of places or activities mentioned.\n2. Once you detect a request for suggestions, trigger fetch_nearby_locations. The inputs latitude, longitude, and thread_id are defined in the code. Fetch and present the user with a list of recommended places or activities based on their inferred preferences. 4. Provide detailed information about the recommendations, including names, locations, and why they match the user's preferences. Encourage the user to ask more questions or refine their preferences for more tailored suggestions. Remember, your primary role is to assist users in discovering new experiences that align with their interests and preferences. Use the tools at your disposal to create a responsive and personalized service."
+    assistant = openai_client.beta.assistants.create(
+        instructions=instructions,
+        model="gpt-4-1106-preview",
+        tools=tools
+    )
+    return assistant.id
+
+# Retrieves thread_id and assistant_id based on session_id
+def retrieve_chat_info(session_id):
+    if session_id is None or not redis_client.exists(session_id):
+        session_id = generate_unique_session_id()
+        thread_id = generate_thread_id()
+        assistant_id = generate_assistant_id()
+        redis_client.hset(session_id, mapping={"thread_id": thread_id, "assistant_id": assistant_id})
+    values = redis_client.hgetall(session_id)
+    thread_id = values.get("thread_id")
+    assistant_id = values.get("assistant_id")
+    return session_id, thread_id, assistant_id
 
 # Retrieves user preference
 def retrieve_user_preference(user_id):
@@ -175,171 +254,109 @@ def update_user_preference(user_id, new_preferences):
     elif key_type != b'none':
         redis_client.delete(user_id)
 
+    # remove any duplicates
     new_preferences_set = set(new_preferences)
     updated_preferences = current_preferences.union(new_preferences_set)
     if updated_preferences:
         updated_preferences = [pref.decode('utf-8') if isinstance(pref, bytes) else pref for pref in updated_preferences]
-        redis_client.delete(user_id)  # Clear existing data
+        redis_client.delete(user_id)
         redis_client.rpush(user_id, *updated_preferences)
     
     return updated_preferences
 
-# User initial inference
-async def user_inference(chat_history):
-
-    # response validation
-    valid_limit = [1, 50, 10]  # min, max, default
-    valid_radius = [10, 100000, 10000]  # min, max, default
-    valid_cur_open = [0, 1, 1]  # closed, open, default
-    valid_categories = ["restaurants", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
-    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
-    
-    # Prepare the prompt
-    few_shot_examples = [
-        {"role": "assistant", "content": "You are a helpful assistant. Analyze the user's conversation and infer their preferences for visiting places in JSON format, including limit, radius, categories, cur_open, and sort_by. Ensure the category is one from the following list: restaurants, food, shopping, fitness, beautysvc, hiking, aquariums, coffee, all. The sort_by option must be one of the following: review_count, rating, best_match, distance."},
-        {"role": "user", "content": "I love spending my evenings at a quiet coffee shop reading a book."},
-        {"role": "assistant", "content": "{\"limit\": 5, \"radius\": 5000, \"categories\": \"coffee\", \"cur_open\": 1, \"sort_by\": \"rating\"}"},
-        {"role": "user", "content": "I'm looking for a gym to start working out."},
-        {"role": "assistant", "content": "{\"limit\": 10, \"radius\": 10000, \"categories\": \"fitness\", \"cur_open\": 1, \"sort_by\": \"distance\"}"}
-    ]
-
-    # add examples with chat history
-    structured_chat_history = few_shot_examples + chat_history
-
-    try:
-        response = openai_client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
-            response_format={ "type": "json_object" },
-            messages=structured_chat_history
-        )
-
-        inferences_str = response.choices[0].message.content
-        print(inferences_str)
-        inferred_preferences = json.loads(inferences_str)
-
-        # Validate and adjust the 'limit'
-        limit = inferred_preferences.get("limit", valid_limit[2])
-        inferred_preferences["limit"] = max(min(limit, valid_limit[1]), valid_limit[0])
-
-        # Validate and adjust the 'radius'
-        radius = inferred_preferences.get("radius", valid_radius[2])
-        inferred_preferences["radius"] = max(min(radius, valid_radius[1]), valid_radius[0])
-
-        # Validate and adjust the 'cur_open'
-        cur_open = inferred_preferences.get("cur_open", valid_cur_open[2])
-        inferred_preferences["cur_open"] = cur_open if cur_open in valid_cur_open[:2] else valid_cur_open[2]
-
-        # Validate and adjust the 'categories'
-        category = inferred_preferences.get("categories", "all").lower()
-        inferred_preferences["categories"] = category if category in valid_categories else "all"
-
-        # Validate and adjust the 'sort_by'
-        sort_by = inferred_preferences.get("sort_by", "review_count").lower()
-        inferred_preferences["sort_by"] = sort_by if sort_by in valid_sort_by else "review_count"
-
-        return inferred_preferences
-
-    except Exception as e:
-        print(f"Error during inference: {e}")
-        # Return default preferences in case of an error
-        return {
-            "limit": valid_limit[2],
-            "radius": valid_radius[2],
-            "cur_open": valid_cur_open[2],
-            "categories": "all",
-            "sort_by": "review_count"
-        }
-
-async def fetch_nearby_locations_inferred(latitude:float, 
-                                          longitude:float,
-                                          thread_id:str):
-    
-    chat_history = openai_client.beta.threads.messages.list(
-        thread_id=thread_id,
-        order="asc"
-    )
-
-    chat_history_contents = []
-    for message in chat_history:
-        chat_history_contents.append({"role": message.role, "content": message.content[0].text.value})
-
-    parameters = await user_inference(chat_history_contents)
-    potential_locations = await fetch_nearby_locations(
-        latitude=latitude,
-        longitude=longitude,
-        limit=parameters["limit"],
-        radius=parameters["radius"],
-        categories=parameters["categories"],
-        cur_open=parameters["cur_open"],
-        sort_by=parameters["sort_by"]
-    )
-    return potential_locations
-    
-
-# Returns the entire prompt for ChatGPT
-def retrieve_complete_prompt(chat_context, user_preference, nearby_locations, rec_limit=10):
-    pass
-
 # Response of chatgpt for search tab
 @app.post("/chatgpt_response")
-async def chatgpt_response(user_id: str="1234", 
-                           session_id: str="1234",
-                           message: str="asflaj",
-                           latitude: float=32.8723812680163,
-                           longitude: float=-117.21242234341588,
+async def chatgpt_response(request: ChatRequest,
                            api_key: str = Depends(get_api_key)):
 
-    
-    # thread_id = retrieve_thread_id(session_id)
-    # user_preferences = retrieve_user_preference(user_id)
-    # return await fetch_nearby_locations_inferred(latitude=latitude, longitude=longitude, thread_id=thread_id)
+    user_id = request.user_id
+    session_id = request.session_id
+    message = request.message
+    latitude = request.latitude
+    longitude = request.longitude
 
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "fetch_nearby_locations_inferred",
-                "description": "Retrieve the locations of potential places for users to visit",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "latitude": {
-                            "type": "float",
-                            "description": "The latitude of a specified location, e.g. 36.1513871523."
-                        },
-                        "longitude": {
-                            "type": "float",
-                            "description": "The longitude of a specified location, e.g. -86.7966029393."
-                        },
-                        "thread_id": {
-                            "type": "string",
-                            "description": "The thread id between ChatGPT and the user, e.g. 'thread_6FZiR5M0XbgysqRDZIM9S8RU'."
-                        }
-                    },
-                    "required": ["latitude", "longitude", "thread_id"],
-                },
-            },
-        }
-    ]
+    # return await fetch_nearby_locations(latitude=latitude, longitude=longitude)
 
-    instructions = "You are an intelligent assistant for the WhatNext? app, designed to suggest places to visit, eat, and things to do based on user preferences. Your goal is to understand user requests and provide personalized recommendations. Follow these steps when interacting with users:\n1. Listen for user messages indicating they are seeking suggestions for places to visit, eat, or activities. Look for keywords like 'looking for', 'suggest', or specific types of places or activities mentioned.\n2. Once you detect a request for suggestions, trigger fetch_nearby_locations_inferred. The inputs latitude, longitude, and thread_id are defined in the code. Fetch and present the user with a list of recommended places or activities based on their inferred preferences. 4. Provide detailed information about the recommendations, including names, locations, and why they match the user's preferences. Encourage the user to ask more questions or refine their preferences for more tailored suggestions. Remember, your primary role is to assist users in discovering new experiences that align with their interests and preferences. Use the tools at your disposal to create a responsive and personalized service."
-    
-    assistant = openai_client.beta.assistants.create(
-        instructions="You are a location recommendation system. ",
-        model="gpt-4-1106-preview",
-        tools=tools
+    session_id, thread_id, assistant_id = retrieve_chat_info(session_id)
+    print({"s": session_id, "t": thread_id, "a": assistant_id})
+
+    user_message = openai_client.beta.threads.messages.create(
+        thread_id = thread_id,
+        role="user",
+        content=message,
     )
 
-    # thread = openai_client.beta.threads.create()
-    # message = openai_client.beta.threads.messages.create(
-    #     thread_id = thread.id,
-    #     role="user",
-    #     content="I'm feeling hungry. Can you recommend me some places to eat?",
-    # )
+    run = openai_client.beta.threads.runs.create(
+        thread_id = thread_id,
+        assistant_id = assistant_id,
+    )
 
-    # run = openai_client.beta.threads.runs.create(
-    #     thread_id = thread.id,
-    #     assistant_id = assistant.id
-    # )
+    run_status = openai_client.beta.threads.runs.retrieve(
+        thread_id=thread_id,
+        run_id=run.id
+    )
 
-    # print(run.model_dump_json(indent=4))
+    while True:
+        run_status = openai_client.beta.threads.runs.retrieve(
+            thread_id=thread_id,
+            run_id=run.id
+        )
+
+        if run_status.status == 'completed':
+            chat_type = "regular"
+            messages = openai_client.beta.threads.messages.list(
+                thread_id=thread_id,
+                order="desc"
+            )
+            for msg in messages.data:
+                message_content = msg.content[0].text.value
+                print(message_content)
+                
+            return {"user_id": user_id, "session_id": session_id, "message_content": message_content, "chat_type": chat_type}
+        
+        elif run_status.status == 'requires_action':
+            print("Function Calling")
+            chat_type = "function"
+            required_actions = run_status.required_action.submit_tool_outputs.model_dump()
+            tool_outputs = []
+            for action in required_actions["tool_calls"]:
+                func_name = action['function']['name']
+                arguments = json.loads(action['function']['arguments'])
+                if "limit" not in arguments:
+                    arguments["limit"] = 10
+                if "radius" not in arguments:
+                    arguments["radius"] = 10000
+                if "categories" not in arguments:
+                    arguments["categories"] = "all"
+                if "cur_open" not in arguments:
+                    arguments["cur_open"] = 0
+                if "sort_by" not in arguments:
+                    arguments["sort_by"] = "best_match"
+
+                if func_name == "fetch_nearby_locations":
+                    output = await fetch_nearby_locations(latitude=float(latitude), 
+                                                        longitude=float(longitude), 
+                                                        limit=int(arguments["limit"]), 
+                                                        radius=int(arguments["radius"]), 
+                                                        categories=arguments["categories"], 
+                                                        cur_open=int(arguments["cur_open"]), 
+                                                        sort_by=arguments["sort_by"])
+                    output_dicts = [loc.model_dump() for loc in output]
+                    output_str = json.dumps(output_dicts, ensure_ascii=False)
+                    tool_outputs.append({
+                        "tool_call_id": action['id'],
+                        "output": output_str
+                    })
+                    
+                else:
+                    raise ValueError(f"Unknown function: {func_name}")
+                
+            print("Submitting outputs back to the Assistant...")
+            openai_client.beta.threads.runs.submit_tool_outputs(
+                thread_id=thread_id,
+                run_id=run.id,
+                tool_outputs=tool_outputs
+            )
+
+        else:
+            continue
