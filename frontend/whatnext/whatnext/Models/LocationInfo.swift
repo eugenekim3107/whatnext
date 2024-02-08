@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import CoreLocation
 
 struct YelpResponse: Codable {
     let businesses: [LocationInfo]
 }
 
-struct LocationInfo: Codable {
+struct LocationInfo: Codable, Identifiable{
     let id: String
     let name: String
     let image_url: String?
@@ -36,6 +37,9 @@ struct Category: Codable {
 struct Coordinates: Codable {
     let latitude: Double
     let longitude: Double
+    var CLLocation: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
 }
 
 struct Location: Codable {

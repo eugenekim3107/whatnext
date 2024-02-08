@@ -141,7 +141,7 @@ struct LocationRowView_Previews: PreviewProvider {
             cur_open: true,
             sort_by: "review_count",
             limit: 15,
-            api_key: "sMFOsH94cd7UX9DqgoU56plsTC9C4MWkaigY9r4yQMELhtCAwbRzYgDLymy9qreZl6YXWyXo5lznGIWmCi7xTFr1BG3JJx5nYT70WEjPuveXBqKbrTFU5ROVk82mZXYx"
+            api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
         )
     }
 }
