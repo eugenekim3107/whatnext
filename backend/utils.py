@@ -5,7 +5,7 @@ def generate_sort_assistant_id(openai_client):
     instructions = "Rank the locations (best to worst) from our chat history and return a comma-separated list of their business IDs in order of preference. Format the response as: 'business_id1, business_id2, ...'. Provide only this list, without additional text or explanation."
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
-        model="gpt-3.5-turbo"
+        model="gpt-3.5-turbo-"
     )
     return assistant.id
 

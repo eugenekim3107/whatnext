@@ -109,7 +109,6 @@ async def fetch_nearby_locations(latitude: float,
                 "$maxDistance": radius
             }
         },
-        "is_open": 1,
     }
 
     if "," in categories:
@@ -161,7 +160,6 @@ async def fetch_nearby_locations_condensed(latitude: float,
                 "$maxDistance": radius
             }
         },
-        "is_open": 1,
     }
 
     if "," in categories:
@@ -179,7 +177,6 @@ async def fetch_nearby_locations_condensed(latitude: float,
     try:
         items = await db.locations.find(query).sort(sort_by, -1).limit(limit).to_list(length=limit)
         open_businesses = []
-
         for item in items:
             item['cur_open'] = 0  # Default to not currently open
             day_of_week = now.strftime('%A')
