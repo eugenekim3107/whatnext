@@ -71,6 +71,16 @@ class Location(BaseModel):
     location: GeoJSON
     price: Optional[str] = None
 
+class LocationCondensed(BaseModel):
+    business_id: str
+    name: Optional[str] = None
+    stars: Optional[float] = None
+    review_count: Optional[float] = None
+    cur_open: Optional[float] = 0
+    categories: Optional[float] = None
+    tag: Optional[float] = None
+    price: Optional[str] = None
+
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
@@ -131,6 +141,74 @@ async def fetch_nearby_locations(latitude: float,
         return open_businesses
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+# Retrieve nearby locations with condensed information
+async def fetch_nearby_locations_condensed(latitude: float, 
+                                           longitude: float, 
+                                           limit: int=50, 
+                                           radius: float=10000, 
+                                           categories: str="all", 
+                                           cur_open: int=1, 
+                                           sort_by: str="best_match") -> List[LocationCondensed]:
+    
+    query = {
+        "location": {
+            "$nearSphere": {
+                "$geometry": {
+                    "type": "Point",
+                    "coordinates": [longitude, latitude]
+                },
+                "$maxDistance": radius
+            }
+        },
+        "is_open": 1,
+    }
+
+    if "," in categories:
+        categories_list = [cat.strip() for cat in categories.split(",")]
+    else:
+        categories_list = [categories.strip()]
+
+    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories_list)
+
+    if categories_list != ["any"]:
+        query["categories"] = {"$regex": regex_pattern, "$options": "i"}
+
+    now = datetime.now()
+
+    try:
+        items = await db.locations.find(query).sort(sort_by, -1).limit(limit).to_list(length=limit)
+        open_businesses = []
+
+        for item in items:
+            item['cur_open'] = 0  # Default to not currently open
+            day_of_week = now.strftime('%A')
+            hours_list = item.get('hours', {}).get(day_of_week)
+
+            if cur_open == 1 and is_within_hours(now, hours_list):
+                item['cur_open'] = 1
+
+            open_businesses.append(LocationCondensed(**item))
+
+        return open_businesses
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+async def fetch_locations_business_id(business_ids: List[str]):
+    query = {
+        "business_id": {"$in": business_ids}
+    }
+
+    try:
+        items = await db.locations.find(query).to_list(None)
+        items_dict = {item['business_id']: item for item in items}
+        ordered_items = [items_dict[business_id] for business_id in business_ids if business_id in items_dict]
+        locations = [Location(**item) for item in ordered_items]
+        return locations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 # Retrieve nearby businesses based on location, time, category, and radius
 @app.get("/nearby_locations", response_model=List[Location])
@@ -192,7 +270,7 @@ async def chatgpt_response(request: ChatRequest,
         )
 
         if run_status.status == 'completed':
-            print("went through normally")
+            print("Generating regular response...")
             chat_type = "regular"
             messages = openai_client.beta.threads.messages.list(
                 thread_id=thread_id,
@@ -205,34 +283,29 @@ async def chatgpt_response(request: ChatRequest,
             return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type}
         
         elif run_status.status == 'requires_action':
-            print("Function Calling")
-            chat_type = "function"
             required_actions = run_status.required_action.submit_tool_outputs.model_dump()
-            tool_outputs = []
+            default_args = {
+                "limit": 10,
+                "radius": 10000,
+                "categories": "all",
+                "cur_open": 1,
+                "sort_by": "best_match"
+            }
             for action in required_actions["tool_calls"]:
-                func_name = action['function']['name']
-                if action['function']['arguments'] is None:
-                    arguments = {}
-                else:
-                    arguments = json.loads(action['function']['arguments'])
-                if "limit" not in arguments:
-                    arguments["limit"] = 10
-                if "radius" not in arguments:
-                    arguments["radius"] = 10000
-                if "categories" not in arguments:
-                    arguments["categories"] = "all"
-                if "cur_open" not in arguments:
-                    arguments["cur_open"] = 1
-                if "sort_by" not in arguments:
-                    arguments["sort_by"] = "best_match"
-                print("Before fetch")
-                output = await fetch_nearby_locations(latitude=float(latitude), 
-                                                    longitude=float(longitude), 
-                                                    limit=20, 
-                                                    radius=int(arguments["radius"]), 
-                                                    categories=arguments["categories"], 
-                                                    cur_open=int(arguments["cur_open"]), 
-                                                    sort_by=arguments["sort_by"])
+                arguments = json.loads(action['function']['arguments']) if action['function']['arguments'] else {}
+                arguments = {**default_args, **arguments}
+
+                print("Fetching nearby locations...")
+                
+                output = await fetch_nearby_locations_condensed(
+                    latitude=float(latitude), 
+                    longitude=float(longitude), 
+                    limit=20, 
+                    radius=int(arguments["radius"]), 
+                    categories=arguments["categories"], 
+                    cur_open=int(arguments["cur_open"]), 
+                    sort_by=arguments["sort_by"]
+                )
 
             run = openai_client.beta.threads.runs.cancel(
                 thread_id=thread_id,
@@ -246,7 +319,7 @@ async def chatgpt_response(request: ChatRequest,
                 content=sort_message,
             )
 
-            print("done creating")
+            print("Sorting locations based on personal preference...")
 
             run = openai_client.beta.threads.runs.create(
                 thread_id=thread_id,
@@ -258,8 +331,6 @@ async def chatgpt_response(request: ChatRequest,
                 run_id=run.id
             )
 
-            print("starting new run")
-
             while True:
 
                 run_status = openai_client.beta.threads.runs.retrieve(
@@ -268,17 +339,18 @@ async def chatgpt_response(request: ChatRequest,
                 )
 
                 if run_status.status == 'completed':
-                    print("went through normally")
-                    chat_type = "regular"
+                    chat_type = "locations"
                     messages = openai_client.beta.threads.messages.list(
                         thread_id=thread_id,
                         order="desc"
                     )
                     business_ids = messages.data[0].content[0].text.value
-                    message_content = business_ids.split(", ")[:arguments["limit"]]
+                    business_ids_top_k = business_ids.split(", ")[:int(arguments["limit"])]
+                    print("Retrieving filtered personalized locations...")
+                    personalized_locations = await fetch_locations_business_id(business_ids_top_k)
                     end = time.time()
                     print(end-start)
-                    return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type}
+                    return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type}
 
                 else:
                     continue

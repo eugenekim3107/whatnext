@@ -91,3 +91,5 @@ async def fetch_nearby_locations_inferred(latitude:float,
     )
     return potential_locations
     
+Benchmarks for Time:
+

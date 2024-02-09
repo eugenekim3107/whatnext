@@ -2,7 +2,7 @@ from datetime import timedelta
 import uuid
 
 def generate_sort_assistant_id(openai_client):
-    instructions = "Rank the locations from our chat history and return a comma-separated list of their business IDs in order of preference. Format the response as: 'business_id1, business_id2, ...'. Provide only this list, without additional text or explanation."
+    instructions = "Rank the locations (best to worst) from our chat history and return a comma-separated list of their business IDs in order of preference. Format the response as: 'business_id1, business_id2, ...'. Provide only this list, without additional text or explanation."
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
         model="gpt-4-0125-preview"
@@ -45,7 +45,7 @@ def generate_assistant_id(openai_client):
         {
             "type": "function",
             "function": {
-                "name": "fetch_nearby_locations",
+                "name": "fetch_nearby_locations_condensed",
                 "description": "Retrieve the locations of potential places for users to visit (DO NOT NEED USERS LOCATION)",
                 "parameters": {
                     "type": "object",
