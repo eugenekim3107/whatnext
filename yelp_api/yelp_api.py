@@ -20,7 +20,7 @@ def get_all_by_cat(api_key,latitude,longitude,categories,save_json=False):
     if total>=0:
         total = 50
     unique_ids = []
-    while total is None or offset+limit <= total:
+    while offset+limit <= total:
         params = params = {'latitude': latitude, 'longitude': -1*longitude,"categories": categories,"radius":40000,'limit':limit,'offset':offset}
         response = requests.get(url, headers=headers, params=params)
         data = response.json()
@@ -29,6 +29,7 @@ def get_all_by_cat(api_key,latitude,longitude,categories,save_json=False):
             json_object = {}
             json_object["business_id"] = entry["id"]
             json_object["name"] = entry["name"] if "name" in entry else None
+            json_object["image_url"] = entry['image_url'] if 'image_url' in entry else None
             json_object["address"] = ' ,'.join(entry['location']['display_address']) if "location" in entry and "display_address" in entry['location'] else None
             
             if 'location' in entry:
@@ -57,12 +58,11 @@ def get_all_by_cat(api_key,latitude,longitude,categories,save_json=False):
             json_object["review_count"] = entry["review_count"] if "review_count" in entry else None
             if "is_closed" in entry:
                 if entry["is_closed"] == False:
-                    json_object["is_open"] = 1
+                    json_object["cur_open"] = 1
                 else:
-                    json_object["is_open"] = 0
+                    json_object["cur_open"] = 0
             else:
                 json_object["is_open"] = None
-            json_object["attributes"] = None
             
             if 'categories' in entry:   
                 json_object["tag"] = [alias["alias"] for alias in entry['categories']]
@@ -71,6 +71,8 @@ def get_all_by_cat(api_key,latitude,longitude,categories,save_json=False):
             json_object['hours'] = retrieve_operating_hours(api_key,json_object["business_id"])
             json_object['location'] = { "type": "Point", "coordinates": [ json_object["longitude"],json_object["latitude"] ] }
             json_object['price'] = entry['price'] if 'price' in entry else None
+            json_object["display_phone"] = entry['display_phone'] if 'display_phone' in entry else None
+            json_object['phone'] = entry['phone'] if 'phone' in entry else None
             res.append(json_object)
             ids.append(json_object["business_id"])
         offset += limit
