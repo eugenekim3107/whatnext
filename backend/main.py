@@ -76,9 +76,9 @@ class LocationCondensed(BaseModel):
     name: Optional[str] = None
     stars: Optional[float] = None
     review_count: Optional[float] = None
-    cur_open: Optional[float] = 0
-    categories: Optional[float] = None
-    tag: Optional[float] = None
+    cur_open: Optional[int] = 0
+    categories: Optional[str] = None
+    tag: Optional[List[str]] = None
     price: Optional[str] = None
 
 # Verifies correct api key
@@ -93,7 +93,7 @@ async def get_api_key(api_key: str = Security(api_key_header)):
 # Retrieve nearby locations
 async def fetch_nearby_locations(latitude: float, 
                                  longitude: float, 
-                                 limit: int=50, 
+                                 limit: int=30, 
                                  radius: float=10000, 
                                  categories: str="all", 
                                  cur_open: int=1, 
@@ -242,7 +242,7 @@ async def chatgpt_response(request: ChatRequest,
     latitude = request.latitude
     longitude = request.longitude
 
-    # return await fetch_nearby_locations(latitude=latitude, longitude=longitude)
+    # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)
     sort_assistant_id = generate_sort_assistant_id(openai_client)
     session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
@@ -252,6 +252,8 @@ async def chatgpt_response(request: ChatRequest,
         role="user",
         content=message,
     )
+
+    print("Starting the assistant response...")
 
     run = openai_client.beta.threads.runs.create(
         thread_id = thread_id,
@@ -291,16 +293,33 @@ async def chatgpt_response(request: ChatRequest,
                 "cur_open": 1,
                 "sort_by": "best_match"
             }
+            # Validation ranges and sets
+            valid_limit_range = [3, 10]  # min, max
+            valid_radius_range = [1000, 100000]  # min, max
+            valid_cur_open_options = [0, 1]  # closed or open
+            valid_categories = ["restaurant", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
+            valid_sort_by_options = ["review_count", "rating", "best_match", "distance"]
+
             for action in required_actions["tool_calls"]:
                 arguments = json.loads(action['function']['arguments']) if action['function']['arguments'] else {}
                 arguments = {**default_args, **arguments}
+
+                # Validate and update arguments
+                arguments["limit"] = max(min(int(arguments["limit"]), valid_limit_range[1]), valid_limit_range[0]) if "limit" in arguments else default_args["limit"]
+                arguments["radius"] = max(min(int(arguments["radius"]), valid_radius_range[1]), valid_radius_range[0]) if "radius" in arguments else default_args["radius"]
+                arguments["categories"] = arguments["categories"] if arguments["categories"] in valid_categories else default_args["categories"]
+                arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
+                arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
+
+
+                print(arguments)
 
                 print("Fetching nearby locations...")
                 
                 output = await fetch_nearby_locations_condensed(
                     latitude=float(latitude), 
                     longitude=float(longitude), 
-                    limit=20, 
+                    limit=40,
                     radius=int(arguments["radius"]), 
                     categories=arguments["categories"], 
                     cur_open=int(arguments["cur_open"]), 
@@ -346,6 +365,7 @@ async def chatgpt_response(request: ChatRequest,
                     )
                     business_ids = messages.data[0].content[0].text.value
                     business_ids_top_k = business_ids.split(", ")[:int(arguments["limit"])]
+                    print(business_ids_top_k)
                     print("Retrieving filtered personalized locations...")
                     personalized_locations = await fetch_locations_business_id(business_ids_top_k)
                     end = time.time()
