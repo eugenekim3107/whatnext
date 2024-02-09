@@ -39,7 +39,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
         loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-        //fetchNearbyLocations(from: location.coordinate)
+//        fetchNearbyLocations(from: location.coordinate)
     }
     
     private func fetchNearbyLocations(from coordinate: CLLocationCoordinate2D) {

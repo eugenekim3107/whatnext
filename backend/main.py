@@ -1,20 +1,17 @@
 from fastapi import FastAPI, Security, HTTPException, Depends
+from utils import *
 from fastapi.security.api_key import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
-from pymongo import MongoClient
 import motor.motor_asyncio
 from typing import List, Optional, Dict
 from pydantic import BaseModel, Field
 from typing import Optional
-from datetime import datetime, timedelta
-import pytz
+from datetime import datetime
 from openai import OpenAI
-import requests
 import redis
 import json
-import uuid
-import time
 import re
+import time
 
 ##############################
 ### Setup and requirements ###
@@ -56,6 +53,9 @@ class GeoJSON(BaseModel):
 class Location(BaseModel):
     business_id: str
     name: Optional[str] = None
+    image_url: Optional[str] = None
+    phone: Optional[str] = None
+    display_phone: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
     state: Optional[str] = None
@@ -80,26 +80,10 @@ async def get_api_key(api_key: str = Security(api_key_header)):
             status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key"
         )
 
-# Checks if the businesses is currently open
-def is_within_hours(now, hours):
-    if not hours or not isinstance(hours, list) or len(hours) != 2:
-        return False
-    open_time_str, close_time_str = hours
-    open_hour, open_minute = int(open_time_str[:2]), int(open_time_str[2:])
-    close_hour, close_minute = int(close_time_str[:2]), int(close_time_str[2:])
-
-    open_time = now.replace(hour=open_hour, minute=open_minute, second=0, microsecond=0)
-    close_time = now.replace(hour=close_hour, minute=close_minute, second=0, microsecond=0)
-
-    if close_time <= open_time:
-        close_time += timedelta(days=1)
-
-    return open_time <= now <= close_time
-
-
+# Retrieve nearby locations
 async def fetch_nearby_locations(latitude: float, 
                                  longitude: float, 
-                                 limit: int=10, 
+                                 limit: int=50, 
                                  radius: float=10000, 
                                  categories: str="all", 
                                  cur_open: int=1, 
@@ -165,110 +149,15 @@ async def nearby_locations(latitude: float=32.8723812680163,
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    
 #########################
 ### Message retrieval ###
 #########################
-
-# Generate new session id
-def generate_unique_session_id():
-    return str(uuid.uuid4())
-
-# Generate new thread id
-def generate_thread_id():
-    thread = openai_client.beta.threads.create()
-    return thread.id
-
-# Generate new assistant id
-def generate_assistant_id():
-    valid_limit = [1, 50, 10]
-    valid_radius = [1000, 100000, 10000]
-    valid_cur_open = [0, 1, 1] 
-    valid_categories = ["restaurant", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
-    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "fetch_nearby_locations",
-                "description": "Retrieve the locations of potential places for users to visit",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "limit": {
-                            "type": "string",
-                            "description": f"Specifies the number of locations to retrieve. Range: {valid_limit[0]}-{valid_limit[1]}, Default: {valid_limit[2]}."
-                        },
-                        "radius": {
-                            "type": "string",
-                            "description": f"Defines the search radius in meters. Range: {valid_radius[0]}-{valid_radius[1]}, Default: {valid_radius[2]}."
-                        },
-                        "categories": {
-                            "type": "string",
-                            "description": f"Categories to filter the search. Options: {', '.join(valid_categories[:-1])}, or {valid_categories[-1]}."
-                        },
-                        "cur_open": {
-                            "type": "string",
-                            "description": f"Filter based on current open status. 0 for closed, 1 for open. Default: {valid_cur_open[2]}."
-                        },
-                        "sort_by": {
-                            "type": "string",
-                            "description": f"Sorts the results by the specified criteria. Options: {', '.join(valid_sort_by[:-1])}, or {valid_sort_by[-1]}."
-                        }
-                    },
-                },
-            },
-        }
-    ]
-    instructions = "You are an intelligent assistant for the WhatNext? app, designed to suggest places to visit, eat, and things to do based on user preferences. Your goal is to understand user requests and provide personalized recommendations. Follow these steps when interacting with users:\n1. Listen for user messages indicating they are seeking suggestions for places to visit, eat, or activities. Look for keywords like 'looking for', 'suggest', or specific types of places or activities mentioned.\n2. Once you detect a request for suggestions, trigger fetch_nearby_locations. The inputs latitude, longitude, and thread_id are defined in the code. Fetch and present the user with a list of recommended places or activities based on their inferred preferences. 4. Provide detailed information about the recommendations, including names, locations, and why they match the user's preferences. Encourage the user to ask more questions or refine their preferences for more tailored suggestions. Remember, your primary role is to assist users in discovering new experiences that align with their interests and preferences. Use the tools at your disposal to create a responsive and personalized service."
-    assistant = openai_client.beta.assistants.create(
-        instructions=instructions,
-        model="gpt-4-1106-preview",
-        tools=tools
-    )
-    return assistant.id
-
-# Retrieves thread_id and assistant_id based on session_id
-def retrieve_chat_info(session_id):
-    if session_id is None or not redis_client.exists(session_id):
-        session_id = generate_unique_session_id()
-        thread_id = generate_thread_id()
-        assistant_id = generate_assistant_id()
-        redis_client.hset(session_id, mapping={"thread_id": thread_id, "assistant_id": assistant_id})
-    values = redis_client.hgetall(session_id)
-    thread_id = values.get("thread_id")
-    assistant_id = values.get("assistant_id")
-    return session_id, thread_id, assistant_id
-
-# Retrieves user preference
-def retrieve_user_preference(user_id):
-    user_preference = redis_client.lrange(user_id, 0, -1)
-    return user_preference
-
-# Updates user preference
-def update_user_preference(user_id, new_preferences):
-    key_type = redis_client.type(user_id)
-    current_preferences = set()
-    if key_type == b'list':
-        current_preferences = set(redis_client.lrange(user_id, 0, -1).decode('utf-8'))
-    elif key_type != b'none':
-        redis_client.delete(user_id)
-
-    # remove any duplicates
-    new_preferences_set = set(new_preferences)
-    updated_preferences = current_preferences.union(new_preferences_set)
-    if updated_preferences:
-        updated_preferences = [pref.decode('utf-8') if isinstance(pref, bytes) else pref for pref in updated_preferences]
-        redis_client.delete(user_id)
-        redis_client.rpush(user_id, *updated_preferences)
-    
-    return updated_preferences
 
 # Response of chatgpt for search tab
 @app.post("/chatgpt_response")
 async def chatgpt_response(request: ChatRequest,
                            api_key: str = Depends(get_api_key)):
-
+    start = time.time()
     user_id = request.user_id
     session_id = request.session_id
     message = request.message
@@ -276,8 +165,8 @@ async def chatgpt_response(request: ChatRequest,
     longitude = request.longitude
 
     # return await fetch_nearby_locations(latitude=latitude, longitude=longitude)
-
-    session_id, thread_id, assistant_id = retrieve_chat_info(session_id)
+    sort_assistant_id = generate_sort_assistant_id(openai_client)
+    session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
     user_message = openai_client.beta.threads.messages.create(
@@ -303,16 +192,17 @@ async def chatgpt_response(request: ChatRequest,
         )
 
         if run_status.status == 'completed':
+            print("went through normally")
             chat_type = "regular"
             messages = openai_client.beta.threads.messages.list(
                 thread_id=thread_id,
-                order="desc"
+                order="asc"
             )
             for msg in messages.data:
                 message_content = msg.content[0].text.value
-                print(message_content)
-                
-            return {"user_id": user_id, "session_id": session_id, "message_content": message_content, "chat_type": chat_type}
+            end = time.time()
+            print(end-start)
+            return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type}
         
         elif run_status.status == 'requires_action':
             print("Function Calling")
@@ -321,7 +211,10 @@ async def chatgpt_response(request: ChatRequest,
             tool_outputs = []
             for action in required_actions["tool_calls"]:
                 func_name = action['function']['name']
-                arguments = json.loads(action['function']['arguments'])
+                if action['function']['arguments'] is None:
+                    arguments = {}
+                else:
+                    arguments = json.loads(action['function']['arguments'])
                 if "limit" not in arguments:
                     arguments["limit"] = 10
                 if "radius" not in arguments:
@@ -329,34 +222,66 @@ async def chatgpt_response(request: ChatRequest,
                 if "categories" not in arguments:
                     arguments["categories"] = "all"
                 if "cur_open" not in arguments:
-                    arguments["cur_open"] = 0
+                    arguments["cur_open"] = 1
                 if "sort_by" not in arguments:
                     arguments["sort_by"] = "best_match"
+                print("Before fetch")
+                output = await fetch_nearby_locations(latitude=float(latitude), 
+                                                    longitude=float(longitude), 
+                                                    limit=20, 
+                                                    radius=int(arguments["radius"]), 
+                                                    categories=arguments["categories"], 
+                                                    cur_open=int(arguments["cur_open"]), 
+                                                    sort_by=arguments["sort_by"])
 
-                if func_name == "fetch_nearby_locations":
-                    output = await fetch_nearby_locations(latitude=float(latitude), 
-                                                        longitude=float(longitude), 
-                                                        limit=int(arguments["limit"]), 
-                                                        radius=int(arguments["radius"]), 
-                                                        categories=arguments["categories"], 
-                                                        cur_open=int(arguments["cur_open"]), 
-                                                        sort_by=arguments["sort_by"])
-                    output_dicts = [loc.model_dump() for loc in output]
-                    output_str = json.dumps(output_dicts, ensure_ascii=False)
-                    tool_outputs.append({
-                        "tool_call_id": action['id'],
-                        "output": output_str
-                    })
-                    
-                else:
-                    raise ValueError(f"Unknown function: {func_name}")
-                
-            print("Submitting outputs back to the Assistant...")
-            openai_client.beta.threads.runs.submit_tool_outputs(
+            run = openai_client.beta.threads.runs.cancel(
                 thread_id=thread_id,
-                run_id=run.id,
-                tool_outputs=tool_outputs
+                run_id=run.id
             )
+
+            sort_message = f"{output}"
+            openai_client.beta.threads.messages.create(
+                thread_id = thread_id,
+                role="user",
+                content=sort_message,
+            )
+
+            print("done creating")
+
+            run = openai_client.beta.threads.runs.create(
+                thread_id=thread_id,
+                assistant_id=sort_assistant_id
+            )
+
+            run_status = openai_client.beta.threads.runs.retrieve(
+                thread_id=thread_id,
+                run_id=run.id
+            )
+
+            print("starting new run")
+
+            while True:
+
+                run_status = openai_client.beta.threads.runs.retrieve(
+                    thread_id=thread_id,
+                    run_id=run.id
+                )
+
+                if run_status.status == 'completed':
+                    print("went through normally")
+                    chat_type = "regular"
+                    messages = openai_client.beta.threads.messages.list(
+                        thread_id=thread_id,
+                        order="desc"
+                    )
+                    business_ids = messages.data[0].content[0].text.value
+                    message_content = business_ids.split(", ")[:arguments["limit"]]
+                    end = time.time()
+                    print(end-start)
+                    return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type}
+
+                else:
+                    continue
 
         else:
             continue

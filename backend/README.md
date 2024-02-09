@@ -55,6 +55,10 @@ To test an endpoint, use the following command:
 curl -X 'GET' 'http://localhost:8080/nearby_locations' -H 'accept: application/json' -H 'whatnext_token: whatnext'
 ```
 
+```
+curl -X POST "http://localhost:8080/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "1234", "message": "I would like to drink some coffee", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
+```
+
 ## Production
 For setting up your environment for production, follow these steps:
 
