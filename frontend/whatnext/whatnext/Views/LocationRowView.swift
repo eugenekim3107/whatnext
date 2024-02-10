@@ -14,10 +14,9 @@ struct LocationRowView: View {
     let longitude: Double
     let categories: String
     let radius: Double
-    let cur_open: Bool
-    let sort_by: String
+    let curOpen: Int
+    let sortBy: String
     let limit: Int
-    let api_key: String
     @State private var scrollIndex = 0
     @State private var timer: Timer?
     @State private var isManuallyScrolling = false
@@ -35,10 +34,10 @@ struct LocationRowView: View {
                 ScrollViewReader { scrollView in
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 5) {
-                            ForEach(viewModel.locations, id: \.id) { location in
+                            ForEach(viewModel.locations, id: \.businessId) { location in
                                 VStack(spacing: 0) {
                                     ZStack(alignment: .topLeading) {
-                                        if let url = URL(string: location.image_url ?? "") {
+                                        if let url = URL(string: location.imageUrl ?? "") {
                                             ZStack{
                                                 AsyncImage(url: url) { image in
                                                     image
@@ -59,9 +58,15 @@ struct LocationRowView: View {
                                                 .resizable()
                                                 .frame(width: 10, height: 10)
                                                 .foregroundColor(.yellow)
-                                            Text(String(format: "%.1f", location.rating ))
-                                                .font(.system(size: 10))
-                                                .foregroundColor(.white)
+                                            Group {
+                                                if let stars = location.stars {
+                                                    Text(String(format: "%.1f", stars))
+                                                } else {
+                                                    Text("N/A")
+                                                }
+                                            }
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.white)
                                         }
                                         .padding(3)
                                         .background(Color.gray)
@@ -70,7 +75,7 @@ struct LocationRowView: View {
                                     }
                                     .frame(width: 110, height: 110)
                                     .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    Text(location.name )
+                                    Text(location.name)
                                         .font(.system(size: 14))
                                         .lineLimit(2)
                                         .multilineTextAlignment(.center)
@@ -103,7 +108,11 @@ struct LocationRowView: View {
             }
         }
         .onAppear {
-            viewModel.fetchLocations(latitude: latitude, longitude: longitude, categories: categories, api_key: api_key)
+            viewModel.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: self.limit,
+                radius: self.radius,
+                categories: categories,
+                curOpen: curOpen,
+                sortBy: self.sortBy)
         }
     }
     
@@ -112,7 +121,7 @@ struct LocationRowView: View {
             withAnimation {
                 guard !isManuallyScrolling, viewModel.locations.count > 0 else { return }
                 scrollIndex = (scrollIndex + 1) % viewModel.locations.count
-                scrollView.scrollTo(viewModel.locations[scrollIndex].id, anchor: .leading)
+                scrollView.scrollTo(viewModel.locations[scrollIndex].businessId, anchor: .leading)
             }
         }
     }
@@ -135,13 +144,12 @@ struct LocationRowView_Previews: PreviewProvider {
             viewModel: viewModel,
             title: "Let's Workout!",
             latitude: 32.88088,
-            longitude: 117.23790,
-            categories: "gyms",
+            longitude: -117.23790,
+            categories: "fitness",
             radius: 10000,
-            cur_open: true,
-            sort_by: "review_count",
-            limit: 15,
-            api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
+            curOpen: 1,
+            sortBy: "review_count",
+            limit: 15
         )
     }
 }

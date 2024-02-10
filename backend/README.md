@@ -102,6 +102,9 @@ To test an endpoint in production, use the following command:
 ```
 curl -k -H "whatnext_token: whatnext" "https://whatnext.live/api/nearby_locations"
 ```
+```
+curl -k -X POST "https://whatnext.live/api/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "1234", "message": "I want to go hiking. Can you give me some suggestions?", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
+```
 
 ## Important Notes
 

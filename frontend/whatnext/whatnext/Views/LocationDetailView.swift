@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LocationDetailView: View {
-    let location: LocationInfo
+    let location: Location
     var dismissAction: () -> Void
 
     var body: some View {
@@ -25,7 +25,7 @@ struct LocationDetailView: View {
             .padding([.top, .trailing])
 
             // Image
-            AsyncImage(url: URL(string: location.image_url ?? "")) { phase in
+            AsyncImage(url: URL(string: location.imageUrl ?? "")) { phase in
                 switch phase {
                 case .empty:
                     ProgressView()
@@ -51,16 +51,16 @@ struct LocationDetailView: View {
                 
                 HStack {
                     ForEach(0..<5, id: \.self) { index in
-                        Image(systemName: index < Int(location.rating) ? "star.fill" : "star")
-                            .foregroundColor(index < Int(location.rating) ? .yellow : .gray)
+                        Image(systemName: index < Int(location.stars ?? 0.0) ? "star.fill" : "star")
+                            .foregroundColor(index < Int(location.stars ?? 0.0) ? .yellow : .gray)
                     }
-                    Text("\(location.rating, specifier: "%.1f") (\(location.review_count) reviews)")
+                    // Fixed string interpolation for stars and review count
+                    Text("\(location.stars ?? 0.0, specifier: "%.1f") (\(location.reviewCount ?? 0) reviews)")
                         .font(.caption)
                         .foregroundColor(.gray)
                 }
             }
             .padding()
-
             Spacer()
         }
         .frame(width: 300, height: 360) // Adjusted height for compact layout

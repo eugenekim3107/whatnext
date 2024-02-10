@@ -11,11 +11,10 @@ import MapKit
 
 class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     var region: MKCoordinateRegion
-    @Published var locations: [LocationInfo] = []
+    @Published var locations: [Location] = []
     private let locationManager = CLLocationManager()
     private let locationService = LocationService()
-    private var api_key = "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
-
+    
     override init() {
         self.region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 32.880977, longitude: -117.237853),
@@ -37,38 +36,37 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
         }
-        loadDummyLocations()
+//        loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-//        fetchNearbyLocations(from: location.coordinate)
+        loadLocationsForMapView(from: location.coordinate)
     }
     
-    private func fetchNearbyLocations(from coordinate: CLLocationCoordinate2D) {
-            // Here you call the fetchLocations function of your LocationService
-            locationService.fetchLocations(
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                categories: "coffee",
-                radius: 30000,
-                cur_open: false,
-                sort_by: "rating",
-                limit: 10,
-                api_key: api_key
-            ) { [weak self] fetchedLocations in
-                DispatchQueue.main.async {
-                    self?.locations = fetchedLocations
+    private func loadLocationsForMapView(from coordinate: CLLocationCoordinate2D) {
+        locationService.fetchNearbyLocations(
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
+            limit: 10,
+            radius: 30000.0,
+            categories: "fitness",
+            curOpen: 1,
+            sortBy: "rating"
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let locations):
+                    self?.locations = locations
+                case .failure(let error):
+                    print("Error fetching locations: \(error)")
                 }
-                print("Fetched locations: \(fetchedLocations)")
-                print(coordinate.latitude)
-                print(coordinate.longitude)
-                print("Number of Locations: ", fetchedLocations.count)
             }
         }
+    }
+
     
     func loadDummyLocations() {
-        // Directly assign dummy data to locations
+        // Correctly assign dummy data to locations
         self.locations = [
-            LocationInfo(id: "1", name: "Coffee Shop", image_url: nil, is_closed: false, url: nil, review_count: 100, categories: [Category(alias: "coffee", title: "Coffee Shop")], rating: 5, coordinates: Coordinates(latitude: 32.880, longitude: -117.237), transactions: ["pickup", "delivery"], location: Location(address1: "123 Main St", address2: nil, address3: nil, city: "San Francisco", zip_code: "94103", country: "US", state: "CA", display_address: ["123 Main St", "San Francisco, CA 94103"]), phone: "+14155552671", display_phone: "(415) 555-2671", distance: 500.0),
-            LocationInfo(id: "2", name: "Best Pizza", image_url: nil, is_closed: false, url: nil, review_count: 250, categories: [Category(alias: "pizza", title: "Pizza")], rating: 4.8, coordinates: Coordinates(latitude: 32.882, longitude: -117.235), transactions: ["pickup"], location: Location(address1: "456 Market St", address2: nil, address3: nil, city: "San Francisco", zip_code: "94105", country: "US", state: "CA", display_address: ["456 Market St", "San Francisco, CA 94105"]), phone: "+14155559876", display_phone: "(415) 555-9876", distance: 600.0)
+            Location(businessId: "1fRCPsVzhhQr3C691KQnIg", name: "Eureka!", imageUrl: "https://s3-media1.fl.yelpcdn.com/bphoto/PW7eQbNYQ8Iu6Aeofg8BOQ/o.jpg", phone: "+18582103444", displayPhone: "(858) 210-3444", address: "4353 La Jolla Village Dr ,San Diego, CA 92122", city: "San Diego", state: "CA", postalCode: "92122", latitude: 32.870379, longitude: -117.211938, stars: 3.9, reviewCount: 1822, curOpen: 1, categories: "restaurant, all", tag: ["tradamerican"], hours: Hours(Monday: ["1100","0000"], Tuesday: ["1100","0000"], Wednesday: ["1100","0000"], Thursday: ["1100","0000"], Friday: ["1100","0100"], Saturday: ["1100","0100"], Sunday: ["1100","0000"]), location: GeoJSON(type: "Point", coordinates: [-117.211938, 32.870379]), price: "$$")
         ]
     }
 }

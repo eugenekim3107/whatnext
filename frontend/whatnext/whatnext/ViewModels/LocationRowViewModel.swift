@@ -8,17 +8,24 @@
 import Foundation
 
 class LocationRowViewModel: ObservableObject {
-    @Published var locations: [LocationInfo] = []
+    @Published var locations: [Location] = []
     @Published var isLoading = true
     private let locationService = LocationService()
 
-    func fetchLocations(latitude: Double, longitude: Double, categories: String, radius: Int = 10000, cur_open: Bool = false, sort_by: String = "rating", limit: Int = 10, api_key: String) {
+    func fetchNearbyLocations(latitude: Double = 32.8723812680163, longitude: Double = -117.21242234341588, limit: Int = 20, radius: Double = 10000.0, categories: String = "any", curOpen: Int = 1, sortBy: String = "best_match") {
         isLoading = true
-        locationService.fetchLocations(latitude: latitude, longitude: longitude, categories: categories, radius: radius, cur_open: cur_open, sort_by: sort_by, limit: limit, api_key: api_key) { [weak self] fetchedLocations in
+        locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy) { [weak self] result in
             DispatchQueue.main.async {
-                self?.locations = fetchedLocations
+                switch result {
+                case .success(let locations):
+                    self?.locations = locations
+                case .failure(let error):
+                    print("Error fetching locations: \(error.localizedDescription)")
+                    self?.locations = []
+                }
                 self?.isLoading = false
             }
         }
     }
 }
+

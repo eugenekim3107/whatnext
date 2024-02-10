@@ -5,7 +5,7 @@ def generate_sort_assistant_id(openai_client):
     instructions = "Rank the locations (best to worst) from our chat history and return a comma-separated list of their business IDs in order of preference. Format the response as: 'business_id1, business_id2, ...'. Provide only this list, without additional text or explanation."
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
-        model="gpt-3.5-turbo-"
+        model="gpt-3.5-turbo-0125"
     )
     return assistant.id
 
@@ -78,7 +78,7 @@ def generate_assistant_id(openai_client):
     instructions = "As the WhatNext? app's assistant, your role is to offer personalized suggestions for places to visit, dine, or activities to enjoy, based on user preferences. Follow these steps to assist users effectively:\n1.Identify requests for suggestions in user messages, looking for keywords like 'looking for', 'suggest', or mentions of specific places or activities.\n2.Upon recognizing a suggestion request, use fetch_nearby_locations with optional parameters like limit, radius, categories, and cur_open to find suitable recommendations. Avoid asking for user location.\n3.Present a curated list of recommendations, detailing names, locations, and why they're a good match for the user's interests.\n4.Encourage further inquiries or preference refinements for even more personalized suggestions. Focus on helping users discover new experiences that align with their interests, utilizing available tools for a responsive and customized service."
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-0125",
         tools=tools
     )
     return assistant.id

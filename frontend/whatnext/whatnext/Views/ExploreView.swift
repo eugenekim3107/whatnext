@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct ExploreView: View {
+    @StateObject var viewModel1 = LocationRowViewModel()
+    @StateObject var viewModel2 = LocationRowViewModel()
+    @StateObject var viewModel3 = LocationRowViewModel()
+    @StateObject var viewModel4 = LocationRowViewModel()
+    
     var body: some View {
-        let viewModel1 = LocationRowViewModel()
-        let viewModel2 = LocationRowViewModel()
-        let viewModel3 = LocationRowViewModel()
-        let viewModel4 = LocationRowViewModel()
 
         NavigationView {
             ScrollView {
@@ -21,49 +22,45 @@ struct ExploreView: View {
                         viewModel: viewModel1,
                         title: "Food and Drinks",
                         latitude: 32.88088,
-                        longitude: 117.23790,
+                        longitude: -117.23790,
                         categories: "food",
                         radius: 5000,
-                        cur_open: true,
-                        sort_by: "review_count",
-                        limit: 15,
-                        api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
+                        curOpen: 1,
+                        sortBy: "review_count",
+                        limit: 15
                     )
                     LocationRowView(
                         viewModel: viewModel2,
                         title: "Coffee Spots",
                         latitude: 32.88088,
-                        longitude: 117.23790,
+                        longitude: -117.23790,
                         categories: "coffee",
                         radius: 5000,
-                        cur_open: true,
-                        sort_by: "best_match",
-                        limit: 15,
-                        api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
+                        curOpen: 1,
+                        sortBy: "best_match",
+                        limit: 15
                     )
                     LocationRowView(
                         viewModel: viewModel3,
-                        title: "Step In Style",
+                        title: "Shopping Spree!",
                         latitude: 32.88088,
-                        longitude: 117.23790,
-                        categories: "shoes",
+                        longitude: -117.23790,
+                        categories: "shopping",
                         radius: 5000,
-                        cur_open: true,
-                        sort_by: "rating",
-                        limit: 15,
-                        api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
+                        curOpen: 1,
+                        sortBy: "rating",
+                        limit: 15
                     )
                     LocationRowView(
                         viewModel: viewModel4,
                         title: "Let's Workout!",
                         latitude: 32.88088,
-                        longitude: 117.23790,
-                        categories: "gyms",
+                        longitude: -117.23790,
+                        categories: "fitness",
                         radius: 5000,
-                        cur_open: true,
-                        sort_by: "best_match",
-                        limit: 15,
-                        api_key: "zVgczAZq-sRyRhKzSJ34uziLaLdgyVBSopgBfynGHKf52T2zGJG-Z9BVXFXOG5w-8RVHoziIL9RY1nLr_DqjfqE9UwpCN6Jp4Ze5BVzEDEm1vcaBQ25mBlCeSZO5ZXYx"
+                        curOpen: 1,
+                        sortBy: "best_match",
+                        limit: 15
                     )
                 }
                 .navigationBarTitle("Explore", displayMode: .large)
