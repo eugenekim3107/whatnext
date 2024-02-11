@@ -15,6 +15,7 @@ struct SearchView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 100, height: 100)
+                    
                     Text("Let's find your next favorite spot!")
                         .font(.headline)
                     Text("What are you in the mood for?")

@@ -35,6 +35,8 @@
 		8ACD17BE2B61F4C50029487A /* LocationRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */; };
 		8ACD17C02B61F75D0029487A /* example.json in Resources */ = {isa = PBXBuildFile; fileRef = 8ACD17BF2B61F75D0029487A /* example.json */; };
 		8ACD17C42B6200860029487A /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17C32B6200860029487A /* TabBarView.swift */; };
+		B9C913582B794E8000594F6B /* ProfileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C913572B794E8000594F6B /* ProfileRowView.swift */; };
+		B9C9135A2B794ED500594F6B /* ProfileRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C913592B794ED500594F6B /* ProfileRowViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +90,8 @@
 		8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowViewModel.swift; sourceTree = "<group>"; };
 		8ACD17BF2B61F75D0029487A /* example.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = example.json; sourceTree = "<group>"; };
 		8ACD17C32B6200860029487A /* TabBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
+		B9C913572B794E8000594F6B /* ProfileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowView.swift; sourceTree = "<group>"; };
+		B9C913592B794ED500594F6B /* ProfileRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,6 +192,7 @@
 				8A8704632B5E043C00183191 /* ProfileView.swift */,
 				8A8704652B5E044500183191 /* SearchView.swift */,
 				8ACD17C32B6200860029487A /* TabBarView.swift */,
+				B9C913572B794E8000594F6B /* ProfileRowView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -202,6 +207,7 @@
 				8A87046D2B5E050F00183191 /* MoreViewModel.swift */,
 				8A87046F2B5E051800183191 /* ProfileViewModel.swift */,
 				8A8704712B5E051F00183191 /* SearchViewModel.swift */,
+				B9C913592B794ED500594F6B /* ProfileRowViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -306,7 +312,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1520;
 				TargetAttributes = {
 					8A8704252B5E022800183191 = {
 						CreatedOnToolsVersion = 14.3.1;
@@ -374,6 +380,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				78F048122B5FEC0F0072AAFA /* MapViewCoordinator.swift in Sources */,
+				B9C9135A2B794ED500594F6B /* ProfileRowViewModel.swift in Sources */,
 				78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */,
 				8A87046A2B5E04FE00183191 /* LoadingViewModel.swift in Sources */,
 				8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */,
@@ -393,6 +400,7 @@
 				8A87045E2B5E042200183191 /* LoadingView.swift in Sources */,
 				8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */,
 				8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */,
+				B9C913582B794E8000594F6B /* ProfileRowView.swift in Sources */,
 				8ACD17B92B61F18A0029487A /* LocationInfo.swift in Sources */,
 				8A87046C2B5E050700183191 /* MapViewModel.swift in Sources */,
 			);
@@ -464,9 +472,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -522,9 +532,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -548,6 +560,7 @@
 				CODE_SIGN_ENTITLEMENTS = whatnext/whatnext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"whatnext/Preview Content\"";
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -591,6 +604,7 @@
 				CODE_SIGN_ENTITLEMENTS = whatnext/whatnext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"whatnext/Preview Content\"";
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -633,6 +647,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -656,6 +671,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -678,6 +694,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -700,6 +717,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 3G7VVNP57S;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
