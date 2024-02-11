@@ -1,6 +1,6 @@
 import SwiftUI
 
-
+//Created by Wenzhou Lyu
 struct ProfileRowView: View {
     var title: String
     var titleIconName: String 
