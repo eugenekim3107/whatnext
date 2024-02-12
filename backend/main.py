@@ -28,7 +28,7 @@ mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 db = mongo_client["locationDatabase"]
 
 # OpenAI
-openai_client = OpenAI(api_key='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')
+openai_client = OpenAI(api_key='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')
 
 # Redis server for chat and user history
 redis_client = redis.Redis(host='localhost', port=8001, db=0, decode_responses=True)

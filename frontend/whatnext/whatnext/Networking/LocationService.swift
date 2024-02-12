@@ -19,7 +19,6 @@ class LocationService {
         
         var components = URLComponents(string: "https://whatnext.live/api/nearby_locations")
         
-        // Create query items array
         var queryItems: [URLQueryItem] = []
         
         if let latitude = latitude {
