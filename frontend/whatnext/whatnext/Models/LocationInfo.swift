@@ -8,18 +8,18 @@
 import Foundation
 
 // Define the GeoJSON structure for the location
-struct GeoJSON: Codable {
+struct GeoJSON: Codable, Hashable {
     let type: String
     let coordinates: [Double]
 }
 
 // Define the structure for the opening hours
-struct Hours: Codable {
+struct Hours: Codable, Hashable {
     let Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday: [String]?
 }
 
 // Define the main Location structure
-struct Location: Codable, Identifiable {
+struct Location: Codable, Identifiable, Hashable {
     var id: String { businessId }
     let businessId: String
     let name: String

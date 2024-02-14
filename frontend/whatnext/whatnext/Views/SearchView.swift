@@ -2,33 +2,75 @@ import SwiftUI
 
 struct SearchView: View {
     @State private var chatText = ""
-    @State private var chatType = ""
-    @State private var messages: [String] = []
+    @State private var accumulatedText = ""
+    @State private var messages: [Message] = []
+    @State private var timer: Bool = true
+    @State private var waitingForResponse: Bool = false
+    @State private var showPopup: Bool = false
+    @State private var sessionId: String? = nil
     
     var body: some View {
         NavigationView{
             messagesView
                 .navigationTitle("Search")
+                .overlay(
+                    Group {
+                        if showPopup {
+                            Text("Please wait for response")
+                                .padding()
+                                .background(Color.gray.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .transition(.opacity)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        }
+                    }
+                )
+                .onChange(of: timer) { newValue in
+                    checkConditionsAndSendMessage()
+                }
+                .onChange(of: accumulatedText) { newValue in
+                    checkConditionsAndSendMessage()
+                }
+                .onChange(of: chatText) { newValue in
+                    checkConditionsAndSendMessage()
+                }
         }
     }
     
     private var messagesView: some View {
         VStack {
             ScrollView {
-                VStack (spacing: 3) {
-                    ForEach(messages, id: \.self) { message in
-                        HStack {
-                            Spacer()
-                            Text(message)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 15)
-                                .padding(.vertical, 10)
-                                .background(Color.blue)
-                                .cornerRadius(30)
+                ScrollViewReader {scrollView in
+                    VStack (spacing: 10) {
+                        if messages.isEmpty {
+                            VStack (spacing: 3){
+                                Spacer(minLength:50)
+                                Image("logo-icon")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 90, height: 90)
+                                Text("Let's find your next favorite spot!")
+                                    .font(.headline)
+                                Text("What are you in the mood for?")
+                                    .font(.headline)
+                                Image("openai-icon")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 120, height: 120, alignment: .top)
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
-                        .padding(.horizontal)
+                        ForEach(messages.indices, id: \.self) { index in
+                            messageView(for: messages[index])
+                                .id(index)
+                        }
                     }
-                    HStack { Spacer() }
+                    .onChange(of: messages.count) { _ in
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                            scrollView.scrollTo(messages.count - 1, anchor: .bottom)
+                        }
+                    }
                 }
             }
             .background(Color(.init(white: 0.95, alpha: 1)))
@@ -39,6 +81,48 @@ struct SearchView: View {
                         .ignoresSafeArea())
             }
         }
+    }
+    
+    private func messageView(for message: Message) -> some View {
+        Group {
+            if message.chat_type == "typing" {
+                TypingIndicatorView()
+                    .padding(.horizontal, 15)
+                    .padding(.vertical, 15)
+                    .background(Color.gray.opacity(0.3))
+                    .cornerRadius(20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.trailing, 50)
+            } else if message.chat_type == "locations" {
+                // Code for locations
+            }
+            else {
+                HStack {
+                    if message.is_user_message == "true" {
+                        Spacer()
+                        Text(message.content)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 10)
+                            .background(Color.blue)
+                            .cornerRadius(20)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.leading, 50)
+                    } else {
+                        Text(message.content)
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 10)
+                            .background(Color.gray.opacity(0.3))
+                            .cornerRadius(20)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.trailing, 50)
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .padding(.horizontal)
     }
     
     private var chatBottomBar: some View {
@@ -56,7 +140,26 @@ struct SearchView: View {
                     .frame(height:40)
                     if !chatText.isEmpty {
                         Button(action: {
-                            sendMessage()
+                            if !waitingForResponse {
+                                let newMessage = Message(
+                                    session_id: sessionId,
+                                    user_id: "1234",
+                                    content: chatText,
+                                    chat_type: "regular",
+                                    is_user_message: "true"
+                                    )
+                                messages.append(newMessage)
+                                appendText()
+                            } else {
+                                withAnimation {
+                                    showPopup = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        showPopup = false
+                                    }
+                                }
+                            }
                         }) {
                             Image(systemName: "arrow.up.circle.fill")
                                 .resizable()
@@ -80,50 +183,81 @@ struct SearchView: View {
         .padding(.bottom, 50)
     }
     
+    private func appendText() {
+        accumulatedText.append(chatText + " ")
+        chatText = ""
+        resetTimer()
+    }
+    
     private func sendMessage() {
-//        let _: Double = 0.0
-//        let longitude: Double = 0.0
-//        let userId: String = "1234"
-//        let sessionId: String? = nil
-        let message: String = chatText
+        let newMessage = Message(
+            session_id: sessionId,
+            user_id: "1234",
+            content: accumulatedText,
+            chat_type: "regular",
+            is_user_message: "true")
+        timer = true
+        waitingForResponse = true
+        let typingIndicatorMessage = Message(session_id: sessionId, user_id: "1234", content: "typingIndicator", chat_type: "typing", is_user_message: "false")
+        messages.append(typingIndicatorMessage)
+        let latitude = 32.88088
+        let longitude = -117.23790
+        let userId = "1234"
+        let message = newMessage.content
         
-        self.messages.append(message)
-        self.chatText = ""
-        
-//        ChatService.shared.postMessage(latitude: latitude, longitude: longitude, userId: userId, sessionId: sessionId, message: message) { response, error in
-//            if let chatResponse = response {
-//                // Handle the chat response
-//                DispatchQueue.main.async {
-//                    // Append the response content to messages array to display it
-//                    self.messages.append(chatResponse.content)
-//                    self.chatText = "" // Reset chatText after sending
-//                }
-//            } else if let error = error {
-//                print("Error sending message: \(error.localizedDescription)")
-//            }
-//        }
+        ChatService.shared.postMessage(latitude: latitude, longitude: longitude, userId: userId, sessionId: sessionId, message: message) { result, error in
+            messages.removeAll { $0.chat_type == "typing" }
+            if let error = error {
+                print("Error: \(error)")
+            } else if let result = result {
+                switch result {
+                case .regular(let message):
+                    sessionId = message.session_id
+                    messages.append(message)
+                    self.waitingForResponse = false
+                    self.accumulatedText = ""
+                case .secondary(let messageSecondary):
+                    sessionId = messageSecondary.session_id
+                    var recommendations = ""
+                    for location in messageSecondary.content {
+                        recommendations.append(location.name + ", ")
+                    }
+                    let recommendationContent = Message(
+                        session_id: sessionId,
+                        user_id: "1234",
+                        content: recommendations,
+                        chat_type: "regular",
+                        is_user_message: "false"
+                    )
+                    messages.append(recommendationContent)
+                    let followUpContent = Message(
+                        session_id: sessionId,
+                        user_id: "1234",
+                        content: "Swipe through these handpicked spots and share your thoughts on them!",
+                        chat_type: "regular",
+                        is_user_message: "false"
+                    )
+                    messages.append(followUpContent)
+                    self.waitingForResponse = false
+                    self.accumulatedText = ""
+                }
+            }
+        }
+    }
+    
+    private func resetTimer() {
+        timer = true
+        Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
+            timer = false
+        }
+    }
+    
+    private func checkConditionsAndSendMessage() {
+        if !timer && !accumulatedText.isEmpty && chatText.isEmpty {
+            sendMessage()
+        }
     }
 }
-//        NavigationView {
-//            VStack {
-//                Spacer()
-//                Image("logo-icon")
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fit)
-//                    .frame(width: 100, height: 100)
-//                Text("Let's find your next favorite spot!")
-//                    .font(.headline)
-//                Text("What are you in the mood for?")
-//                    .font(.headline)
-//                Image("openai-icon")
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fit)
-//                    .frame(width: 120, height: 120, alignment: .top)
-//                Spacer(minLength: 200)
-//            }
-//
-//        }
-//    }
 
 struct SearchView_Previews: PreviewProvider {
     static var previews: some View {

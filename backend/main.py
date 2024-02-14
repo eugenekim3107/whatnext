@@ -279,7 +279,7 @@ async def chatgpt_response(request: ChatRequest,
                 message_content = msg.content[0].text.value
             end = time.time()
             print(end-start)
-            return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type}
+            return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
         
         elif run_status.status == 'requires_action':
             required_actions = run_status.required_action.submit_tool_outputs.model_dump()
@@ -367,7 +367,7 @@ async def chatgpt_response(request: ChatRequest,
                     personalized_locations = await fetch_locations_business_id(business_ids_top_k)
                     end = time.time()
                     print(end-start)
-                    return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type}
+                    return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type, "is_user_message": "false"}
 
                 else:
                     continue
