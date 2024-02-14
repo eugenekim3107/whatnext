@@ -35,7 +35,7 @@ struct MapView: View {
                                 self.selectedLocation = location
                             }
                         }) {
-                            Image("fitness.pin")
+                            Image("food.pin") //fitness.pin")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30, height: 30)

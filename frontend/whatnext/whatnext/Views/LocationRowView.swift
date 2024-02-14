@@ -20,89 +20,112 @@ struct LocationRowView: View {
     @State private var scrollIndex = 0
     @State private var timer: Timer?
     @State private var isManuallyScrolling = false
+    @State private var showingDetail = false
+    @State private var selectedLocation: Location?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(title)
-                .font(.system(size: 25, weight: .bold))
-                .foregroundColor(.black)
-                .padding(.leading)
-            
-            if viewModel.isLoading {
-                PlaceholderView()
-            } else {
-                ScrollViewReader { scrollView in
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.locations, id: \.businessId) { location in
-                                VStack(spacing: 0) {
-                                    ZStack(alignment: .topLeading) {
-                                        if let url = URL(string: location.imageUrl ?? "") {
-                                            ZStack{
-                                                AsyncImage(url: url) { image in
-                                                    image
-                                                        .resizable()
-                                                        .scaledToFill()
-                                                } placeholder: {
-                                                    ProgressView()
+        ZStack{
+            VStack(alignment: .leading, spacing: 10) {
+                Text(title)
+                    .font(.system(size: 25, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.leading)
+                if let selectedLocation = selectedLocation, showingDetail {
+                    // You can adjust the position and animation of this detail view as needed
+                    LocationDetailView(location: selectedLocation, dismissAction: {
+                        self.selectedLocation = nil
+                        self.showingDetail = false
+                    })
+                    .transition(.move(edge: .bottom)) // Example transition
+                    .animation(.default, value: showingDetail) // Example animation
+                }
+                
+                if viewModel.isLoading {
+                    PlaceholderView()
+                } else {
+                    ScrollViewReader { scrollView in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 5) {
+                                ForEach(viewModel.locations, id: \.businessId) { location in
+                                    VStack(spacing: 0) {
+                                        ZStack(alignment: .topLeading) {
+                                            if let url = URL(string: location.imageUrl ?? "") {
+                                                ZStack{
+                                                    AsyncImage(url: url) { image in
+                                                        image
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                    } placeholder: {
+                                                        ProgressView()
+                                                    }
                                                 }
-                                            }
-                                            .frame(width: 110, height: 110)
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                                        } else {
-                                            Color.gray.opacity(0.3)
-                                        }
-                                        
-                                        HStack(spacing: 2) {
-                                            Image(systemName: "star.fill")
-                                                .resizable()
-                                                .frame(width: 10, height: 10)
-                                                .foregroundColor(.yellow)
-                                            Group {
-                                                if let stars = location.stars {
-                                                    Text(String(format: "%.1f", stars))
-                                                } else {
-                                                    Text("N/A")
+                                                .frame(width: 110, height: 110)
+                                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                                .onTapGesture {
+                                                    self.selectedLocation = location
+                                                    self.showingDetail = true
                                                 }
+                                            } else {
+                                                Color.gray.opacity(0.3)
                                             }
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.white)
+                                            
+                                            HStack(spacing: 2) {
+                                                Image(systemName: "star.fill")
+                                                    .resizable()
+                                                    .frame(width: 10, height: 10)
+                                                    .foregroundColor(.yellow)
+                                                Group {
+                                                    if let stars = location.stars {
+                                                        Text(String(format: "%.1f", stars))
+                                                    } else {
+                                                        Text("N/A")
+                                                    }
+                                                }
+                                                .font(.system(size: 10))
+                                                .foregroundColor(.white)
+                                            }
+                                            .padding(3)
+                                            .background(Color.gray)
+                                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                                            .padding([.top, .leading], 5)
                                         }
-                                        .padding(3)
-                                        .background(Color.gray)
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                                        .padding([.top, .leading], 5)
+                                        .frame(width: 110, height: 110)
+                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        // Tap gesture modifier
+                                        .onTapGesture {
+                                            self.selectedLocation = location
+                                            self.showingDetail = true
+                                        }
+                                        Text(location.name)
+                                            .font(.system(size: 14))
+                                            .lineLimit(2)
+                                            .multilineTextAlignment(.center)
+                                            .truncationMode(.tail)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                            .frame(height: 50)
+                                            .frame(width: 110)
                                     }
-                                    .frame(width: 110, height: 110)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    Text(location.name)
-                                        .font(.system(size: 14))
-                                        .lineLimit(2)
-                                        .multilineTextAlignment(.center)
-                                        .truncationMode(.tail)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(height: 50)
-                                        .frame(width: 110)
                                 }
                             }
+                            .padding([.leading, .trailing])
+                            .gesture(
+                                DragGesture().onChanged { _ in
+                                    isManuallyScrolling = true
+                                    timer?.invalidate()
+                                }
+                                    .onEnded { _ in
+                                        isManuallyScrolling = false
+                                        startTimer(scrollView: scrollView)
+                                    }
+                            )
                         }
-                        .gesture(
-                            DragGesture().onChanged { _ in
-                                isManuallyScrolling = true
-                                timer?.invalidate()
-                            }
-                                .onEnded { _ in
-                                    isManuallyScrolling = false
-                                    startTimer(scrollView: scrollView)
-                                }
-                        )
-                    }
-                    .padding([.leading, .trailing])
-                    .onAppear {
-                        startTimer(scrollView: scrollView)
-                    }
-                    .onDisappear {
-                        timer?.invalidate()
+                        .padding([.leading, .trailing])
+                        .onAppear {
+                            startTimer(scrollView: scrollView)
+                        }
+                        .onDisappear {
+                            timer?.invalidate()
+                        }
                     }
                 }
             }
