@@ -52,11 +52,11 @@ uvicorn main:app --host 0.0.0.0 --port 8080 --reload
 ### Testing Endpoints
 To test an endpoint, use the following command:
 ```
-curl -X 'GET' 'http://localhost:8080/nearby_locations' -H 'accept: application/json' -H 'whatnext_token: whatnext'
+curl -X 'GET' 'http://localhost:8080/api/nearby_locations' -H 'accept: application/json' -H 'whatnext_token: whatnext'
 ```
 
 ```
-curl -X POST "http://localhost:8080/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "1234", "message": "I would like to drink some coffee", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
+curl -X POST "http://localhost:8080/api/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "1234", "message": "I would like to drink some coffee", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
 ```
 
 ## Production
@@ -92,7 +92,7 @@ docker ps
 ```
 If the Docker conatiner is not running, initialize the database using:
 ```
-docker run -d --restart=always --name whatnext-container -p 8000:8000 whatnext-image
+docker run -d --restart=always --name whatnext-container -p 8000:8000 --env OPENAI_API_KEY=$OPENAI_API_KEY whatnext-image
 ```
 - `whatnext-container`: The name of the container.
 - `whatnext-image`: The name of the image.

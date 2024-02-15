@@ -3,7 +3,8 @@ import SwiftUI
 struct SearchView: View {
     @State private var chatText = ""
     @State private var accumulatedText = ""
-    @State private var messages: [Message] = []
+//    @State private var messages: [Message] = []
+    @State private var messages: [ChatContent] = []
     @State private var timer: Bool = true
     @State private var waitingForResponse: Bool = false
     @State private var showPopup: Bool = false
@@ -62,8 +63,15 @@ struct SearchView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         ForEach(messages.indices, id: \.self) { index in
-                            messageView(for: messages[index])
-                                .id(index)
+                            Group {
+                                switch messages[index] {
+                                case .message(let message):
+                                    messageView(for: message)
+                                case .messageSecondary(let messageSecondary):
+                                    messageSecondaryView(for: messageSecondary)
+                                }
+                            }
+                            .id(index)
                         }
                     }
                     .onChange(of: messages.count) { _ in
@@ -83,6 +91,20 @@ struct SearchView: View {
         }
     }
     
+    enum ChatContent {
+        case message(Message)
+        case messageSecondary(MessageSecondary)
+    }
+    
+    private func messageSecondaryView(for message: MessageSecondary) -> some View {
+        HStack {
+            InteractiveLocationView(locations: message.content)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 50)
+            Spacer()
+        }
+    }
+    
     private func messageView(for message: Message) -> some View {
         Group {
             if message.chat_type == "typing" {
@@ -93,10 +115,7 @@ struct SearchView: View {
                     .cornerRadius(20)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.trailing, 50)
-            } else if message.chat_type == "locations" {
-                // Code for locations
-            }
-            else {
+            } else {
                 HStack {
                     if message.is_user_message == "true" {
                         Spacer()
@@ -148,7 +167,7 @@ struct SearchView: View {
                                     chat_type: "regular",
                                     is_user_message: "true"
                                     )
-                                messages.append(newMessage)
+                                messages.append(.message(newMessage))
                                 appendText()
                             } else {
                                 withAnimation {
@@ -199,37 +218,33 @@ struct SearchView: View {
         timer = true
         waitingForResponse = true
         let typingIndicatorMessage = Message(session_id: sessionId, user_id: "1234", content: "typingIndicator", chat_type: "typing", is_user_message: "false")
-        messages.append(typingIndicatorMessage)
+        messages.append(.message(typingIndicatorMessage))
         let latitude = 32.88088
         let longitude = -117.23790
         let userId = "1234"
         let message = newMessage.content
         
         ChatService.shared.postMessage(latitude: latitude, longitude: longitude, userId: userId, sessionId: sessionId, message: message) { result, error in
-            messages.removeAll { $0.chat_type == "typing" }
+            DispatchQueue.main.async {
+                // Remove the typing indicator
+                self.messages.removeAll(where: {
+                    if case .message(let msg) = $0, msg.chat_type == "typing" {
+                        return true
+                    }
+                    return false
+                })
+            }
             if let error = error {
                 print("Error: \(error)")
             } else if let result = result {
                 switch result {
                 case .regular(let message):
                     sessionId = message.session_id
-                    messages.append(message)
+                    messages.append(.message(message))
                     self.waitingForResponse = false
                     self.accumulatedText = ""
-                case .secondary(let messageSecondary):
-                    sessionId = messageSecondary.session_id
-                    var recommendations = ""
-                    for location in messageSecondary.content {
-                        recommendations.append(location.name + ", ")
-                    }
-                    let recommendationContent = Message(
-                        session_id: sessionId,
-                        user_id: "1234",
-                        content: recommendations,
-                        chat_type: "regular",
-                        is_user_message: "false"
-                    )
-                    messages.append(recommendationContent)
+                case .secondary(let message):
+                    messages.append(.messageSecondary(message))
                     let followUpContent = Message(
                         session_id: sessionId,
                         user_id: "1234",
@@ -237,7 +252,7 @@ struct SearchView: View {
                         chat_type: "regular",
                         is_user_message: "false"
                     )
-                    messages.append(followUpContent)
+                    messages.append(.message(followUpContent))
                     self.waitingForResponse = false
                     self.accumulatedText = ""
                 }

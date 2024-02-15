@@ -35,55 +35,7 @@ struct LocationRowView: View {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 5) {
                             ForEach(viewModel.locations, id: \.businessId) { location in
-                                VStack(spacing: 0) {
-                                    ZStack(alignment: .topLeading) {
-                                        if let url = URL(string: location.imageUrl ?? "") {
-                                            ZStack{
-                                                AsyncImage(url: url) { image in
-                                                    image
-                                                        .resizable()
-                                                        .scaledToFill()
-                                                } placeholder: {
-                                                    ProgressView()
-                                                }
-                                            }
-                                            .frame(width: 110, height: 110)
-                                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                                        } else {
-                                            Color.gray.opacity(0.3)
-                                        }
-                                        
-                                        HStack(spacing: 2) {
-                                            Image(systemName: "star.fill")
-                                                .resizable()
-                                                .frame(width: 10, height: 10)
-                                                .foregroundColor(.yellow)
-                                            Group {
-                                                if let stars = location.stars {
-                                                    Text(String(format: "%.1f", stars))
-                                                } else {
-                                                    Text("N/A")
-                                                }
-                                            }
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.white)
-                                        }
-                                        .padding(3)
-                                        .background(Color.gray)
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                                        .padding([.top, .leading], 5)
-                                    }
-                                    .frame(width: 110, height: 110)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    Text(location.name)
-                                        .font(.system(size: 14))
-                                        .lineLimit(2)
-                                        .multilineTextAlignment(.center)
-                                        .truncationMode(.tail)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(height: 50)
-                                        .frame(width: 110)
-                                }
+                                LocationRowSimpleView(location: location)
                             }
                         }
                         .gesture(
@@ -123,6 +75,62 @@ struct LocationRowView: View {
                 scrollIndex = (scrollIndex + 1) % viewModel.locations.count
                 scrollView.scrollTo(viewModel.locations[scrollIndex].businessId, anchor: .leading)
             }
+        }
+    }
+}
+
+struct LocationRowSimpleView: View {
+    var location: Location
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                if let url = URL(string: location.imageUrl ?? "") {
+                    ZStack{
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    }
+                    .frame(width: 110, height: 110)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                } else {
+                    Color.gray.opacity(0.3)
+                }
+                
+                HStack(spacing: 2) {
+                    Image(systemName: "star.fill")
+                        .resizable()
+                        .frame(width: 10, height: 10)
+                        .foregroundColor(.yellow)
+                    Group {
+                        if let stars = location.stars {
+                            Text(String(format: "%.1f", stars))
+                        } else {
+                            Text("N/A")
+                        }
+                    }
+                    .font(.system(size: 10))
+                    .foregroundColor(.white)
+                }
+                .padding(3)
+                .background(Color.gray)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .padding([.top, .leading], 5)
+            }
+            .frame(width: 110, height: 110)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            Text(location.name)
+                .font(.system(size: 14))
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(height: 50)
+                .frame(width: 110)
         }
     }
 }

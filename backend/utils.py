@@ -1,8 +1,8 @@
 from datetime import timedelta
 import uuid
 
-def generate_sort_assistant_id(openai_client):
-    instructions = "Rank the locations (best to worst) from our chat history and return a comma-separated list of their business IDs in order of preference. Format the response as: 'business_id1, business_id2, ...'. Provide only this list, without additional text or explanation."
+def generate_sort_assistant_id(openai_client, recommendation_num):
+    instructions = f"Review the prior messages for details on user preference. Based on the discussed attributes, such as category, cuisine, and overall experience, identify and the top {recommendation_num}. Directly provide the unique business IDs associated with these locations, ordered by preference. The response must strictly be a comma-separated list of business IDs, from highest to lowest ranked, with a single spaces in between the IDs and no additional text or explanations. Ensure the format is exactly as follows: 'business_id1, business_id2, business_id3, ...'. The output must adhere to this structure precisely."
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
         model="gpt-3.5-turbo-0125"

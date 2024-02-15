@@ -12,6 +12,7 @@ import redis
 import json
 import re
 import time
+import os
 
 ##############################
 ### Setup and requirements ###
@@ -28,7 +29,7 @@ mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 db = mongo_client["locationDatabase"]
 
 # OpenAI
-openai_client = OpenAI(api_key='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')
+openai_client = OpenAI(api_key="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")
 
 # Redis server for chat and user history
 redis_client = redis.Redis(host='localhost', port=8001, db=0, decode_responses=True)
@@ -128,13 +129,14 @@ async def fetch_nearby_locations(latitude: float,
         open_businesses = []
 
         for item in items:
-            item['cur_open'] = 0  # Default to not currently open
+            perm_status = item['cur_open']
+            item['cur_open'] = 0
             day_of_week = now.strftime('%A')
             hours_list = item.get('hours', {}).get(day_of_week)
 
-            if cur_open == 1 and is_within_hours(now, hours_list):
+            if perm_status == 1 and is_within_hours(now, hours_list):
                 item['cur_open'] = 1
-
+                
             open_businesses.append(Location(**item))
 
         return open_businesses
@@ -208,7 +210,7 @@ async def fetch_locations_business_id(business_ids: List[str]):
 
 
 # Retrieve nearby businesses based on location, time, category, and radius
-@app.get("/nearby_locations", response_model=List[Location])
+@app.get("/api/nearby_locations", response_model=List[Location])
 async def nearby_locations(latitude: float=32.8723812680163,
                            longitude: float=-117.21242234341588,
                            limit: int=20,
@@ -229,7 +231,7 @@ async def nearby_locations(latitude: float=32.8723812680163,
 #########################
 
 # Response of chatgpt for search tab
-@app.post("/chatgpt_response")
+@app.post("/api/chatgpt_response")
 async def chatgpt_response(request: ChatRequest,
                            api_key: str = Depends(get_api_key)):
     start = time.time()
@@ -239,8 +241,7 @@ async def chatgpt_response(request: ChatRequest,
     latitude = request.latitude
     longitude = request.longitude
 
-    # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)
-    sort_assistant_id = generate_sort_assistant_id(openai_client)
+    # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)d
     session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
@@ -308,8 +309,9 @@ async def chatgpt_response(request: ChatRequest,
                 arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
                 arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
 
-
+                arguments["limit"] = 4
                 print(arguments)
+                sort_assistant_id = generate_sort_assistant_id(openai_client, recommendation_num=arguments["limit"])
 
                 print("Fetching nearby locations...")
                 
@@ -327,6 +329,7 @@ async def chatgpt_response(request: ChatRequest,
                 thread_id=thread_id,
                 run_id=run.id
             )
+            print(output)
 
             sort_message = f"{output}"
             openai_client.beta.threads.messages.create(
@@ -361,8 +364,9 @@ async def chatgpt_response(request: ChatRequest,
                         order="desc"
                     )
                     business_ids = messages.data[0].content[0].text.value
+                    print(f"BUSINESS IDS: {business_ids}")
                     business_ids_top_k = business_ids.split(", ")[:int(arguments["limit"])]
-                    print(business_ids_top_k)
+                    print(f"BUSINESS IDS TOP K: {business_ids_top_k}")
                     print("Retrieving filtered personalized locations...")
                     personalized_locations = await fetch_locations_business_id(business_ids_top_k)
                     end = time.time()
