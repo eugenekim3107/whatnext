@@ -13,7 +13,7 @@ class LocationService {
                               limit: Int? = 20,
                               radius: Double? = 10000.0,
                               categories: String? = "any",
-                              curOpen: Int? = 1,
+                              curOpen: Int? = 0,
                               sortBy: String? = "review_count",
                               completion: @escaping (Result<[Location], Error>) -> Void) {
         

@@ -25,7 +25,7 @@ struct ExploreView: View {
                         longitude: -117.23790,
                         categories: "food",
                         radius: 5000,
-                        curOpen: 1,
+                        curOpen: 0,
                         sortBy: "review_count",
                         limit: 15
                     )
@@ -36,7 +36,7 @@ struct ExploreView: View {
                         longitude: -117.23790,
                         categories: "coffee",
                         radius: 5000,
-                        curOpen: 1,
+                        curOpen: 0,
                         sortBy: "best_match",
                         limit: 15
                     )
@@ -47,7 +47,7 @@ struct ExploreView: View {
                         longitude: -117.23790,
                         categories: "shopping",
                         radius: 5000,
-                        curOpen: 1,
+                        curOpen: 0,
                         sortBy: "rating",
                         limit: 15
                     )
@@ -58,7 +58,7 @@ struct ExploreView: View {
                         longitude: -117.23790,
                         categories: "fitness",
                         radius: 5000,
-                        curOpen: 1,
+                        curOpen: 0,
                         sortBy: "best_match",
                         limit: 15
                     )
