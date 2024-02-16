@@ -7,44 +7,42 @@
 
 import Foundation
 
-struct YelpResponse: Codable {
-    let businesses: [LocationInfo]
+// Define the GeoJSON structure for the location
+struct GeoJSON: Codable, Hashable {
+    let type: String
+    let coordinates: [Double]
 }
 
-struct LocationInfo: Codable {
-    let id: String
+// Define the structure for the opening hours
+struct Hours: Codable, Hashable {
+    let Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday: [String]?
+}
+
+// Define the main Location structure
+struct Location: Codable, Identifiable, Hashable {
+    var id: String { businessId }
+    let businessId: String
     let name: String
-    let image_url: String?
-    let is_closed: Bool
-    let url: String?
-    let review_count: Int
-    let categories: [Category]
-    let rating: Double
-    let coordinates: Coordinates
-    let transactions: [String]
-    let location: Location
-    let phone: String?
-    let display_phone: String?
-    let distance: Double?
+    let imageUrl: String?
+    let phone, displayPhone, address, city: String?
+    let state, postalCode: String?
+    let latitude, longitude: Double?
+    let stars: Double?
+    let reviewCount: Int?
+    let curOpen: Int?
+    let categories: String?
+    let tag: [String]?
+    let hours: Hours?
+    let location: GeoJSON
+    let price: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case businessId = "business_id"
+        case name, imageUrl = "image_url", phone, displayPhone = "display_phone", address, city, state, postalCode = "postal_code", latitude, longitude, stars, reviewCount = "review_count", curOpen = "cur_open", categories, tag, hours, location, price
+    }
 }
 
-struct Category: Codable {
-    let alias: String
-    let title: String
-}
-
-struct Coordinates: Codable {
-    let latitude: Double
-    let longitude: Double
-}
-
-struct Location: Codable {
-    let address1: String?
-    let address2: String?
-    let address3: String?
-    let city: String?
-    let zip_code: String?
-    let country: String?
-    let state: String?
-    let display_address: [String]
+// Define a struct to hold the array of locations for the API response
+struct LocationsResponse: Codable {
+    let locations: [Location]
 }

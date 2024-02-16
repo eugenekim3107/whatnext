@@ -8,43 +8,67 @@
 import Foundation
 
 class LocationService {
-    func fetchLocations(latitude: Double, longitude: Double, categories: String, radius: Int = 1000, cur_open: Bool = false, sort_by: String = "rating", limit: Int = 10, api_key: String, completion: @escaping ([LocationInfo]) -> Void) {
+    func fetchNearbyLocations(latitude: Double? = 32.8723812680163,
+                              longitude: Double? = -117.21242234341588,
+                              limit: Int? = 20,
+                              radius: Double? = 10000.0,
+                              categories: String? = "any",
+                              curOpen: Int? = 1,
+                              sortBy: String? = "review_count",
+                              completion: @escaping (Result<[Location], Error>) -> Void) {
         
-        let headers = ["Authorization": "Bearer \(api_key)"]
-        var components = URLComponents(string: "https://api.yelp.com/v3/businesses/search")
-        components?.queryItems = [
-            URLQueryItem(name: "latitude", value: "\(latitude)"),
-            URLQueryItem(name: "longitude", value: "\(-longitude)"),
-            URLQueryItem(name: "categories", value: categories),
-            URLQueryItem(name: "radius", value: "\(radius)"),
-            URLQueryItem(name: "limit", value: "\(limit)"),
-            URLQueryItem(name: "open_now", value: "\(cur_open)"),
-            URLQueryItem(name: "sort_by", value: sort_by)
-        ]
+        var components = URLComponents(string: "https://whatnext.live/api/nearby_locations")
+        
+        var queryItems: [URLQueryItem] = []
+        
+        if let latitude = latitude {
+            queryItems.append(URLQueryItem(name: "latitude", value: "\(latitude)"))
+        }
+        if let longitude = longitude {
+            queryItems.append(URLQueryItem(name: "longitude", value: "\(longitude)"))
+        }
+        if let limit = limit {
+            queryItems.append(URLQueryItem(name: "limit", value: "\(limit)"))
+        }
+        if let radius = radius {
+            queryItems.append(URLQueryItem(name: "radius", value: "\(radius)"))
+        }
+        if let categories = categories {
+            queryItems.append(URLQueryItem(name: "categories", value: categories))
+        }
+        if let curOpen = curOpen {
+            queryItems.append(URLQueryItem(name: "cur_open", value: "\(curOpen)"))
+        }
+        if let sortBy = sortBy {
+            queryItems.append(URLQueryItem(name: "sort_by", value: sortBy))
+        }
+        
+        components?.queryItems = queryItems
         
         guard let url = components?.url else {
-            print("Invalid URL")
+            completion(.failure(NSError(domain: "InvalidURL", code: -1, userInfo: nil)))
             return
         }
-
+        
         var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = headers
-
+        request.addValue("whatnext", forHTTPHeaderField: "whatnext_token")
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                print("Error fetching data: \(error?.localizedDescription ?? "Unknown error")")
+            if let error = error {
+                completion(.failure(error))
                 return
             }
-
+            
+            guard let data = data else {
+                completion(.failure(NSError(domain: "NoData", code: -2, userInfo: nil)))
+                return
+            }
+            
             do {
-                let jsonResponse = try JSONDecoder().decode(YelpResponse.self, from: data)
-                let locations = jsonResponse.businesses
-
-                DispatchQueue.main.async {
-                    completion(locations)
-                }
+                let locations = try JSONDecoder().decode([Location].self, from: data)
+                completion(.success(locations))
             } catch {
-                print("Failed to decode locations: \(error.localizedDescription)")
+                completion(.failure(error))
             }
         }.resume()
     }

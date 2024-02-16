@@ -1,0 +1,95 @@
+# User initial inference
+async def user_inference(chat_history):
+
+    # response validation
+    valid_limit = [1, 50, 10]  # min, max, default
+    valid_radius = [10, 100000, 10000]  # min, max, default
+    valid_cur_open = [0, 1, 1]  # closed, open, default
+    valid_categories = ["restaurant", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
+    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
+    
+    # Prepare the prompt
+    few_shot_examples = [
+        {"role": "assistant", "content": "You are a helpful assistant. Analyze the user's conversation and infer their preferences for visiting places in JSON format, including limit, radius, categories, cur_open, and sort_by. Ensure the category is one from the following list: restaurant, food, shopping, fitness, beautysvc, hiking, aquariums, coffee, all. The sort_by option must be one of the following: review_count, rating, best_match, distance."},
+        {"role": "user", "content": "I love spending my evenings at a quiet coffee shop reading a book."},
+        {"role": "assistant", "content": "{\"limit\": 5, \"radius\": 5000, \"categories\": \"coffee\", \"cur_open\": 1, \"sort_by\": \"rating\"}"},
+        {"role": "user", "content": "I'm looking for a gym to start working out."},
+        {"role": "assistant", "content": "{\"limit\": 10, \"radius\": 10000, \"categories\": \"fitness\", \"cur_open\": 1, \"sort_by\": \"distance\"}"}
+    ]
+
+    # add examples with chat history
+    structured_chat_history = few_shot_examples + chat_history
+
+    try:
+        response = openai_client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            response_format={ "type": "json_object" },
+            messages=structured_chat_history
+        )
+
+        inferences_str = response.choices[0].message.content
+
+        inferred_preferences = json.loads(inferences_str)
+
+        # Validate and adjust the 'limit'
+        limit = inferred_preferences.get("limit", valid_limit[2])
+        inferred_preferences["limit"] = max(min(limit, valid_limit[1]), valid_limit[0])
+
+        # Validate and adjust the 'radius'
+        radius = inferred_preferences.get("radius", valid_radius[2])
+        inferred_preferences["radius"] = max(min(radius, valid_radius[1]), valid_radius[0])
+
+        # Validate and adjust the 'cur_open'
+        cur_open = inferred_preferences.get("cur_open", valid_cur_open[2])
+        inferred_preferences["cur_open"] = cur_open if cur_open in valid_cur_open[:2] else valid_cur_open[2]
+
+        # Validate and adjust the 'categories'
+        category = inferred_preferences.get("categories", "all").lower()
+        inferred_preferences["categories"] = category if category in valid_categories else "all"
+
+        # Validate and adjust the 'sort_by'
+        sort_by = inferred_preferences.get("sort_by", "review_count").lower()
+        inferred_preferences["sort_by"] = sort_by if sort_by in valid_sort_by else "review_count"
+
+        return inferred_preferences
+
+    except Exception as e:
+        print(f"Error during inference: {e}")
+        # Return default preferences in case of an error
+        return {
+            "limit": valid_limit[2],
+            "radius": valid_radius[2],
+            "cur_open": valid_cur_open[2],
+            "categories": "all",
+            "sort_by": "review_count"
+        }
+
+
+# latitude and longitude are strings due to the input of assistant api
+async def fetch_nearby_locations_inferred(latitude:float, 
+                                          longitude:float,
+                                          thread_id:str):
+    
+    chat_history = openai_client.beta.threads.messages.list(
+        thread_id=thread_id,
+        order="asc"
+    )
+
+    chat_history_contents = []
+    for message in chat_history:
+        chat_history_contents.append({"role": message.role, "content": message.content[0].text.value})
+
+    parameters = await user_inference(chat_history_contents)
+    potential_locations = await fetch_nearby_locations(
+        latitude=latitude,
+        longitude=longitude,
+        limit=parameters["limit"],
+        radius=parameters["radius"],
+        categories=parameters["categories"],
+        cur_open=parameters["cur_open"],
+        sort_by=parameters["sort_by"]
+    )
+    return potential_locations
+    
+Benchmarks for Time:
+
