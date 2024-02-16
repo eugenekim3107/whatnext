@@ -301,6 +301,7 @@ async def chatgpt_response(request: ChatRequest,
             for action in required_actions["tool_calls"]:
                 arguments = json.loads(action['function']['arguments']) if action['function']['arguments'] else {}
                 arguments = {**default_args, **arguments}
+                print(f"Arguments GPT: {arguments}")
 
                 # Validate and update arguments
                 arguments["limit"] = max(min(int(arguments["limit"]), valid_limit_range[1]), valid_limit_range[0]) if "limit" in arguments else default_args["limit"]
@@ -309,8 +310,7 @@ async def chatgpt_response(request: ChatRequest,
                 arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
                 arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
 
-                arguments["limit"] = 4
-                print(arguments)
+                print(f"Arguments after default: {arguments}")
                 sort_assistant_id = generate_sort_assistant_id(openai_client, recommendation_num=arguments["limit"])
 
                 print("Fetching nearby locations...")
@@ -325,11 +325,28 @@ async def chatgpt_response(request: ChatRequest,
                     sort_by=arguments["sort_by"]
                 )
 
-            run = openai_client.beta.threads.runs.cancel(
-                thread_id=thread_id,
-                run_id=run.id
-            )
-            print(output)
+                print(len(output))
+
+                business_names = ', '.join([location.name for location in output if location.name is not None])
+                openai_client.beta.threads.runs.submit_tool_outputs(
+                    thread_id=thread_id,
+                    run_id=run.id,
+                    tool_outputs=[
+                        {
+                            "tool_call_id": action["id"],
+                            "output": business_names
+                        }
+                    ]
+                )
+                run_status = openai_client.beta.threads.runs.retrieve(
+                    thread_id=thread_id,
+                    run_id=run.id
+                )
+                while run_status.status == "in_progress":
+                    run_status = openai_client.beta.threads.runs.retrieve(
+                        thread_id=thread_id,
+                        run_id=run.id
+                    )
 
             sort_message = f"{output}"
             openai_client.beta.threads.messages.create(
@@ -340,24 +357,24 @@ async def chatgpt_response(request: ChatRequest,
 
             print("Sorting locations based on personal preference...")
 
-            run = openai_client.beta.threads.runs.create(
+            run_sort = openai_client.beta.threads.runs.create(
                 thread_id=thread_id,
                 assistant_id=sort_assistant_id
             )
 
-            run_status = openai_client.beta.threads.runs.retrieve(
+            run_sort_status = openai_client.beta.threads.runs.retrieve(
                 thread_id=thread_id,
-                run_id=run.id
+                run_id=run_sort.id
             )
 
             while True:
 
-                run_status = openai_client.beta.threads.runs.retrieve(
+                run_sort_status = openai_client.beta.threads.runs.retrieve(
                     thread_id=thread_id,
-                    run_id=run.id
+                    run_id=run_sort.id
                 )
 
-                if run_status.status == 'completed':
+                if run_sort_status.status == 'completed':
                     chat_type = "locations"
                     messages = openai_client.beta.threads.messages.list(
                         thread_id=thread_id,
@@ -369,6 +386,7 @@ async def chatgpt_response(request: ChatRequest,
                     print(f"BUSINESS IDS TOP K: {business_ids_top_k}")
                     print("Retrieving filtered personalized locations...")
                     personalized_locations = await fetch_locations_business_id(business_ids_top_k)
+
                     end = time.time()
                     print(end-start)
                     return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type, "is_user_message": "false"}

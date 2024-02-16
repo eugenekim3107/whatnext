@@ -283,7 +283,7 @@ struct LocationSearchSimpleView: View {
         }
         .padding([.top, .leading, .trailing])
         .background(Color.white)
-        .shadow(color:Color.black.opacity(0.2), radius:2, x:-2, y:2)
+        .shadow(color:Color.black.opacity(0.6), radius:3, x:0, y:0)
         .padding([.top], 2)
         .padding([.bottom], 2)
     }

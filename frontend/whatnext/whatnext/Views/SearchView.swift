@@ -3,7 +3,6 @@ import SwiftUI
 struct SearchView: View {
     @State private var chatText = ""
     @State private var accumulatedText = ""
-//    @State private var messages: [Message] = []
     @State private var messages: [ChatContent] = []
     @State private var timer: Bool = true
     @State private var waitingForResponse: Bool = false
