@@ -20,7 +20,7 @@ import pytz
 ##############################
 
 # API key credentials
-API_KEY = os.getenv('whatnext_token')
+API_KEY = "whatnext"
 API_KEY_NAME = "whatnext_token"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
@@ -137,7 +137,7 @@ async def fetch_nearby_locations(latitude: float,
             day_of_week = now.strftime('%A')
             hours_list = item.get('hours', {}).get(day_of_week)
 
-            if perm_status == 1 and is_within_hours(now, hours_list):
+            if perm_status == 1 and cur_open == 1 and is_within_hours(now, hours_list):
                 item['cur_open'] = 1
                 open_businesses.append(Location(**item))
             if cur_open == 0:
@@ -192,7 +192,7 @@ async def fetch_nearby_locations_condensed(latitude: float,
             day_of_week = now.strftime('%A')
             hours_list = item.get('hours', {}).get(day_of_week)
 
-            if perm_status == 1 and is_within_hours(now, hours_list):
+            if perm_status == 1 and cur_open == 1 and is_within_hours(now, hours_list):
                 item['cur_open'] = 1
                 open_businesses.append(LocationCondensed(**item))
             if cur_open == 0:
@@ -261,12 +261,15 @@ async def chatgpt_response(request: ChatRequest,
 
     # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)d
     session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
+    print({"s": session_id, "t": thread_id, "a": assistant_id})
 
     openai_client.beta.threads.messages.create(
         thread_id = thread_id,
         role="user",
         content=message,
     )
+
+    print("Starting the assistant response...")
 
     run = openai_client.beta.threads.runs.create(
         thread_id = thread_id,
@@ -312,6 +315,8 @@ async def chatgpt_response(request: ChatRequest,
                 func_name = action['function']['name']
                 arguments = json.loads(action['function']['arguments']) if action['function']['arguments'] else {}
                 arguments = {**default_args, **arguments}
+                print(f"Function Name: {func_name}")
+                print(f"Arguments GPT: {arguments}")
 
                 # Check the function call name
                 if func_name == "fetch_nearby_locations_condensed":
@@ -322,6 +327,10 @@ async def chatgpt_response(request: ChatRequest,
                     arguments["categories"] = arguments["categories"] if arguments["categories"] in valid_categories else default_args["categories"]
                     arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
                     arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
+
+                    print(f"Arguments after default: {arguments}")
+
+                    print("Fetching nearby locations...")
                 
                     output_nearby_locations = await fetch_nearby_locations_condensed(
                         latitude=float(latitude), 
@@ -333,6 +342,8 @@ async def chatgpt_response(request: ChatRequest,
                         sort_by=arguments["sort_by"]
                     )
 
+                    print(f"OUTPUT LENGTH: {len(output_nearby_locations)}")
+
                     if len(output_nearby_locations) == 0:
                         business_info = "All nearby locations are either currently closed or unavaliable."
                     else:
@@ -341,7 +352,7 @@ async def chatgpt_response(request: ChatRequest,
                         "tool_call_id": action["id"],
                         "output": business_info
                     }
-
+                    print("created tool")
                     tool_outputs.append(tool_output)
                 
                 elif func_name == "fetch_specific_location":
@@ -349,9 +360,13 @@ async def chatgpt_response(request: ChatRequest,
                     # Validate business_id
                     arguments["business"] = arguments["business_id"] if arguments["business_id"] is not None else ""
 
+                    print("Fetching specific location...")
+
                     output_specific_location = await fetch_specific_location(
                         business_id=arguments["business_id"]
                     )
+
+                    print(f"BUSINESS_ID: {output_specific_location}")
 
                     if output_specific_location is None:
                         business_info = "No additional information about location"
@@ -364,18 +379,21 @@ async def chatgpt_response(request: ChatRequest,
                     tool_outputs.append(tool_output)
                 
                 else:
-                    continue
+                    print(f"Function name not registered: {func_name}")
 
+            print("submitting tool")    
             openai_client.beta.threads.runs.submit_tool_outputs(
                 thread_id=thread_id,
                 run_id=run.id,
                 tool_outputs=tool_outputs
             )
+            print("finished submitting tool")
         
         else:
             continue
     
     if output_nearby_locations is None or len(output_nearby_locations) == 0:
+        print("Generating regular response...")
         chat_type = "regular"
         messages = openai_client.beta.threads.messages.list(
             thread_id=thread_id,
@@ -384,6 +402,7 @@ async def chatgpt_response(request: ChatRequest,
         for msg in messages.data:
             message_content = msg.content[0].text.value
         end = time.time()
+        print(end-start)
         return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
     
     else:
@@ -394,7 +413,8 @@ async def chatgpt_response(request: ChatRequest,
             role="user",
             content=sort_message,
         )
-        
+
+        print("Sorting locations based on personal preference...")
         run_sort_id = create_sorting_run(openai_client, thread_id, assistant_id)
 
         run_sort_status = openai_client.beta.threads.runs.retrieve(
@@ -415,8 +435,12 @@ async def chatgpt_response(request: ChatRequest,
             order="desc"
         )
         business_ids = messages.data[0].content[0].text.value
+        print(f"BUSINESS IDS: {business_ids}")
         business_ids_top_k = business_ids.split(", ")[:int(arguments["limit"])]
+        print(f"BUSINESS IDS TOP K: {business_ids_top_k}")
+        print("Retrieving filtered personalized locations...")
         personalized_locations = await fetch_locations_business_id(business_ids_top_k)
 
         end = time.time()
+        print(end-start)
         return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type, "is_user_message": "false"}

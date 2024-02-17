@@ -137,7 +137,7 @@ async def fetch_nearby_locations(latitude: float,
             day_of_week = now.strftime('%A')
             hours_list = item.get('hours', {}).get(day_of_week)
 
-            if perm_status == 1 and is_within_hours(now, hours_list):
+            if perm_status == 1 and cur_open == 1 and is_within_hours(now, hours_list):
                 item['cur_open'] = 1
                 open_businesses.append(Location(**item))
             if cur_open == 0:
@@ -192,7 +192,7 @@ async def fetch_nearby_locations_condensed(latitude: float,
             day_of_week = now.strftime('%A')
             hours_list = item.get('hours', {}).get(day_of_week)
 
-            if perm_status == 1 and is_within_hours(now, hours_list):
+            if perm_status == 1 and cur_open == 1 and is_within_hours(now, hours_list):
                 item['cur_open'] = 1
                 open_businesses.append(LocationCondensed(**item))
             if cur_open == 0:
