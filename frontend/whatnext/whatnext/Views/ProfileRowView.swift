@@ -65,7 +65,6 @@ struct ProfileRowView_Previews: PreviewProvider {
             titleIconName: "star.fill",
             titleIconColor: .yellow,
             items: [
-                // Add your mock ProfileItem instances here
                 ProfileItem(imageURL: URL(string: "https://s3-media1.fl.yelpcdn.com/bphoto/vxSx2j9gnJ-dWu9OFYyhRQ/o.jpg")!),
                 ProfileItem(imageURL: URL(string: "https://s3-media1.fl.yelpcdn.com/bphoto/6Z_nkxlxwN5KjSI4o-T1uA/o.jpg")!),
                 ProfileItem(imageURL: URL(string: "https://s3-media3.fl.yelpcdn.com/bphoto/GH7ulQACJUkL-GKjke_YgA/o.jpg")!),
