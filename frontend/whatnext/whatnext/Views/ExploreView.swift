@@ -45,7 +45,7 @@ struct ExploreView: View {
                         title: "Shopping Spree!",
                         latitude: 32.88088,
                         longitude: -117.23790,
-                        categories: "shopping",
+                        categories: "deptstores",
                         radius: 5000,
                         curOpen: 0,
                         sortBy: "rating",
@@ -66,6 +66,12 @@ struct ExploreView: View {
                 .navigationBarTitle("Explore", displayMode: .large)
                 .padding(.top)
                 .padding(.bottom, 50)
+            }
+            .refreshable {
+                viewModel1.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: "food", curOpen: 0, sortBy: "review_count")
+                viewModel2.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: "coffee", curOpen: 0, sortBy: "best_match")
+                viewModel3.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: "deptstores", curOpen: 0, sortBy: "rating")
+                viewModel4.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: "fitness", curOpen: 0, sortBy: "best_match")
             }
             .background(Color(UIColor.systemGroupedBackground))
         }

@@ -13,14 +13,15 @@ class LocationRowViewModel: ObservableObject {
     private var isDataLoaded = false
     private let locationService = LocationService()
 
-    func fetchNearbyLocations(latitude: Double = 32.8723812680163, longitude: Double = -117.21242234341588, limit: Int = 20, radius: Double = 10000.0, categories: String = "any", curOpen: Int = 1, sortBy: String = "best_match") {
+    func fetchNearbyLocations(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: String, curOpen: Int, sortBy: String) {
+        guard !isDataLoaded else { return }
         isLoading = true
-        isDataLoaded = true
         locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let locations):
                     self?.locations = locations
+                    self?.isDataLoaded = true
                 case .failure(let error):
                     print("Error fetching locations: \(error.localizedDescription)")
                     self?.locations = []
@@ -30,8 +31,8 @@ class LocationRowViewModel: ObservableObject {
         }
     }
     
-    func refreshData() {
+    func refreshData(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: String, curOpen: Int, sortBy: String) {
         isDataLoaded = false
-        fetchNearbyLocations()
+        fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy)
     }
 }

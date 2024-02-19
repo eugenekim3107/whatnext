@@ -39,7 +39,7 @@ def generate_assistant_id(openai_client):
     valid_cur_open = [0, 1, 1]
     categories_file_path = "categories.json"
     valid_categories = open_json_file(categories_file_path)
-    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
+    valid_sort_by = ["review_count", "stars"]
     tools = [
         {
             "type": "function",
@@ -65,7 +65,7 @@ def generate_assistant_id(openai_client):
                         "cur_open": {
                             "type": "string",
                             "enum": [0, 1],
-                            "description": f"Filter based on current open status. 0 for closed, 1 for open. Default: {valid_cur_open[2]}."
+                            "description": f"Filter based on current open status. 0 for both closed and open, while 1 is just for open. Default: {valid_cur_open[2]}."
                         },
                         "sort_by": {
                             "type": "string",

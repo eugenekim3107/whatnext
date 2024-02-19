@@ -13,6 +13,7 @@ struct SearchView: View {
         NavigationView{
             messagesView
                 .navigationTitle("Search")
+                .navigationBarItems(trailing: refreshButton)
                 .overlay(
                     Group {
                         if showPopup {
@@ -35,6 +36,19 @@ struct SearchView: View {
                 .onChange(of: chatText) { newValue in
                     checkConditionsAndSendMessage()
                 }
+        }
+    }
+    
+    // Define the refresh button view
+    private var refreshButton: some View {
+        Button(action: restartConversation ) {
+            Text("New Chat")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+                .padding(.vertical, 5)
+                .padding(.horizontal, 10)
+                .background(.orange)
+                .cornerRadius(5)
         }
     }
     
@@ -270,6 +284,13 @@ struct SearchView: View {
         if !timer && !accumulatedText.isEmpty && chatText.isEmpty {
             sendMessage()
         }
+    }
+    
+    private func restartConversation() {
+        messages.removeAll()
+        sessionId = nil
+        accumulatedText = ""
+        chatText = ""
     }
 }
 

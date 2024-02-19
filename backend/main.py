@@ -99,7 +99,7 @@ async def fetch_nearby_locations(latitude: float,
                                  radius: float=10000, 
                                  categories: str="all", 
                                  cur_open: int=0, 
-                                 sort_by: str="best_match") -> List[Location]:
+                                 sort_by: str="review_count") -> List[Location]:
 
     query = {
         "location": {
@@ -154,7 +154,7 @@ async def fetch_nearby_locations_condensed(latitude: float,
                                            radius: float=10000, 
                                            categories: str="all", 
                                            cur_open: int=0, 
-                                           sort_by: str="best_match") -> List[LocationCondensed]:
+                                           sort_by: str="review_count") -> List[LocationCondensed]:
     
     query = {
         "location": {
@@ -297,8 +297,8 @@ async def chatgpt_response(request: ChatRequest,
                 "limit": 10,
                 "radius": 10000,
                 "categories": "all",
-                "cur_open": 1,
-                "sort_by": "best_match"
+                "cur_open": 0,
+                "sort_by": "review_count"
             }
             # Validation ranges and sets
             valid_limit_range = [3, 10]  # min, max
@@ -306,7 +306,7 @@ async def chatgpt_response(request: ChatRequest,
             valid_cur_open_options = [0, 1]  # closed or open
             categories_file_path = "categories.json"
             valid_categories = open_json_file(categories_file_path)
-            valid_sort_by_options = ["review_count", "rating", "best_match", "distance"]
+            valid_sort_by_options = ["review_count", "stars"]
 
             tool_outputs = []
 
@@ -397,10 +397,8 @@ async def chatgpt_response(request: ChatRequest,
         chat_type = "regular"
         messages = openai_client.beta.threads.messages.list(
             thread_id=thread_id,
-            order="asc"
         )
-        for msg in messages.data:
-            message_content = msg.content[0].text.value
+        message_content = messages.data[0].content[0].text.value
         end = time.time()
         print(end-start)
         return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
@@ -432,7 +430,6 @@ async def chatgpt_response(request: ChatRequest,
         chat_type = "locations"
         messages = openai_client.beta.threads.messages.list(
             thread_id=thread_id,
-            order="desc"
         )
         business_ids = messages.data[0].content[0].text.value
         print(f"BUSINESS IDS: {business_ids}")
