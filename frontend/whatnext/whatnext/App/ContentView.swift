@@ -1,51 +1,62 @@
-//
-//  ContentView.swift
-//  whatnext
-//
-//  Created by Eugene Kim on 1/21/24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedTab = Tab.explore
+    
+    @AppStorage("log_status") var logStatus: Bool = false
+    
+    
+    
+    var body: some View {
+        let _ = print(logStatus)
+        if logStatus {
+            
+            AfterLoginView()
+        } else {
+            
+            LoginView()
+            
+        }
+    }
+}
 
+struct AfterLoginView: View {
+    @State private var selectedTab = Tab.explore
+    
     init() {
         UITabBar.appearance().isHidden = true
     }
-
+    
     var body: some View {
         ZStack {
-            VStack {
-                TabView(selection: $selectedTab) {
-                    MapView()
-                        .edgesIgnoringSafeArea(.bottom)
-                        .animation(nil, value: selectedTab)
-                        .tag(Tab.map)
-                    
-                    SearchView()
-                        .animation(nil, value: selectedTab)
-                        .tag(Tab.search)
-                    
-                    ExploreView()
-                        .animation(nil, value: selectedTab)
-                        .tag(Tab.explore)
-                    
-                    ProfileView()
-                        .animation(nil, value: selectedTab)
-                        .tag(Tab.profile)
-                    
-                    MoreView()
-                        .animation(nil, value: selectedTab)
-                        .tag(Tab.more)
-                }
+            TabView(selection: $selectedTab) {
+                MapView()
+                    .edgesIgnoringSafeArea(.bottom)
+                    .animation(nil, value: selectedTab)
+                    .tag(Tab.map)
+                
+                SearchView()
+                    .animation(nil, value: selectedTab)
+                    .tag(Tab.search)
+                
+                ExploreView()
+                    .animation(nil, value: selectedTab)
+                    .tag(Tab.explore)
+                
+                ProfileView()
+                    .animation(nil, value: selectedTab)
+                    .tag(Tab.profile)
+                
+                MoreView()
+                    .animation(nil, value: selectedTab)
+                    .tag(Tab.more)
             }
-
             VStack {
                 Spacer()
                 TabBarView(selectedTab: $selectedTab)
+                // Your custom TabBarView here
             }
-        }.edgesIgnoringSafeArea(.bottom)
+        }
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
