@@ -20,7 +20,7 @@ struct LocationRowView: View {
     @State private var scrollIndex = 0
     @State private var timer: Timer?
     @State private var isManuallyScrolling = false
-
+ 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)

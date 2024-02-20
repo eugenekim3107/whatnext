@@ -37,6 +37,9 @@
 		8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BB2B61F2030029487A /* LocationService.swift */; };
 		8ACD17BE2B61F4C50029487A /* LocationRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */; };
 		8ACD17C42B6200860029487A /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17C32B6200860029487A /* TabBarView.swift */; };
+		8ADEA5572B83FE270031BA33 /* ProfileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA5562B83FE270031BA33 /* ProfileRowView.swift */; };
+		8ADEA5592B8425DE0031BA33 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA5582B8425DE0031BA33 /* ProfileService.swift */; };
+		8ADEA55B2B8425FC0031BA33 /* ProfileRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA55A2B8425FC0031BA33 /* ProfileRowViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +95,9 @@
 		8ACD17BB2B61F2030029487A /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowViewModel.swift; sourceTree = "<group>"; };
 		8ACD17C32B6200860029487A /* TabBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
+		8ADEA5562B83FE270031BA33 /* ProfileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowView.swift; sourceTree = "<group>"; };
+		8ADEA5582B8425DE0031BA33 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
+		8ADEA55A2B8425FC0031BA33 /* ProfileRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +200,7 @@
 				7830FCDA2B70F29E00B31394 /* LocationDetailView.swift */,
 				8A6024C42B7C8D5300CCF51A /* TypingIndicatorView.swift */,
 				8A6024CC2B7C9A3600CCF51A /* InteractiveLocationView.swift */,
+				8ADEA5562B83FE270031BA33 /* ProfileRowView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -208,6 +215,7 @@
 				8A87046D2B5E050F00183191 /* MoreViewModel.swift */,
 				8A87046F2B5E051800183191 /* ProfileViewModel.swift */,
 				8A8704712B5E051F00183191 /* SearchViewModel.swift */,
+				8ADEA55A2B8425FC0031BA33 /* ProfileRowViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -244,6 +252,7 @@
 			children = (
 				8ACD17BB2B61F2030029487A /* LocationService.swift */,
 				8A86A43A2B785E13002CE48E /* ChatService.swift */,
+				8ADEA5582B8425DE0031BA33 /* ProfileService.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -380,12 +389,14 @@
 			files = (
 				78F048142B5FEC710072AAFA /* LocationManager.swift in Sources */,
 				8A87046A2B5E04FE00183191 /* LoadingViewModel.swift in Sources */,
+				8ADEA5592B8425DE0031BA33 /* ProfileService.swift in Sources */,
 				7830FCDB2B70F29E00B31394 /* LocationDetailView.swift in Sources */,
 				8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */,
 				8A6024CD2B7C9A3600CCF51A /* InteractiveLocationView.swift in Sources */,
 				8A86A43B2B785E13002CE48E /* ChatService.swift in Sources */,
 				8A8704642B5E043C00183191 /* ProfileView.swift in Sources */,
 				8A8704662B5E044500183191 /* SearchView.swift in Sources */,
+				8ADEA55B2B8425FC0031BA33 /* ProfileRowViewModel.swift in Sources */,
 				8A8704622B5E043300183191 /* MoreView.swift in Sources */,
 				8A87042C2B5E022800183191 /* ContentView.swift in Sources */,
 				8A8704602B5E042B00183191 /* MapView.swift in Sources */,
@@ -403,6 +414,7 @@
 				8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */,
 				8ACD17B92B61F18A0029487A /* LocationInfo.swift in Sources */,
 				8A87046C2B5E050700183191 /* MapViewModel.swift in Sources */,
+				8ADEA5572B83FE270031BA33 /* ProfileRowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
