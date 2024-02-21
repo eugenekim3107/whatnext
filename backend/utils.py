@@ -38,8 +38,10 @@ def generate_assistant_id(openai_client):
     valid_radius = [1000, 100000, 10000]
     valid_cur_open = [0, 1, 1]
     categories_file_path = "categories.json"
+    tags_file_path = "tags.json"
     valid_categories = open_json_file(categories_file_path)
-    valid_sort_by = ["review_count", "stars"]
+    valid_tags = open_json_file(tags_file_path)
+    valid_sort_by = ["review_count", "stars", "random"]
     tools = [
         {
             "type": "function",
@@ -60,12 +62,17 @@ def generate_assistant_id(openai_client):
                         "categories": {
                             "type": "string",
                             "enum": valid_categories,
-                            "description": f"Categories to filter the search. Options: categories within the categories.json file."
+                            "description": f"Primary categories to filter the search, representing broad sectors or types of locations. Categories help in segmenting locations into major groups for easier discovery. Categories must be in 'enum'."
                         },
                         "cur_open": {
                             "type": "string",
                             "enum": [0, 1],
                             "description": f"Filter based on current open status. 0 for both closed and open, while 1 is just for open. Default: {valid_cur_open[2]}."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "enum": valid_tags,
+                            "description": f"Optional tags to refine your search based on specific attributes or specialties within a category. Tags provide a granular level of filtering to help you find locations that offer particular services, cuisines, or features. Tags must be in 'enum'."
                         },
                         "sort_by": {
                             "type": "string",

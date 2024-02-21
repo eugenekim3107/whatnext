@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Security, HTTPException, Depends
+from fastapi import FastAPI, Security, HTTPException, Depends, Query
 from utils import *
 from fastapi.security.api_key import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
@@ -14,6 +14,7 @@ import re
 import time
 import os
 import pytz
+import random
 
 ##############################
 ### Setup and requirements ###
@@ -67,7 +68,7 @@ class Location(BaseModel):
     stars: Optional[float] = None
     review_count: Optional[int] = 0
     cur_open: Optional[int] = 0
-    categories: Optional[str] = None
+    categories: Optional[List[str]] = None
     tag: Optional[List[str]] = None
     hours: Optional[Dict[str, List[str]]] = None
     location: GeoJSON
@@ -79,7 +80,7 @@ class LocationCondensed(BaseModel):
     stars: Optional[float] = None
     review_count: Optional[float] = None
     cur_open: Optional[int] = 0
-    categories: Optional[str] = None
+    categories: Optional[List[str]] = None
     tag: Optional[List[str]] = None
     price: Optional[str] = None
 
@@ -95,13 +96,14 @@ async def get_api_key(api_key: str = Security(api_key_header)):
 # Retrieve nearby locations
 async def fetch_nearby_locations(latitude: float, 
                                  longitude: float, 
-                                 limit: int=30, 
-                                 radius: float=10000, 
-                                 categories: str="all", 
-                                 cur_open: int=0, 
+                                 limit: int=30,
+                                 radius: float=10000,
+                                 categories: List[str]=["all"], 
+                                 cur_open: int=0,
+                                 tag: List[str]=None,
                                  sort_by: str="review_count") -> List[Location]:
-
-    query = {
+    
+    query_base = {
         "location": {
             "$nearSphere": {
                 "$geometry": {
@@ -113,25 +115,28 @@ async def fetch_nearby_locations(latitude: float,
         },
     }
 
-    if "," in categories:
-        categories_list = [cat.strip() for cat in categories.split(",")]
-    else:
-        categories_list = [categories.strip()]
+    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories)
 
-    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories_list)
+    if categories != ["any"]:
+        query_base["categories"] = {"$regex": regex_pattern, "$options": "i"}
 
-    if categories_list != ["any"]:
-        query["categories"] = {"$regex": regex_pattern, "$options": "i"}
+    query_with_tag = query_base.copy()
 
+    if tag:
+        query_with_tag["tag"] = {"$in": tag}
     pacific = pytz.timezone('America/Los_Angeles')
     now_utc = datetime.now(pytz.utc)
     now = now_utc.astimezone(pacific)
 
-    try:
-        items = await db.locations.find(query).sort(sort_by, -1).limit(limit).to_list(length=limit)
-        open_businesses = []
+    async def query_and_process(query):
+        if sort_by != "random":
+            items = await db.locations.find(query).sort(sort_by, -1).to_list(length=limit)
+        else:
+            items = await db.locations.find(query).to_list(length=limit)
+            random.shuffle(items)
 
-        for item in items:
+        open_businesses = []
+        for item in items[:limit]:
             perm_status = item['cur_open']
             item['cur_open'] = 0
             day_of_week = now.strftime('%A')
@@ -144,6 +149,13 @@ async def fetch_nearby_locations(latitude: float,
                 open_businesses.append(Location(**item))
             
         return open_businesses
+
+    try:
+        locations = await query_and_process(query_with_tag)
+        if not locations and tag:
+            locations = await query_and_process(query_base)
+        
+        return locations
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -152,11 +164,12 @@ async def fetch_nearby_locations_condensed(latitude: float,
                                            longitude: float, 
                                            limit: int=50, 
                                            radius: float=10000, 
-                                           categories: str="all", 
-                                           cur_open: int=0, 
+                                           categories: List[str]=["all"], 
+                                           cur_open: int=0,
+                                           tag: List[str]=None,
                                            sort_by: str="review_count") -> List[LocationCondensed]:
     
-    query = {
+    query_base = {
         "location": {
             "$nearSphere": {
                 "$geometry": {
@@ -168,25 +181,28 @@ async def fetch_nearby_locations_condensed(latitude: float,
         },
     }
 
-    if "," in categories:
-        categories_list = [cat.strip() for cat in categories.split(",")]
-    else:
-        categories_list = [categories.strip()]
+    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories)
 
-    regex_pattern = '|'.join(f"(^|, ){re.escape(cat)}(,|$)" for cat in categories_list)
+    if categories != ["any"]:
+        query_base["categories"] = {"$regex": regex_pattern, "$options": "i"}
 
-    if categories_list != ["any"]:
-        query["categories"] = {"$regex": regex_pattern, "$options": "i"}
+    query_with_tag = query_base.copy()
 
+    if tag:
+        query_with_tag["tag"] = {"$in": tag}
     pacific = pytz.timezone('America/Los_Angeles')
     now_utc = datetime.now(pytz.utc)
     now = now_utc.astimezone(pacific)
 
-    try:
-        items = await db.locations.find(query).sort(sort_by, -1).limit(limit).to_list(length=limit)
-        open_businesses = []
+    async def query_and_process(query):
+        if sort_by != "random":
+            items = await db.locations.find(query).sort(sort_by, -1).to_list(length=limit)
+        else:
+            items = await db.locations.find(query).to_list(length=limit)
+            random.shuffle(items)
 
-        for item in items:
+        open_businesses = []
+        for item in items[:limit]:
             perm_status = item['cur_open']
             item['cur_open'] = 0
             day_of_week = now.strftime('%A')
@@ -199,6 +215,13 @@ async def fetch_nearby_locations_condensed(latitude: float,
                 open_businesses.append(LocationCondensed(**item))
             
         return open_businesses
+
+    try:
+        locations = await query_and_process(query_with_tag)
+        if not locations and tag:
+            locations = await query_and_process(query_base)
+        
+        return locations
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
@@ -233,13 +256,14 @@ async def nearby_locations(latitude: float=32.8723812680163,
                            longitude: float=-117.21242234341588,
                            limit: int=20,
                            radius: float=10000.0,
-                           categories: str="any", # 'any' is all categories
+                           categories: List[str]= Query(["any"]),
                            cur_open: int=0,
+                           tag: List[str]= Query(None),
                            sort_by: str="review_count",
                            api_key: str = Depends(get_api_key)):
     
     try:
-        open_businesses = await fetch_nearby_locations(latitude, longitude, limit, radius, categories, cur_open, sort_by)
+        open_businesses = await fetch_nearby_locations(latitude, longitude, limit, radius, categories, cur_open, tag, sort_by)
         return open_businesses
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -298,6 +322,7 @@ async def chatgpt_response(request: ChatRequest,
                 "radius": 10000,
                 "categories": "all",
                 "cur_open": 0,
+                "tag": None,
                 "sort_by": "review_count"
             }
             # Validation ranges and sets
@@ -305,8 +330,10 @@ async def chatgpt_response(request: ChatRequest,
             valid_radius_range = [1000, 100000]  # min, max
             valid_cur_open_options = [0, 1]  # closed or open
             categories_file_path = "categories.json"
+            tags_file_path = "tags.json"
             valid_categories = open_json_file(categories_file_path)
-            valid_sort_by_options = ["review_count", "stars"]
+            valid_tags = open_json_file(tags_file_path)
+            valid_sort_by_options = ["review_count", "stars", "random"]
 
             tool_outputs = []
 
@@ -326,6 +353,7 @@ async def chatgpt_response(request: ChatRequest,
                     arguments["radius"] = max(min(int(arguments["radius"]), valid_radius_range[1]), valid_radius_range[0]) if "radius" in arguments else default_args["radius"]
                     arguments["categories"] = arguments["categories"] if arguments["categories"] in valid_categories else default_args["categories"]
                     arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
+                    arguments["tag"] = arguments["tag"] if arguments["tag"] in valid_tags else default_args["tag"]
                     arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
 
                     print(f"Arguments after default: {arguments}")
@@ -337,8 +365,9 @@ async def chatgpt_response(request: ChatRequest,
                         longitude=float(longitude), 
                         limit=30,
                         radius=int(arguments["radius"]), 
-                        categories=arguments["categories"], 
+                        categories=[arguments["categories"]], 
                         cur_open=int(arguments["cur_open"]), 
+                        tag=[arguments["tag"]],
                         sort_by=arguments["sort_by"]
                     )
 
