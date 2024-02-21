@@ -12,14 +12,28 @@ struct LocationRowView: View {
     let title: String
     let latitude: Double
     let longitude: Double
-    let categories: String
+    let categories: [String]
     let radius: Double
     let curOpen: Int
+    var tag: [String]? = nil
     let sortBy: String
     let limit: Int
     @State private var scrollIndex = 0
     @State private var timer: Timer?
     @State private var isManuallyScrolling = false
+    
+    init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
+        self.viewModel = viewModel
+        self.title = title
+        self.latitude = latitude
+        self.longitude = longitude
+        self.categories = categories
+        self.radius = radius
+        self.curOpen = curOpen
+        self.tag = tag
+        self.sortBy = sortBy
+        self.limit = limit
+    }
  
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -66,6 +80,7 @@ struct LocationRowView: View {
                                        radius: self.radius,
                                        categories: categories,
                                        curOpen: curOpen,
+                                       tag: tag ?? [],
                                        sortBy: self.sortBy)
         }
     }
@@ -155,7 +170,7 @@ struct LocationRowView_Previews: PreviewProvider {
             title: "Let's Workout!",
             latitude: 32.88088,
             longitude: -117.23790,
-            categories: "fitness",
+            categories: ["fitness"],
             radius: 10000,
             curOpen: 1,
             sortBy: "review_count",

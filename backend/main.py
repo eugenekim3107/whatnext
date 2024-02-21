@@ -282,8 +282,6 @@ async def chatgpt_response(request: ChatRequest,
     message = request.message
     latitude = request.latitude
     longitude = request.longitude
-
-    # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)d
     session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
@@ -387,7 +385,7 @@ async def chatgpt_response(request: ChatRequest,
                 elif func_name == "fetch_specific_location":
 
                     # Validate business_id
-                    arguments["business"] = arguments["business_id"] if arguments["business_id"] is not None else ""
+                    arguments["business_id"] = arguments["business_id"] if arguments["business_id"] is not None else ""
 
                     print("Fetching specific location...")
 

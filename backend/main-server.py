@@ -387,7 +387,7 @@ async def chatgpt_response(request: ChatRequest,
                 elif func_name == "fetch_specific_location":
 
                     # Validate business_id
-                    arguments["business"] = arguments["business_id"] if arguments["business_id"] is not None else ""
+                    arguments["business_id"] = arguments["business_id"] if arguments["business_id"] is not None else ""
 
                     print("Fetching specific location...")
 

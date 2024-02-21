@@ -13,10 +13,10 @@ class LocationRowViewModel: ObservableObject {
     private var isDataLoaded = false
     private let locationService = LocationService()
 
-    func fetchNearbyLocations(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: String, curOpen: Int, sortBy: String) {
+    func fetchNearbyLocations(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: [String], curOpen: Int, tag: [String]? = nil, sortBy: String) {
         guard !isDataLoaded else { return }
         isLoading = true
-        locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy) { [weak self] result in
+        locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, tag: tag, sortBy: sortBy) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let locations):
@@ -31,8 +31,8 @@ class LocationRowViewModel: ObservableObject {
         }
     }
     
-    func refreshData(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: String, curOpen: Int, sortBy: String) {
+    func refreshData(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: [String], curOpen: Int, tag: [String]? = nil, sortBy: String) {
         isDataLoaded = false
-        fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy)
+        fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, tag:tag, sortBy: sortBy)
     }
 }

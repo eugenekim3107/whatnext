@@ -94,7 +94,7 @@ def generate_assistant_id(openai_client):
                     "properties": {
                         "business_id": {
                             "type": "string",
-                            "description": f"The business_id used to identify a specifc location."
+                            "description": f"The business_id used to identify a specifc location. The business_id is composed of the category and a four-digit number."
                         }
                     },
                     "required": ["business_id"],
@@ -111,7 +111,8 @@ def generate_assistant_id(openai_client):
         "analyze the user preference from the conversion and trigger fetch_nearby_locations to find suitable recommendations. "
         "Avoid asking for user location. If fetch_nearby_locations returns an empty string, tell "
         "the user there are currently no open, nearby, or specified locations.\n3. If the user asks for more "
-        "detail about a specific location, trigger fetch_specific_location and use the information to respond to the question."
+        "detail about a specific location by providing the location's name, extract the corresponding business_id and trigger fetch_specific_location."
+        "Use this information in your response to the user."
     )
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,

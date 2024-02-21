@@ -12,35 +12,36 @@ class LocationService {
                               longitude: Double? = -117.21242234341588,
                               limit: Int? = 20,
                               radius: Double? = 10000.0,
-                              categories: String? = "any",
+                              categories: [String]? = ["any"],
                               curOpen: Int? = 0,
+                              tag: [String]? = nil,
                               sortBy: String? = "review_count",
                               completion: @escaping (Result<[Location], Error>) -> Void) {
         
         var components = URLComponents(string: "https://whatnext.live/api/nearby_locations")
-        
         var queryItems: [URLQueryItem] = []
         
-        if let latitude = latitude {
-            queryItems.append(URLQueryItem(name: "latitude", value: "\(latitude)"))
+        // Standard parameters
+        let standardParams: [(String, String?)] = [
+            ("latitude", latitude.map { String($0) }),
+            ("longitude", longitude.map { String($0) }),
+            ("limit", limit.map(String.init)),
+            ("radius", radius.map { String($0) }),
+            ("cur_open", curOpen.map(String.init)),
+            ("sort_by", sortBy)
+        ]
+        
+        for (name, value) in standardParams where value != nil {
+            queryItems.append(URLQueryItem(name: name, value: value))
         }
-        if let longitude = longitude {
-            queryItems.append(URLQueryItem(name: "longitude", value: "\(longitude)"))
+        
+        // Categories and tag require special handling to join array elements
+        if let categoriesValue = categories?.joined(separator: ","), !categoriesValue.isEmpty {
+            queryItems.append(URLQueryItem(name: "categories", value: categoriesValue))
         }
-        if let limit = limit {
-            queryItems.append(URLQueryItem(name: "limit", value: "\(limit)"))
-        }
-        if let radius = radius {
-            queryItems.append(URLQueryItem(name: "radius", value: "\(radius)"))
-        }
-        if let categories = categories {
-            queryItems.append(URLQueryItem(name: "categories", value: categories))
-        }
-        if let curOpen = curOpen {
-            queryItems.append(URLQueryItem(name: "cur_open", value: "\(curOpen)"))
-        }
-        if let sortBy = sortBy {
-            queryItems.append(URLQueryItem(name: "sort_by", value: sortBy))
+
+        if let tagValue = tag?.joined(separator: ","), !tagValue.isEmpty {
+            queryItems.append(URLQueryItem(name: "tag", value: tagValue))
         }
         
         components?.queryItems = queryItems
