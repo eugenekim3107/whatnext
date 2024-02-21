@@ -12,6 +12,7 @@ struct MapView: View {
     @StateObject private var viewModel = MapViewModel()
     @State private var trackingMode: MapUserTrackingMode = .follow
     @State private var selectedLocation: Location?
+    @State private var showSearchButton = false
     @GestureState private var magnification: CGFloat = 1.0
 
     var body: some View {
@@ -44,7 +45,19 @@ struct MapView: View {
                 }
                 .gesture(magnifyGesture)
                 .ignoresSafeArea(edges: .all)
-
+                .overlay(
+                    Button(action: {
+                        viewModel.searchInNewArea(center: viewModel.region.center)
+                    }) {
+                        Image(systemName: "magnifyingglass")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .clipShape(Circle())
+                    },
+                    alignment: .topTrailing
+                )
+                        
             if let selectedLocation = selectedLocation {
                 LocationDetailView(location: selectedLocation, dismissAction: {
                     self.selectedLocation = nil
@@ -62,7 +75,7 @@ struct MapView: View {
     }
     
     private func pinImage(for categories: [String]) -> Image {
-        if categories.contains("food") {
+        if categories.contains("restaurant") {
             return Image("food.pin")
         } else if categories.contains("fitness") {
             return Image("fitness.pin")
