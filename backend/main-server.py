@@ -84,6 +84,9 @@ class LocationCondensed(BaseModel):
     tag: Optional[List[str]] = None
     price: Optional[str] = None
 
+class ProfileRequest(BaseModel):
+    user_id: str
+
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
@@ -470,3 +473,37 @@ async def chatgpt_response(request: ChatRequest,
         end = time.time()
         print(end-start)
         return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type, "is_user_message": "false"}
+
+
+#########################
+### Profile Retrieval ###
+#########################
+
+async def fetch_user_info(user_id: str):
+    query_base = {"user_id": user_id}
+    user_info = await db.users.find_one(query_base)
+    return user_info
+
+async def fetch_friends_info(user_id: str):
+    query_base = {"user_id": user_id}
+
+# Retrieve profile information given user_id
+@app.post("/api/user_info")
+async def user_info(request: ProfileRequest,
+                    api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    user_info = await fetch_user_info(user_id)
+    return {"user_id": user_info["user_id"], 
+            "image_url": user_info["image_url"], 
+            "display_name": user_info["display_name"], 
+            "friends": user_info["friends"],
+            "visited": user_info["visited"], 
+            "favorites": user_info["favorites"]}
+
+# Retrieve friend information given user_id
+@app.post("/api/friends_info")
+async def friends_info(request: ProfileRequest,
+                       api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    friends_info = await fetch_friends_info(user_id)
+    return {"user_id": friends_info["user_id"], "friends_info": friends_info["friends_info"]}

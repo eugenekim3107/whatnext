@@ -84,6 +84,9 @@ class LocationCondensed(BaseModel):
     tag: Optional[List[str]] = None
     price: Optional[str] = None
 
+class ProfileRequest(BaseModel):
+    user_id: str
+
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
@@ -468,3 +471,94 @@ async def chatgpt_response(request: ChatRequest,
         end = time.time()
         print(end-start)
         return {"user_id": user_id, "session_id": session_id, "content": personalized_locations, "chat_type": chat_type, "is_user_message": "false"}
+
+
+#########################
+### Profile Retrieval ###
+#########################
+
+async def fetch_user_info(user_id: str):
+    query_base = {"user_id": user_id}
+    user_info = await db.users.find_one(query_base)
+    if user_info:
+        user_info.pop('_id', None)
+    return user_info
+
+async def fetch_friends_info(user_id: str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "friends" not in user_info:
+        return []
+
+    friends_user_ids = user_info["friends"]
+
+    friends_cursor = db.users.find({"user_id": {"$in": friends_user_ids}})
+    friends_info = []
+    async for friend in friends_cursor:
+        friend.pop('_id', None)
+        friends_info.append(friend)
+    
+    return friends_info
+
+async def fetch_visited_info(user_id: str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "visited" not in user_info:
+        return []
+    
+    location_ids = user_info["visited"]
+    locations = await fetch_locations_business_id(location_ids)
+    return locations
+
+async def fetch_favorites_info(user_id: str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "favorites" not in user_info:
+        return []
+    
+    location_ids = user_info["favorites"]
+    locations = await fetch_locations_business_id(location_ids)
+    return locations
+
+# Retrieve profile information given user_id
+@app.post("/api/user_info")
+async def user_info(request: ProfileRequest,
+                    api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    user_info = await fetch_user_info(user_id)
+    if not user_info:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "user_id": user_info["user_id"], 
+        "image_url": user_info.get("image_url"), 
+        "display_name": user_info["display_name"], 
+        "friends": len(user_info.get("friends", [])),
+        "visited": len(user_info.get("visited", [])), 
+        "favorites": len(user_info.get("favorites", []))
+    }
+
+@app.post("/api/friends_info")
+async def friends_info(request: ProfileRequest,
+                       api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    friends_info_list = await fetch_friends_info(user_id)
+    formatted_friends_info = [{
+        "user_id": friend["user_id"],
+        "image_url": friend.get("image_url"),
+        "display_name": friend["display_name"],
+        "friends": friend.get("friends", []),
+        "visited": friend.get("visited", []), 
+        "favorites": friend.get("favorites", [])
+    } for friend in friends_info_list]
+    return {"user_id": user_id, "friends_info": formatted_friends_info}
+
+@app.post("/api/visited_info")
+async def visited_info(request: ProfileRequest,
+                       api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    locations = await fetch_visited_info(user_id)
+    return {"user_id": user_id, "visited_locations": locations}
+
+@app.post("/api/favorites_info")
+async def favorites_info(request: ProfileRequest,
+                         api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    locations = await fetch_favorites_info(user_id)
+    return {"user_id": user_id, "favorites_locations": locations}

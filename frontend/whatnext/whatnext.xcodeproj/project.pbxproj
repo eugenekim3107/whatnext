@@ -40,6 +40,7 @@
 		8ADEA5572B83FE270031BA33 /* ProfileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA5562B83FE270031BA33 /* ProfileRowView.swift */; };
 		8ADEA5592B8425DE0031BA33 /* ProfileService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA5582B8425DE0031BA33 /* ProfileService.swift */; };
 		8ADEA55B2B8425FC0031BA33 /* ProfileRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA55A2B8425FC0031BA33 /* ProfileRowViewModel.swift */; };
+		8ADEA55D2B85D6280031BA33 /* ProfileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADEA55C2B85D6280031BA33 /* ProfileInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,6 +99,7 @@
 		8ADEA5562B83FE270031BA33 /* ProfileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowView.swift; sourceTree = "<group>"; };
 		8ADEA5582B8425DE0031BA33 /* ProfileService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileService.swift; sourceTree = "<group>"; };
 		8ADEA55A2B8425FC0031BA33 /* ProfileRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRowViewModel.swift; sourceTree = "<group>"; };
+		8ADEA55C2B85D6280031BA33 /* ProfileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -225,6 +227,7 @@
 			children = (
 				8ACD17B82B61F18A0029487A /* LocationInfo.swift */,
 				78F048132B5FEC710072AAFA /* LocationManager.swift */,
+				8ADEA55C2B85D6280031BA33 /* ProfileInfo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				8A87046E2B5E050F00183191 /* MoreViewModel.swift in Sources */,
 				8A8704682B5E04F000183191 /* ExploreViewModel.swift in Sources */,
 				8A87045C2B5E041100183191 /* ExploreView.swift in Sources */,
+				8ADEA55D2B85D6280031BA33 /* ProfileInfo.swift in Sources */,
 				8A87045E2B5E042200183191 /* LoadingView.swift in Sources */,
 				8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */,
 				8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */,
