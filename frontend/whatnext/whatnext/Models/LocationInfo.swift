@@ -30,7 +30,7 @@ struct Location: Codable, Identifiable, Hashable {
     let stars: Double?
     let reviewCount: Int?
     let curOpen: Int?
-    let categories: String?
+    let categories: [String]?
     let tag: [String]?
     let hours: Hours?
     let location: GeoJSON

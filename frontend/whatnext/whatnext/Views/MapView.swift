@@ -35,7 +35,7 @@ struct MapView: View {
                                 self.selectedLocation = location
                             }
                         }) {
-                            Image("food.pin") //fitness.pin")
+                            pinImage(for: location.categories ?? [""]) // Now accepts [String]
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30, height: 30)
@@ -59,6 +59,16 @@ struct MapView: View {
         let newLatDelta = max(0.002, min(100, span.latitudeDelta / Double(delta)))
         let newLonDelta = max(0.002, min(100, span.longitudeDelta / Double(delta)))
         viewModel.region.span = MKCoordinateSpan(latitudeDelta: newLatDelta, longitudeDelta: newLonDelta)
+    }
+    
+    private func pinImage(for categories: [String]) -> Image {
+        if categories.contains("food") {
+            return Image("food.pin")
+        } else if categories.contains("fitness") {
+            return Image("fitness.pin")
+        } else {
+            return Image("heart.pin") // A default pin for other categories
+        }
     }
 }
 
