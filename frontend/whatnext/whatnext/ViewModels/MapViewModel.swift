@@ -12,8 +12,6 @@ import MapKit
 class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     var region: MKCoordinateRegion
     @Published var locations: [Location] = []
-    @Published var hasUserLocationChanged = false
-    let thresholdValue: CLLocationDistance = 50 
     private let locationManager = CLLocationManager()
     private let locationService = LocationService()
     
@@ -40,13 +38,14 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         }
         //loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-        //loadLocationsForMapView(from: location.coordinate)
+        loadLocationsForMapView(from: location.coordinate)
     }
 
     func searchInNewArea(center: CLLocationCoordinate2D) {
         // Perform the search using the center of the map view
-        //loadLocationsForMapView(from: center)
+        print("Searching near the center location: \(center.latitude), \(center.longitude)")
         loadDummyLocations()
+        loadLocationsForMapView(from: center)
     }
 
     private func loadLocationsForMapView(from coordinate: CLLocationCoordinate2D) {
