@@ -285,8 +285,6 @@ async def chatgpt_response(request: ChatRequest,
     message = request.message
     latitude = request.latitude
     longitude = request.longitude
-
-    # return await fetch_nearby_locations_condensed(latitude=latitude, longitude=longitude)d
     session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
@@ -482,10 +480,42 @@ async def chatgpt_response(request: ChatRequest,
 async def fetch_user_info(user_id: str):
     query_base = {"user_id": user_id}
     user_info = await db.users.find_one(query_base)
+    if user_info:
+        user_info.pop('_id', None)
     return user_info
 
 async def fetch_friends_info(user_id: str):
-    query_base = {"user_id": user_id}
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "friends" not in user_info:
+        return []
+
+    friends_user_ids = user_info["friends"]
+
+    friends_cursor = db.users.find({"user_id": {"$in": friends_user_ids}})
+    friends_info = []
+    async for friend in friends_cursor:
+        friend.pop('_id', None)
+        friends_info.append(friend)
+    
+    return friends_info
+
+async def fetch_visited_info(user_id: str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "visited" not in user_info:
+        return []
+    
+    location_ids = user_info["visited"]
+    locations = await fetch_locations_business_id(location_ids)
+    return locations
+
+async def fetch_favorites_info(user_id: str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info or "favorites" not in user_info:
+        return []
+    
+    location_ids = user_info["favorites"]
+    locations = await fetch_locations_business_id(location_ids)
+    return locations
 
 # Retrieve profile information given user_id
 @app.post("/api/user_info")
@@ -493,17 +523,42 @@ async def user_info(request: ProfileRequest,
                     api_key: str = Depends(get_api_key)):
     user_id = request.user_id
     user_info = await fetch_user_info(user_id)
-    return {"user_id": user_info["user_id"], 
-            "image_url": user_info["image_url"], 
-            "display_name": user_info["display_name"], 
-            "friends": user_info["friends"],
-            "visited": user_info["visited"], 
-            "favorites": user_info["favorites"]}
+    if not user_info:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {
+        "user_id": user_info["user_id"], 
+        "image_url": user_info.get("image_url"), 
+        "display_name": user_info["display_name"], 
+        "friends": user_info.get("friends", []),
+        "visited": user_info.get("visited", []), 
+        "favorites": user_info.get("favorites", [])
+    }
 
-# Retrieve friend information given user_id
 @app.post("/api/friends_info")
 async def friends_info(request: ProfileRequest,
                        api_key: str = Depends(get_api_key)):
     user_id = request.user_id
-    friends_info = await fetch_friends_info(user_id)
-    return {"user_id": friends_info["user_id"], "friends_info": friends_info["friends_info"]}
+    friends_info_list = await fetch_friends_info(user_id)
+    formatted_friends_info = [{
+        "user_id": friend["user_id"],
+        "image_url": friend.get("image_url"),
+        "display_name": friend["display_name"],
+        "friends": friend.get("friends", []),
+        "visited": friend.get("visited", []), 
+        "favorites": friend.get("favorites", [])
+    } for friend in friends_info_list]
+    return {"user_id": user_id, "friends_info": formatted_friends_info}
+
+@app.post("/api/visited_info")
+async def visited_info(request: ProfileRequest,
+                       api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    locations = await fetch_visited_info(user_id)
+    return {"user_id": user_id, "visited_locations": locations}
+
+@app.post("/api/favorites_info")
+async def favorites_info(request: ProfileRequest,
+                         api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    locations = await fetch_favorites_info(user_id)
+    return {"user_id": user_id, "favorites_locations": locations}

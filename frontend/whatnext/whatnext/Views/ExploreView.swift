@@ -69,10 +69,10 @@ struct ExploreView: View {
                 .padding(.bottom, 50)
             }
             .refreshable {
-                viewModel1.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["food"], curOpen: 0, sortBy: "random")
-                viewModel2.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["coffee"], curOpen: 0, sortBy: "random")
-                viewModel3.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["shopping"], curOpen: 0, tag: ["random"], sortBy: "rating")
-                viewModel4.refreshData(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["fitness"], curOpen: 0, sortBy: "random")
+                viewModel1.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["food"], curOpen: 0, sortBy: "random")
+                viewModel2.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["coffee"], curOpen: 0, sortBy: "random")
+                viewModel3.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["shopping"], curOpen: 0, tag: ["random"], sortBy: "rating")
+                viewModel4.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["fitness"], curOpen: 0, sortBy: "random")
             }
             .background(Color(UIColor.systemGroupedBackground))
         }

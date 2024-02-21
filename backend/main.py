@@ -529,9 +529,9 @@ async def user_info(request: ProfileRequest,
         "user_id": user_info["user_id"], 
         "image_url": user_info.get("image_url"), 
         "display_name": user_info["display_name"], 
-        "friends": len(user_info.get("friends", [])),
-        "visited": len(user_info.get("visited", [])), 
-        "favorites": len(user_info.get("favorites", []))
+        "friends": user_info.get("friends", []),
+        "visited": user_info.get("visited", []), 
+        "favorites": user_info.get("favorites", [])
     }
 
 @app.post("/api/friends_info")
