@@ -9,7 +9,6 @@ import Foundation
 
 class ProfileViewModel: ObservableObject {
     @Published var userInfo: UserInfo?
-    @Published var isLoading = true
     @Published var errorMessage: String?
     private var isDataLoaded = false
 
@@ -17,7 +16,6 @@ class ProfileViewModel: ObservableObject {
 
     func fetchUserInfo(userId: String) {
         guard !isDataLoaded else { return }
-        isLoading = true
         errorMessage = nil
         
         profileService.fetchUserInfo(userId: userId) { [weak self] result in
@@ -30,7 +28,6 @@ class ProfileViewModel: ObservableObject {
                     self?.errorMessage = error.localizedDescription
                     print("Error fetching user info: \(error.localizedDescription)")
                 }
-                self?.isLoading = false
             }
         }
     }
