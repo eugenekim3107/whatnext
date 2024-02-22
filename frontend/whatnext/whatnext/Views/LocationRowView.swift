@@ -74,7 +74,7 @@ struct LocationRowView: View {
             }
         }
         .onAppear {
-        viewModel.fetchNearbyLocations(latitude: latitude,
+            viewModel.fetchNearbyLocations(latitude: latitude,
                                        longitude: longitude,
                                        limit: self.limit,
                                        radius: self.radius,
