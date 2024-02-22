@@ -1,35 +1,58 @@
-//
-//  MoreView.swift
-//  whatnext
-//
-//  Created by Eugene Kim on 1/21/24.
-//
-
 import SwiftUI
+import Firebase
+import GoogleSignIn
 
 struct MoreView: View {
-    var settings: [SettingsSection] = [.init(name: "Notifications", imageName: "bell.circle", color: .black),
-                                       .init(name: "Location", imageName: "location.circle", color: .black),
-                                       .init(name:"Privacy", imageName: "hand.raised.circle", color: .black),
-                                       .init(name:"Account", imageName: "person.crop.circle", color: .black)]
+    @AppStorage("log_status") var logStatus: Bool = false
+    @State private var showingLogoutAlert = false // State to control alert presentation
+
+    var settings: [SettingsSection] = [
+        .init(name: "Notifications", imageName: "bell.circle", color: .black),
+        .init(name: "Location", imageName: "location.circle", color: .black),
+        .init(name: "Privacy", imageName: "hand.raised.circle", color: .black),
+        .init(name: "Account", imageName: "person.crop.circle", color: .black),
+        .init(name: "Logout", imageName: "arrow.right.circle", color: .black)
+    ]
     
-    var feedbacks: [FeedbackSection] = [.init(name: "Overall Experience", imageName: "hand.thumbsup.circle", color: .black),
-                                       .init(name: "Recommendation Accuracy", imageName: "target", color: .black),
-                                       .init(name:"Suggestions", imageName: "lightbulb.circle", color: .black)]
+    var feedbacks: [FeedbackSection] = [
+        .init(name: "Overall Experience", imageName: "hand.thumbsup.circle", color: .black),
+        .init(name: "Recommendation Accuracy", imageName: "target", color: .black),
+        .init(name: "Suggestions", imageName: "lightbulb.circle", color: .black)
+    ]
     
-    var terms: [TermsAndConditionsSection] = [.init(name: "Acceptance of Terms", imageName: "doc.circle", color: .black),
-                                       .init(name: "Privacy Policy", imageName: "lock.circle", color: .black),
-                                       .init(name:"User Conduct", imageName: "figure.walk.circle", color: .black)]
+    var terms: [TermsAndConditionsSection] = [
+        .init(name: "Acceptance of Terms", imageName: "doc.circle", color: .black),
+        .init(name: "Privacy Policy", imageName: "lock.circle", color: .black),
+        .init(name: "User Conduct", imageName: "figure.walk.circle", color: .black)
+    ]
     
     var body: some View {
         NavigationStack {
             List {
                 Section("Settings") {
                     ForEach(settings, id: \.name) { setting in
-                        NavigationLink(value: setting) {
-                            Label(setting.name, systemImage: setting.imageName)
-                                .foregroundColor(setting.color)
-                                .id(setting.name)
+                        if setting.name == "Logout" {
+                            Button(action: {
+                                showingLogoutAlert = true // Show logout confirmation alert
+                            }) {
+                                Label(setting.name, systemImage: setting.imageName)
+                                    .foregroundColor(setting.color)
+                            }
+                            .alert(isPresented: $showingLogoutAlert) {
+                                Alert(
+                                    title: Text("Confirm Logout"),
+                                    message: Text("Are you sure you want to log out?"),
+                                    primaryButton: .destructive(Text("Logout")) {
+                                        logout() // Call logout function if user confirms
+                                    },
+                                    secondaryButton: .cancel()
+                                )
+                            }
+                        } else {
+                            NavigationLink(value: setting) {
+                                Label(setting.name, systemImage: setting.imageName)
+                                    .foregroundColor(setting.color)
+                            }
                         }
                     }
                 }
@@ -58,27 +81,18 @@ struct MoreView: View {
                 Spacer().listRowBackground(Color.clear)
             }
             .navigationTitle("More")
-            .navigationDestination(for: SettingsSection.self) { setting in
-                ZStack {
-                    Color.white.ignoresSafeArea()
-                    Label(setting.name, systemImage: setting.imageName)
-                        .font(.largeTitle).bold()
-                }
+        }
+    }
+
+    func logout() {
+        do {
+            try Auth.auth().signOut()
+            GIDSignIn.sharedInstance.signOut()
+            withAnimation(.easeInOut) {
+                logStatus = false
             }
-            .navigationDestination(for: FeedbackSection.self) { feedback in
-                ZStack {
-                    Color.white.ignoresSafeArea()
-                    Label(feedback.name, systemImage: feedback.imageName)
-                        .font(.largeTitle).bold()
-                }
-            }
-            .navigationDestination(for: TermsAndConditionsSection.self) { term in
-                ZStack {
-                    Color.white.ignoresSafeArea()
-                    Label(term.name, systemImage: term.imageName)
-                        .font(.largeTitle).bold()
-                }
-            }
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError)
         }
     }
 }
@@ -106,3 +120,4 @@ struct TermsAndConditionsSection: Hashable {
     let imageName: String
     let color: Color
 }
+
