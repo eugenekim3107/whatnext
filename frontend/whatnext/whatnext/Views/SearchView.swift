@@ -60,7 +60,7 @@ struct SearchView: View {
                         if messages.isEmpty {
                             VStack (spacing: 3){
                                 Spacer(minLength:50)
-                                Image("logo-icon")
+                                Image("logo-1")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                                     .frame(width: 90, height: 90)
