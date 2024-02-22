@@ -1,77 +1,125 @@
+//
+//  ProfileRowView.swift
+//  whatnext
+//
+//  Created by Eugene Kim on 2/19/24.
+//
+
 import SwiftUI
 
 struct ProfileRowView: View {
-    var title: String
-    var titleIconName: String
-    var titleIconColor: Color
-    var items: [ProfileItem] // Assuming ProfileItem is defined elsewhere
-    var isCircle: Bool
+    @ObservedObject var viewModel: ProfileRowViewModel
+    let title: String
+    let userId: String
+    @State private var scrollIndex = 0
+    @State private var timer: Timer?
+    @State private var isManuallyScrolling = false
     
+    init(viewModel: ProfileRowViewModel, title: String, userId: String) {
+        self.viewModel = viewModel
+        self.title = title
+        self.userId = userId
+    }
+ 
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack(spacing: 5) {
-                Image(systemName: titleIconName)
-                    .foregroundColor(titleIconColor)
-                    .imageScale(.small)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack (spacing: 5) {
+                Image("friends.pin")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 20)
                 Text(title)
-                    .font(.title2)
-            }
-            .padding(.leading, 20)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 20) {
-                    ForEach(items) { item in
-                        AsyncImage(url: item.imageURL) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                if isCircle {
-                                    image.resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(Circle())
-                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                                } else {
-                                    image.resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 80, height: 80)
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white, lineWidth: 2))
-                                }
-                            case .failure(_):
-                                Image(systemName: "exclamationmark.circle").resizable().scaledToFill()
-                                    .frame(width: 80, height: 80)
-                                    // RoundedRectangle with zero corner radius equals a rectangle
-                                    .clipShape(RoundedRectangle(cornerRadius: 0))
-                            @unknown default:
-                                EmptyView()
+                    .font(.system(size: 25, weight: .bold))
+                    .foregroundColor(.black)
+            }.padding(.leading)
+            if viewModel.isLoading {
+                PlaceholderView()
+            } else {
+                ScrollViewReader { scrollView in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 5) {
+                            ForEach(viewModel.friendsInfo, id: \.userId) { profile in
+                                ProfileRowSimpleView(profile: profile)
                             }
                         }
-                        .padding(.vertical)
+                        .gesture(
+                            DragGesture().onChanged { _ in
+                                isManuallyScrolling = true
+                                timer?.invalidate()
+                            }
+                                .onEnded { _ in
+                                    isManuallyScrolling = false
+                                    startTimer(scrollView: scrollView)
+                                }
+                        )
+                    }
+                    .padding([.leading, .trailing])
+                    .onAppear {
+                        startTimer(scrollView: scrollView)
+                    }
+                    .onDisappear {
+                        timer?.invalidate()
                     }
                 }
-                .padding(.horizontal)
+            }
+        }
+        .onAppear {
+            viewModel.fetchFriendsInfo(userId: userId)
+        }
+    }
+    
+    private func startTimer(scrollView: ScrollViewProxy) {
+        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
+            withAnimation {
+                guard !isManuallyScrolling, viewModel.friendsInfo.count > 0 else { return }
+                scrollIndex = (scrollIndex + 1) % viewModel.friendsInfo.count
+                scrollView.scrollTo(viewModel.friendsInfo[scrollIndex].userId, anchor: .leading)
             }
         }
     }
 }
 
-// Preview Provider
+struct ProfileRowSimpleView: View {
+    var profile: UserInfo
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                if let url = URL(string: profile.imageUrl ?? "") {
+                    ZStack{
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    }
+                    .frame(width: 110, height: 110)
+                    .clipShape(Circle())
+                } else {
+                    Color.gray.opacity(0.3)
+                }
+            }
+            .frame(width: 110, height: 110)
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+            Text(profile.displayName)
+                .font(.system(size: 14))
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .truncationMode(.tail)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(height: 50)
+                .frame(width: 110)
+        }
+    }
+}
+
 struct ProfileRowView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileRowView(
-            title: "Example Title",
-            titleIconName: "star.fill",
-            titleIconColor: .yellow,
-            items: [
-                ProfileItem(imageURL: URL(string: "https://s3-media1.fl.yelpcdn.com/bphoto/vxSx2j9gnJ-dWu9OFYyhRQ/o.jpg")!),
-                ProfileItem(imageURL: URL(string: "https://s3-media1.fl.yelpcdn.com/bphoto/6Z_nkxlxwN5KjSI4o-T1uA/o.jpg")!),
-                ProfileItem(imageURL: URL(string: "https://s3-media3.fl.yelpcdn.com/bphoto/GH7ulQACJUkL-GKjke_YgA/o.jpg")!),
-                ProfileItem(imageURL: URL(string: "https://s3-media4.fl.yelpcdn.com/bphoto/UTRNj5MtbuC7SC0Owso-bw/o.jpg")!),
-                
-            ],
-            isCircle: true // Set this to false to see rectangles instead
-        )
+        let viewModel = ProfileRowViewModel()
+        return ProfileRowView(viewModel: viewModel,
+                       title: "Friends",
+                       userId: "eugenekim")
     }
 }

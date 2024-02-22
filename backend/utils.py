@@ -1,13 +1,6 @@
 from datetime import timedelta
 import uuid
-
-def generate_sort_assistant_id(openai_client, recommendation_num):
-    instructions = f"Review the prior messages for details on user preference. Identify and rank, from highest to lowest ranked, the locations that best match the user's preference. Directly provide the unique business IDs associated with these locations. The response must strictly be a comma-separated list of business IDs with a single spaces in between the IDs and no additional text or explanations. Ensure the format is exactly as follows: 'business_id1, business_id2, business_id3, ...'. The output must adhere to this structure precisely."
-    assistant = openai_client.beta.assistants.create(
-        instructions=instructions,
-        model="gpt-3.5-turbo-0125"
-    )
-    return assistant.id
+import json
 
 # Checks if the businesses is currently open
 def is_within_hours(now, hours):
@@ -34,20 +27,21 @@ def generate_thread_id(openai_client):
     thread = openai_client.beta.threads.create()
     return thread.id
 
-# Generate new file
-def generate_file(openai_client, file_path):
-    openai_client.files.create(
-        file=open(file_path, "rb"),
-        purpose="assistants"
-    )
+def open_json_file(file_path):
+    with open(file_path, 'r') as file:
+        file_content = json.load(file)
+    return file_content
 
 # Generate new assistant id
 def generate_assistant_id(openai_client):
     valid_limit = [3, 50, 10]
     valid_radius = [1000, 100000, 10000]
     valid_cur_open = [0, 1, 1]
-    valid_categories = ["restaurant", "food", "shopping", "fitness", "beautysvc", "hiking", "aquariums", "coffee", "all"]
-    valid_sort_by = ["review_count", "rating", "best_match", "distance"]
+    categories_file_path = "categories.json"
+    tags_file_path = "tags.json"
+    valid_categories = open_json_file(categories_file_path)
+    valid_tags = open_json_file(tags_file_path)
+    valid_sort_by = ["review_count", "stars", "random"]
     tools = [
         {
             "type": "function",
@@ -68,12 +62,17 @@ def generate_assistant_id(openai_client):
                         "categories": {
                             "type": "string",
                             "enum": valid_categories,
-                            "description": f"Categories to filter the search. Options: categories within the categories.json file."
+                            "description": f"Primary categories to filter the search, representing broad sectors or types of locations. Categories help in segmenting locations into major groups for easier discovery. Categories must be in 'enum'."
                         },
                         "cur_open": {
                             "type": "string",
                             "enum": [0, 1],
-                            "description": f"Filter based on current open status. 0 for closed, 1 for open. Default: {valid_cur_open[2]}."
+                            "description": f"Filter based on current open status. 0 for both closed and open, while 1 is just for open. Default: {valid_cur_open[2]}."
+                        },
+                        "tag": {
+                            "type": "string",
+                            "enum": valid_tags,
+                            "description": f"Optional tags to refine your search based on specific attributes or specialties within a category. Tags provide a granular level of filtering to help you find locations that offer particular services, cuisines, or features. Tags must be in 'enum'."
                         },
                         "sort_by": {
                             "type": "string",
@@ -84,15 +83,64 @@ def generate_assistant_id(openai_client):
                     "required": ["categories"],
                 },
             },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "fetch_specific_location",
+                "description": "Input a business_id and retrieve its detailed information (ONLY FOR SPECIFIC BUSINESS_ID QUERY).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "business_id": {
+                            "type": "string",
+                            "description": f"The business_id used to identify a specifc location. The business_id is composed of the category and a four-digit number."
+                        }
+                    },
+                    "required": ["business_id"],
+                }
+            }
         }
     ]
-    instructions = "As the WhatNext? app's assistant, your role is to offer personalized suggestions for places to visit, dine, or activities to enjoy, based on user preferences. Do not answer unrelated questions.\nFollow these steps to assist users effectively:\n1. Identify requests for suggestions in user messages, looking for keywords like 'looking for', 'suggest', or mentions of specific places or activities. Interact with the user for more tailored recommendations.\n2. Upon recognizing a suggestion request, analyze the user preference from the conversion and trigger fetch_nearby_locations to find suitable recommendations. Avoid asking for user location."
+    instructions = (
+        "As the WhatNext? app's location recommender, your role is to offer personalized suggestions for places "
+        "to visit, dine, or activities to enjoy, based on user preferences. Do not answer unrelated questions. "
+        "\nFollow these steps to assist users effectively:\n1. Identify requests for suggestions in user " 
+        "messages, looking for keywords like 'looking for', 'suggest', or mentions of specific places or activities. "
+        "Interact with the user for more tailored recommendations.\n2. Upon recognizing a suggestion request, "
+        "analyze the user preference from the conversion and trigger fetch_nearby_locations to find suitable recommendations. "
+        "Avoid asking for user location. If fetch_nearby_locations returns an empty string, tell "
+        "the user there are currently no open, nearby, or specified locations.\n3. If the user asks for more "
+        "detail about a specific location by providing the location's name, extract the corresponding business_id and trigger fetch_specific_location."
+        "Use this information in your response to the user."
+    )
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
+        name="WhatNext? Location Recommender",
         model="gpt-3.5-turbo-0125",
         tools=tools
     )
     return assistant.id
+
+# Create sorting run
+def create_sorting_run(openai_client, thread_id, assistant_id):
+    instructions = (
+            "As the WhatNext? app's location sorter, review the prior conversation history for details on user preference. "
+            "Identify and rank, from highest to lowest ranked, the locations that best match the user's preference. "
+            "Your response should be a comma-separated list of business_id associated with these locations, "
+            "with a single space after each comma, and no spaces before the IDs or additional characters. "
+            "The format must be exactly as follows: 'business_id1, business_id2, business_id3, ...'. "
+            "Ensure the output adheres strictly to this structure, without any prefixes, bullet points, explanation, and additional text."
+        )
+    
+    run_sort = openai_client.beta.threads.runs.create(
+        thread_id=thread_id,
+        assistant_id=assistant_id,
+        instructions=instructions,
+        tools=[],
+        model="gpt-3.5-turbo-0125"
+    )
+    return run_sort.id
 
 # Retrieves thread_id and assistant_id based on session_id
 def retrieve_chat_info(session_id, redis_client, openai_client):

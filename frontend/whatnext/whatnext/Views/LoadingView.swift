@@ -17,17 +17,11 @@ struct LoadingView: View {
             ContentView()
         } else {
             VStack(spacing: 0) {
-                VStack {
-                    Image("logo-icon")
+                VStack (spacing: 20) {
+                    Image("logo-3")
                         .resizable()
                         .scaledToFit()
-                        .frame(height: 200)
-
-                    Text("WhatNext?")
-                        .font(.system(size: 40))
-                        .foregroundColor(.white.opacity(0.8))
-                        .shadow(color: .white, radius: 10, x: 0, y: 0)
-                        .shadow(color: .white, radius: 10, x: 0, y: 0)
+                        .frame(height: 300)
                 }
                 .scaleEffect(size)
                 .opacity(opacity)

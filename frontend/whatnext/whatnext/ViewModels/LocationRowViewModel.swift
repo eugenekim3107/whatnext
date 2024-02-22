@@ -10,15 +10,21 @@ import Foundation
 class LocationRowViewModel: ObservableObject {
     @Published var locations: [Location] = []
     @Published var isLoading = true
+    @Published var favoritesInfo: [Location] = []
+    @Published var visitedInfo: [Location] = []
+    private var isDataLoaded = false
     private let locationService = LocationService()
+    private let profileService = ProfileService()
 
-    func fetchNearbyLocations(latitude: Double = 32.8723812680163, longitude: Double = -117.21242234341588, limit: Int = 20, radius: Double = 10000.0, categories: String = "any", curOpen: Int = 1, sortBy: String = "best_match") {
+    func fetchNearbyLocations(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: [String], curOpen: Int, tag: [String]? = nil, sortBy: String) {
+        guard !isDataLoaded else { return }
         isLoading = true
-        locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, sortBy: sortBy) { [weak self] result in
+        locationService.fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, tag: tag, sortBy: sortBy) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let locations):
                     self?.locations = locations
+                    self?.isDataLoaded = true
                 case .failure(let error):
                     print("Error fetching locations: \(error.localizedDescription)")
                     self?.locations = []
@@ -27,5 +33,55 @@ class LocationRowViewModel: ObservableObject {
             }
         }
     }
+    
+    func fetchFavoritesInfo(userId: String) {
+        guard !isDataLoaded else { return }
+        isLoading = true
+        profileService.fetchFavoritesInfo(userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let favoritesInfo):
+                    self?.favoritesInfo = favoritesInfo.favoritesLocations
+                    self?.isDataLoaded = true
+                case .failure(let error):
+                    print("Error fetching friends info: \(error.localizedDescription)")
+                    self?.favoritesInfo = []
+                }
+                self?.isLoading = false
+            }
+        }
+    }
+    
+    func fetchVisitedInfo(userId: String) {
+        guard !isDataLoaded else { return }
+        isLoading = true
+        profileService.fetchVisitedInfo(userId: userId) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let visitedInfo):
+                    self?.visitedInfo = visitedInfo.locations
+                    self?.isDataLoaded = true
+                case .failure(let error):
+                    print("Error fetching friends info: \(error.localizedDescription)")
+                    self?.visitedInfo = []
+                }
+                self?.isLoading = false
+            }
+        }
+    }
+    
+    func refreshDataLocations(latitude: Double, longitude: Double, limit: Int, radius: Double, categories: [String], curOpen: Int, tag: [String]? = nil, sortBy: String) {
+        isDataLoaded = false
+        fetchNearbyLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, tag:tag, sortBy: sortBy)
+    }
+    
+    func refreshDataVisited(userId: String) {
+        isDataLoaded = false
+        fetchVisitedInfo(userId: userId)
+    }
+    
+    func refreshDataFavorites(userId: String) {
+        isDataLoaded = false
+        fetchFavoritesInfo(userId: userId)
+    }
 }
-

@@ -92,7 +92,7 @@ docker ps
 ```
 If the Docker conatiner is not running, initialize the database using:
 ```
-docker run -d --restart=always --name whatnext-container -p 8000:8000 --env OPENAI_API_KEY=$OPENAI_API_KEY whatnext-image
+docker run -d --restart=always --name whatnext-container -p 8000:8000 --env OPENAI_API_KEY=$OPENAI_API_KEY --env whatnext_token=$whatnext_token whatnext-image
 ```
 - `whatnext-container`: The name of the container.
 - `whatnext-image`: The name of the image.
