@@ -1,10 +1,5 @@
-//
-//  ProfileView.swift
-//  whatnext
-//
-//  Created by Eugene Kim on 1/21/24.
-//
 
+//Created By Wenzhou Lyu
 import SwiftUI
 
 struct ProfileView: View {
@@ -122,3 +117,4 @@ struct ProfileView_Previews: PreviewProvider {
         ProfileView()
     }
 }
+
