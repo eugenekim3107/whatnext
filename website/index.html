@@ -21,6 +21,7 @@
             <li><a href="#demo">Demo</a></li>
             <li><a href="#team">Team</a></li>
             <li><a href="#download">Download</a></li>
+            <li><a href="#paper">Paper</a></li>
         </ul>
     </nav>
 </header> 
@@ -61,9 +62,14 @@
 <section id="features">
     <div class="page-tabs">
         <div class="page-tabs-header active" onclick="openTab(event, 'map')">
-            <div id="map" class="tabcontent" style="display:block;">
-                <h2>Map</h2>
-                <p>This is the Map tab content.</p>
+            <div id="map" class="tabcontent" style="display:flex;">
+                <div id="map-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="map-content" class="info-content">
+                    <h2>Map</h2>
+                    <p>This is the Map tab content.</p>
+                </div>
             </div>
             <div id="map-letters" class="page-tabs-header-container active">
                 <div class="page-tabs-header-letters">
@@ -71,13 +77,18 @@
                     <div>A</div>
                     <div>P</div>
                 </div>
-                <img id="map-icon" class="icons" src="assets/img/map.fill.svg" alt="map-icon">
+                <img id="map-icon" class="icons" src="assets/img/map.svg" alt="map-icon">
             </div>
         </div>
         <div class="page-tabs-header" onclick="openTab(event, 'search')">
             <div id="search" class="tabcontent" style="display:none;">
-                <h2>Search</h2>
-                <p>This is the Search tab content.</p>
+                <div id="search-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="search-content" class="info-content">
+                    <h2>Search</h2>
+                    <p>This is the Search tab content.</p>
+                </div>
             </div>
             <div id="search-letters" class="page-tabs-header-container">
                 <div class="page-tabs-header-letters">
@@ -93,8 +104,13 @@
         </div>
         <div class="page-tabs-header" onclick="openTab(event, 'explore')">
             <div id="explore" class="tabcontent" style="display:none;">
-                <h2>Explore</h2>
-                <p>This is the Explore tab content.</p>
+                <div id="explore-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="explore-content" class="info-content">
+                    <h2>Explore</h2>
+                    <p>This is the Explore tab content.</p>
+                </div>
             </div>
             <div id="explore-letters" class="page-tabs-header-container">
                 <div class="page-tabs-header-letters">
@@ -111,8 +127,13 @@
         </div>
         <div class="page-tabs-header" onclick="openTab(event, 'profile')">
             <div id="profile" class="tabcontent" style="display:none;">
-                <h2>Profile</h2>
-                <p>This is the Profile tab content.</p>
+                <div id="profile-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="profile-content" class="info-content">
+                    <h2>Profile</h2>
+                    <p>This is the Profile tab content.</p>
+                </div>
             </div>
             <div id="profile-letters" class="page-tabs-header-container">
                 <div class="page-tabs-header-letters">
@@ -129,8 +150,13 @@
         </div>
         <div class="page-tabs-header" onclick="openTab(event, 'more')">
             <div id="more" class="tabcontent" style="display:none;">
-                <h2>More</h2>
-                <p>This is the More tab content.</p>
+                <div id="more-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="more-content" class="info-content">
+                    <h2>More</h2>
+                    <p>This is the More tab content.</p>
+                </div>
             </div>  
             <div id="more-letters" class="page-tabs-header-container">
                 <div class="page-tabs-header-letters">

@@ -54,7 +54,7 @@ function openTab(evt, tabName) {
     }
 
     // Show the current tab, and add an "active" class to the link that opened the tab and to the tab content
-    document.getElementById(tabName).style.display = "block";
+    document.getElementById(tabName).style.display = "flex";
     document.getElementById(tabName).className += " active";
     document.getElementById(tabName+"-letters").className += " active";
     evt.currentTarget.className += " active";

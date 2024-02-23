@@ -158,13 +158,24 @@ section {
     width: 100%;
 }
 
+.page-tabs-header-container.active::before {
+    content: '';
+    display: inline-block;
+    transform: translateX(10%);
+    width: 30px;
+    height: 30px;
+    background-image: url('../img/pin.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
 .page-tabs-header-container.active {
     font-weight: bold;
 }
 
 .icons {
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     position: absolute;
     transform: translateX(-50%);
     bottom: 10px;
@@ -178,13 +189,22 @@ section {
 }
 
 .tabcontent {
-    display: none;
-    height: auto;
-    width: 100%;
-    min-width: 70vw;
+    display: flex; /* Use Flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: auto; /* Adjust height as needed */
+    width: 100%; /* Full width */
+    min-width: 70vw; /* Minimum width */
+    text-align: center; /* Center text if needed */
+    display: none; /* Keep this to hide content initially */
 }
 
-/* Active tab content */
 .tabcontent.active {
-    display: block;
+    display: flex; /* Changed to flex to maintain the flex container properties */
+}
+
+.iphone-screen img {
+    width: 100%; /* Default to full width on small screens */
+    height: auto;
+    max-width: 300px; /* Ensures image does not exceed its original size */
 }
