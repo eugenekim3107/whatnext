@@ -7,9 +7,7 @@ struct ContentView: View {
     
     
     var body: some View {
-        let _ = print(logStatus)
         if logStatus {
-            
             AfterLoginView()
         } else {
             

@@ -15,7 +15,7 @@ struct LoginView: View {
     var body: some View {
         ScrollView(.vertical,showsIndicators: false){
             VStack(alignment:.center, spacing: 15) {
-                Image("logo-icon")
+                Image("logo-1")
                     .resizable()
                     .frame(width: 50,height: 50)
                     .padding(.bottom,-20)

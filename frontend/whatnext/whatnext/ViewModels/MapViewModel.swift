@@ -43,7 +43,6 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func searchInNewArea(center: CLLocationCoordinate2D) {
         // Perform the search using the center of the map view
-        print("Searching near the center location: \(center.latitude), \(center.longitude)")
         loadDummyLocations()
         loadLocationsForMapView(from: center)
     }
