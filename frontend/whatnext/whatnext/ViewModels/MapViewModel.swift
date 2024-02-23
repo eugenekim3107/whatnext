@@ -41,7 +41,44 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
         loadLocationsForMapView(from: location.coordinate)
     }
     
+    func searchInNewArea(center: CLLocationCoordinate2D) {
+        // Perform the search using the center of the map view
+        print("Searching near the center location: \(center.latitude), \(center.longitude)")
+        loadDummyLocations()
+        loadLocationsForMapView(from: center)
+    }
+    
     private func loadLocationsForMapView(from coordinate: CLLocationCoordinate2D) {
+        // Initially clear the locations if you want to refresh the data
+        self.locations.removeAll()
+
+        // Group for coordinating the two fetch calls
+        let fetchGroup = DispatchGroup()
+
+        // Fetch food locations
+        fetchGroup.enter()
+        locationService.fetchNearbyLocations(
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude,
+            limit: 10,
+            radius: 30000.0,
+            categories: ["food"],
+            curOpen: 0,
+            sortBy: "rating"
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let locations):
+                    self?.locations.append(contentsOf: locations)
+                case .failure(let error):
+                    print("Error fetching food locations: \(error)")
+                }
+                fetchGroup.leave()
+            }
+        }
+
+        // Fetch fitness locations
+        fetchGroup.enter()
         locationService.fetchNearbyLocations(
             latitude: coordinate.latitude,
             longitude: coordinate.longitude,
@@ -54,13 +91,20 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let locations):
-                    self?.locations = locations
+                    self?.locations.append(contentsOf: locations)
                 case .failure(let error):
-                    print("Error fetching locations: \(error)")
+                    print("Error fetching fitness locations: \(error)")
                 }
+                fetchGroup.leave()
             }
         }
+
+        // Once both calls are complete, update the UI if needed
+        fetchGroup.notify(queue: .main) {
+            // Update UI or perform any additional operations after both fetches are complete
+        }
     }
+
 
     
     func loadDummyLocations() {

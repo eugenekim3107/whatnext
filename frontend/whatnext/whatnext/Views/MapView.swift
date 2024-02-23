@@ -12,17 +12,11 @@ struct MapView: View {
     @StateObject private var viewModel = MapViewModel()
     @State private var trackingMode: MapUserTrackingMode = .follow
     @State private var selectedLocation: Location?
+    @State private var userHasInteracted = false
+    @State private var showingDetail = false
     @GestureState private var magnification: CGFloat = 1.0
 
     var body: some View {
-        let magnifyGesture = MagnificationGesture()
-            .updating($magnification) { (currentState, gestureState, transaction) in
-                gestureState = currentState
-            }
-            .onEnded { value in
-                zoomMap(by: value)
-            }
-
         ZStack {
             Map(coordinateRegion: $viewModel.region,
                 interactionModes: .all,
@@ -33,23 +27,48 @@ struct MapView: View {
                         Button(action: {
                             DispatchQueue.main.async {
                                 self.selectedLocation = location
+                                self.showingDetail = true
                             }
                         }) {
-                            Image("fitness.pin")
+                            pinImage(for: location.categories ?? [""]) // Now accepts [String]
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30, height: 30)
                         }
                     }
                 }
-                .gesture(magnifyGesture)
+                .gesture(
+                    DragGesture().onChanged({ _ in userHasInteracted = true })
+                )
                 .ignoresSafeArea(edges: .all)
+            
+            // Only show the button if the user has interacted with the map
+            if userHasInteracted {
+                VStack {
+                    Button("Search This Area") {
+                        viewModel.searchInNewArea(center: viewModel.region.center)
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                    .padding(.top, 20) // Add some padding from the top edge
+                    .transition(.opacity) // Smoothly fade in the button
+                    .animation(.easeInOut, value: userHasInteracted)
 
-            if let selectedLocation = selectedLocation {
+                    Spacer() // Push the button to the top
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            }
+                        
+            if showingDetail, let selectedLocation = selectedLocation {
                 LocationDetailView(location: selectedLocation, dismissAction: {
+                    self.showingDetail = false // Set to false when dismissing the detail view
                     self.selectedLocation = nil
+                    
                 })
-                .transition(.scale)
+                .transition(.opacity)
+                .zIndex(2)
             }
         }
     }
@@ -59,6 +78,16 @@ struct MapView: View {
         let newLatDelta = max(0.002, min(100, span.latitudeDelta / Double(delta)))
         let newLonDelta = max(0.002, min(100, span.longitudeDelta / Double(delta)))
         viewModel.region.span = MKCoordinateSpan(latitudeDelta: newLatDelta, longitudeDelta: newLonDelta)
+    }
+    
+    private func pinImage(for categories: [String]) -> Image {
+        if categories.contains("food") {
+            return Image("food.pin")
+        } else if categories.contains("fitness") {
+            return Image("fitness.pin")
+        } else {
+            return Image("heart.pin")
+        }
     }
 }
 
@@ -77,7 +106,7 @@ struct AnnotationView: View {
             }
         } else {
             // Provide a fallback view in case the URL is invalid
-            Image(systemName: "logo-icon")
+            Image(systemName: "logo-1")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 30, height: 30)
@@ -97,4 +126,3 @@ struct MapView_Previews: PreviewProvider {
         MapView()
     }
 }
-
