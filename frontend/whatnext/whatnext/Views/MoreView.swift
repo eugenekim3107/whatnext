@@ -10,7 +10,7 @@ struct MoreView: View {
         .init(name: "Notifications", imageName: "bell.circle", color: .black),
         .init(name: "Location", imageName: "location.circle", color: .black),
         .init(name: "Privacy", imageName: "hand.raised.circle", color: .black),
-        .init(name: "Account", imageName: "person.crop.circle", color: .black),
+        .init(name: "Preferences", imageName: "person.crop.circle", color: .black),
         .init(name: "Logout", imageName: "arrow.right.circle", color: .black)
     ]
     
@@ -81,6 +81,27 @@ struct MoreView: View {
                 Spacer().listRowBackground(Color.clear)
             }
             .navigationTitle("More")
+            .navigationDestination(for: SettingsSection.self) { setting in
+                    ZStack {
+                        Color.white.ignoresSafeArea()
+                        Label(setting.name, systemImage: setting.imageName)
+                            .font(.largeTitle).bold()
+                    }
+                }
+                .navigationDestination(for: FeedbackSection.self) { feedback in
+                    ZStack {
+                        Color.white.ignoresSafeArea()
+                        Label(feedback.name, systemImage: feedback.imageName)
+                            .font(.largeTitle).bold()
+                    }
+                }
+                .navigationDestination(for: TermsAndConditionsSection.self) { term in
+                    ZStack {
+                        Color.white.ignoresSafeArea()
+                        Label(term.name, systemImage: term.imageName)
+                            .font(.largeTitle).bold()
+                    }
+                }
         }
     }
 
