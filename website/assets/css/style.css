@@ -1,8 +1,10 @@
 body, html {
+    height: 100%;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     scroll-behavior: smooth;
-    font-family: Arial, sans-serif;
+    font-family: 'Abhaya Libre', serif;
 }
 
 header {
@@ -46,7 +48,7 @@ nav#navbar ul li {
 nav#navbar ul li a {
     color: white;
     text-decoration: none;
-    font-size: 16px;
+    font-size: 25px;
     font-weight: 500; /* Make text bolder */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
     transition: color 0.3s ease; /* Smooth transition for hover effect */
@@ -107,4 +109,82 @@ section {
     text-align: left; /* Ensures text alignment is uniform */
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Black shadow for contrast */
     padding-left: 0; /* Adjust based on overall .carousel-text padding */
+}
+
+/*--------------------------------------------------------------
+# Feature Section
+--------------------------------------------------------------*/
+
+/* General styling for the feature section container */
+#features {
+    background: #f9f9f9;
+    min-height: 100vh;
+    box-sizing: border-box;
+    font-weight: 500;
+}
+
+/* Styling for the tabs container */
+.page-tabs {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Default styling for each tab header */
+.page-tabs-header {
+    display: flex;
+    flex-grow: 1;
+    background-color: #ffffff;
+    border-right: 3px solid #dcdcdc;
+    transition: all 0.3s ease-in-out;
+    padding-top: 60px;
+}
+
+.page-tabs-header:hover {
+    background-color: #f2f2f2;
+}
+
+.page-tabs-header.active {
+    background-color: #f2f2f2;
+}
+
+.page-tabs-header-container {
+    cursor: pointer;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.page-tabs-header-container.active {
+    font-weight: bold;
+}
+
+.icons {
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    transform: translateX(-50%);
+    bottom: 10px;
+}
+
+.page-tabs-header-letters div {
+    font-size: 3rem;
+    color: #333;
+    margin: 0.2rem;
+    text-transform: uppercase;
+}
+
+.tabcontent {
+    display: none;
+    height: auto;
+    width: 100%;
+    min-width: 70vw;
+}
+
+/* Active tab content */
+.tabcontent.active {
+    display: block;
 }

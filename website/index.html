@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatNext?</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- <link rel="icon" type="image/x-icon" href="assets/img/favicon-logo.ico"> -->
     <link rel="icon" type="image/png" href="assets/img/favicon-logo.png" sizes="48x48">
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -59,7 +59,90 @@
 </section>
 
 <section id="features">
-    <h1>Features</h1>
+    <div class="page-tabs">
+        <div class="page-tabs-header active" onclick="openTab(event, 'map')">
+            <div id="map" class="tabcontent" style="display:block;">
+                <h2>Map</h2>
+                <p>This is the Map tab content.</p>
+            </div>
+            <div id="map-letters" class="page-tabs-header-container active">
+                <div class="page-tabs-header-letters">
+                    <div>M</div>
+                    <div>A</div>
+                    <div>P</div>
+                </div>
+                <img id="map-icon" class="icons" src="assets/img/map.fill.svg" alt="map-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'search')">
+            <div id="search" class="tabcontent" style="display:none;">
+                <h2>Search</h2>
+                <p>This is the Search tab content.</p>
+            </div>
+            <div id="search-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>S</div>
+                    <div>E</div>
+                    <div>A</div>
+                    <div>R</div>
+                    <div>C</div>
+                    <div>H</div>
+                </div>
+                <img id="search-icon" class="icons" src="assets/img/search.svg" alt="search-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'explore')">
+            <div id="explore" class="tabcontent" style="display:none;">
+                <h2>Explore</h2>
+                <p>This is the Explore tab content.</p>
+            </div>
+            <div id="explore-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>E</div>
+                    <div>X</div>
+                    <div>P</div>
+                    <div>L</div>
+                    <div>O</div>
+                    <div>R</div>
+                    <div>E</div>
+                </div>
+                <img id="explore-icon" class="icons" src="assets/img/explore.svg" alt="explore-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'profile')">
+            <div id="profile" class="tabcontent" style="display:none;">
+                <h2>Profile</h2>
+                <p>This is the Profile tab content.</p>
+            </div>
+            <div id="profile-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>P</div>
+                    <div>R</div>
+                    <div>O</div>
+                    <div>F</div>
+                    <div>I</div>
+                    <div>L</div>
+                    <div>E</div>
+                </div>
+                <img id="profile-icon" class="icons" src="assets/img/profile.svg" alt="profile-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'more')">
+            <div id="more" class="tabcontent" style="display:none;">
+                <h2>More</h2>
+                <p>This is the More tab content.</p>
+            </div>  
+            <div id="more-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>M</div>
+                    <div>O</div>
+                    <div>R</div>
+                    <div>E</div>
+                </div>
+                <img id="more-icon" class="icons" src="assets/img/more.svg" alt="more-icon">
+            </div>
+        </div>
+    </div>    
 </section>
 
 <section id="demo">
