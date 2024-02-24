@@ -1,14 +1,28 @@
+@font-face {
+    font-family: 'Kelson-Light';
+    src: url('../fonts/Armasen-Kelson-Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Kelson-Medium';
+    src: url('../fonts/Armasen-Kelson-Medium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body, html {
     height: 100%;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     scroll-behavior: smooth;
-    font-family: 'Abhaya Libre', serif;
+    font-family: 'Kelson-Light', 'Kelson-Medium', serif;
 }
 
 header {
-    background-color: rgba(100, 159, 189, 0.7); /* Full opacity */
+    background-color: rgba(64, 163, 213, 0.7); /* Full opacity */
     color: #fff;
     position: fixed;
     top: 0;
@@ -48,7 +62,7 @@ nav#navbar ul li {
 nav#navbar ul li a {
     color: white;
     text-decoration: none;
-    font-size: 25px;
+    font-size: 20px;
     font-weight: 500; /* Make text bolder */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
     transition: color 0.3s ease; /* Smooth transition for hover effect */
@@ -121,6 +135,7 @@ section {
     min-height: 100vh;
     box-sizing: border-box;
     font-weight: 500;
+    max-height: 100vh;
 }
 
 /* Styling for the tabs container */
@@ -143,11 +158,11 @@ section {
 }
 
 .page-tabs-header:hover {
-    background-color: #f2f2f2;
+    background-color: #88D4F4;
 }
 
 .page-tabs-header.active {
-    background-color: #f2f2f2;
+    background-color: #88D4F4;
 }
 
 .page-tabs-header-container {
@@ -161,15 +176,46 @@ section {
 .page-tabs-header-container.active::before {
     content: '';
     display: inline-block;
-    transform: translateX(10%);
-    width: 30px;
-    height: 30px;
+    transform: translateX(12%);
+    width: 40px;
+    height: 40px;
     background-image: url('../img/pin.svg');
     background-size: contain;
     background-repeat: no-repeat;
 }
 
+.page-tabs-header-container:hover::before {
+    content: '';
+    display: inline-block;
+    transform: translateX(12%);
+    width: 40px;
+    height: 40px;
+    background-image: url('../img/pin.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    animation: fallDownAnimation 1s ease forwards;
+}
+
+@keyframes fallDownAnimation {
+    0% {
+        opacity: 0;
+        transform: translateX(12%) translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(12%) translateY(0);
+    }
+}
+
 .page-tabs-header-container.active {
+    font-weight: bold;
+    position: relative;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.page-tabs-header-container:hover {
     font-weight: bold;
 }
 
@@ -182,6 +228,7 @@ section {
 }
 
 .page-tabs-header-letters div {
+    font-family: "Kelson-Medium";
     font-size: 3rem;
     color: #333;
     margin: 0.2rem;
@@ -189,22 +236,57 @@ section {
 }
 
 .tabcontent {
-    display: flex; /* Use Flexbox */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    height: auto; /* Adjust height as needed */
-    width: 100%; /* Full width */
-    min-width: 70vw; /* Minimum width */
-    text-align: center; /* Center text if needed */
-    display: none; /* Keep this to hide content initially */
-}
-
-.tabcontent.active {
-    display: flex; /* Changed to flex to maintain the flex container properties */
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    height: auto;
+    width: 100%;
+    min-width: 70vw;
+    text-align: center;
+    display: none;
+    max-height: 100vh;
 }
 
 .iphone-screen img {
-    width: 100%; /* Default to full width on small screens */
+    width: 100%;
     height: auto;
-    max-width: 300px; /* Ensures image does not exceed its original size */
+    max-width: 300px;
+}
+
+.info-content {
+    color: rgb(0, 0, 0);
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.info-content p {
+    font-size: 20px;
+    background: #E9ECEF;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.info-content ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.info-content li {
+    font-size: 20px;
+    background: #E9ECEF;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }

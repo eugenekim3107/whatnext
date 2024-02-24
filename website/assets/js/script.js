@@ -46,11 +46,6 @@ function openTab(evt, tabName) {
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
         tabletterlinks[i].className = tabletterlinks[i].className.replace(" active", "");
-        var iconId = tabletterlinks[i].id.replace('-letters', '-icon')
-        var iconElement = document.getElementById(iconId);
-        if (iconElement && iconElement.src.includes(".fill.svg")) {
-            iconElement.src = iconElement.src.replace(".fill.svg", ".svg");
-        }
     }
 
     // Show the current tab, and add an "active" class to the link that opened the tab and to the tab content
@@ -58,11 +53,5 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).className += " active";
     document.getElementById(tabName+"-letters").className += " active";
     evt.currentTarget.className += " active";
-
-    var activeIconId = tabName + "-icon";
-    var activeIconElement = document.getElementById(activeIconId);
-    if (activeIconElement && !activeIconElement.src.includes(".fill.svg")) {
-        activeIconElement.src = activeIconElement.src.replace(".svg", ".fill.svg");
-    }
 }
 
