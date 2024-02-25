@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatNext?</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- <link rel="icon" type="image/x-icon" href="assets/img/favicon-logo.ico"> -->
     <link rel="icon" type="image/png" href="assets/img/favicon-logo.png" sizes="48x48">
+    <link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -21,6 +21,7 @@
             <li><a href="#demo">Demo</a></li>
             <li><a href="#team">Team</a></li>
             <li><a href="#download">Download</a></li>
+            <li><a href="#paper">Paper</a></li>
         </ul>
     </nav>
 </header> 
@@ -59,7 +60,183 @@
 </section>
 
 <section id="features">
-    <h1>Features</h1>
+    <div class="page-tabs">
+        <div class="page-tabs-header active" onclick="openTab(event, 'map')">
+            <div id="map" class="tabcontent" style="display:flex;">
+                <div id="map-screen" class="iphone-screen">
+                    <img src="assets/img/map-frame.png">
+                </div>
+                <div id="map-content" class="info-content">
+                    <h2>Overview</h2>
+                    <p>Dynamically displays points of interest (POIs) near the user's current location, enhancing exploration and interaction within a geographical context.</p>
+                    
+                    <h2>Technical Details</h2>
+                    <ul>
+                        <li>Utilizes SwiftUI for constructing the user interface, offering a modern, responsive design that adapts to various device screens.</li>
+                        <li>Employs MapKit for integrating comprehensive mapping capabilities, including rendering maps, displaying POIs, and handling user interactions with the map.</li>
+                        <li>Fetches real-time location data from an API endpoint, keeping the app updated with the latest business information.</li>
+                    </ul>
+                    
+                    <h2>Features</h2>
+                    <ul>
+                        <li>A refresh button seamlessly updates the map with new POIs as users explore different areas, ensuring responsive information.</li>
+                        <li>Different activities and categories are represented with distinct pin icons, making it easy for users to quickly identify the type of POIs they're interested in.</li>
+                        <li>By tapping on POI markers, users access additional information about the location including descriptions, photos, and directions.</li>
+                    </ul>
+                </div>                
+            </div>
+            <div id="map-letters" class="page-tabs-header-container active">
+                <div class="page-tabs-header-letters">
+                    <div>M</div>
+                    <div>A</div>
+                    <div>P</div>
+                </div>
+                <img id="map-icon" class="icons" src="assets/img/map.svg" alt="map-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'search')">
+            <div id="search" class="tabcontent" style="display:none;">
+                <div id="search-screen" class="iphone-screen">
+                    <img src="assets/img/search-frame.png">
+                </div>
+                <div id="search-content" class="info-content">
+                    <h2>Overview</h2>
+                    <p>Integrates large language models (LLMs) with real-time location data to offer a personalized location recommendation chatbot for the users.</p>
+
+                    <h2>Technical Details</h2>
+                    <ul>
+                        <li>Leverages OpenAI's Assistant API as the chatbot, enabling complex natural language understanding for processing user queries and delivering context-aware responses.</li>
+                        <li>Capable of function calls and inferring parameters from limited conversation history and user information.</li>
+                        <li>Sorts the list of recommendations based on factors like conversation history, user tags, proximity, and operational hours.</li>
+                        <li>Leverages Redis for in-memory storage, enabling quickly storage and retrieve of chat history.</li>
+                    </ul>
+
+                    <h2>Features</h2>
+                    <ul>
+                        <li>Users interact with an advanced chatbot that accommodates typos, offering a level of flexibility not found in standard search boxes.</li>
+                        <li>Recommendations are displayed as swipeable location cards that offer a quick glance at what's nearby, enhancing the discovery process.</li>
+                        <li>After each recommendation, users can provide feedback to the chatbot or ask for more information about the recommendations.</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="search-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>S</div>
+                    <div>E</div>
+                    <div>A</div>
+                    <div>R</div>
+                    <div>C</div>
+                    <div>H</div>
+                </div>
+                <img id="search-icon" class="icons" src="assets/img/search.svg" alt="search-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'explore')">
+            <div id="explore" class="tabcontent" style="display:none;">
+                <div id="explore-screen" class="iphone-screen">
+                    <img src="assets/img/explore-frame.png">
+                </div>
+                <div id="explore-content" class="info-content">
+                    <h2>Overview</h2>
+                    <p>Explore new destinations tailored to your interests, ranging from trending spots and local favorites to places recently visited by friends.</p>
+
+                    <h2>Technical Details</h2>
+                    <ul>
+                        <li>Leverages secure HTTPS requests and API tokens to retrieve up-to-date location data, ensuring security during data transmission.</li>
+                        <li>Employs different sorting algorithms to suggest unique locations that still align with user preferences.</li>
+                    </ul>
+
+                    <h2>Features</h2>
+                    <ul>
+                        <li>Uses expandable location cards, offering additional information about the location including descriptions, photos, and directions.</li>
+                        <li>Supports automated scrolling and swipeable rows, making it easy for users to navigate through suggestions.</li>
+                        <li>Allows users to refresh content with a simple gesture, introducing new recommendations without additional effort.</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="explore-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>E</div>
+                    <div>X</div>
+                    <div>P</div>
+                    <div>L</div>
+                    <div>O</div>
+                    <div>R</div>
+                    <div>E</div>
+                </div>
+                <img id="explore-icon" class="icons" src="assets/img/explore.svg" alt="explore-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'profile')">
+            <div id="profile" class="tabcontent" style="display:none;">
+                <div id="profile-screen" class="iphone-screen">
+                    <img src="assets/img/profile-frame.png">
+                </div>
+                <div id="profile-content" class="info-content">
+                    <h2>Overview</h2>
+                    <p>Introducing a social media tab that displays your connections, allows you to save your favorite spots, and keeps a record of your visit history.</p>
+
+                    <h2>Technical Details</h2>
+                    <ul>
+                        <li>Automatically retrieves the latest user data from MongoDB, ensuring all information presented is current and accurate.</li>
+                        <li>Utilizes AWS S3 buckets for efficient and secure storage of user profile images.</li>
+                    </ul>
+
+                    <h2>Features</h2>
+                    <ul>
+                        <li>Features expandable profile cards that reveal more about friends, allowing you to find recommendations their latest activities.</li>
+                        <li>Enables profile customization through the upload of personal photos.</li>
+                        <li>Provides ability for users to manage their favorite locations and their visit history.</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="profile-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>P</div>
+                    <div>R</div>
+                    <div>O</div>
+                    <div>F</div>
+                    <div>I</div>
+                    <div>L</div>
+                    <div>E</div>
+                </div>
+                <img id="profile-icon" class="icons" src="assets/img/profile.svg" alt="profile-icon">
+            </div>
+        </div>
+        <div class="page-tabs-header" onclick="openTab(event, 'more')">
+            <div id="more" class="tabcontent" style="display:none;">
+                <div id="more-screen" class="iphone-screen">
+                    <img src="assets/img/more-frame.png">
+                </div>
+                <div id="more-content" class="info-content">
+                    <h2>Overview</h2>
+                    <p>Features a section for users to manage their personal settings, provide feedback, and understand the terms and conditions of the service.</p>
+
+                    <h2>Technical Details</h2>
+                    <ul>
+                        <li>Integrates Google Firebase for secure account management, allowing for reliable authentication, account recovery, and real-time data synchronization across devices.</li>
+                        <li>Utilizes Core Location for location services, allowing users to customize their location settings.</li>
+                    </ul>
+
+                    <h2>Features</h2>
+                    <ul>
+                        <li>Allows users to adjust settings related to notifications, location tracking, and privacy according to their preferences.</li>
+                        <li>Features a section where users can provide feedback on their experience and suggest areas for improvement.</li>
+                        <li>Includes a terms and condition section that outlines the legal considerations such as acceptance of terms, privacy policy, and user conduct.</li>
+                    </ul>
+                </div>
+            </div>  
+            <div id="more-letters" class="page-tabs-header-container">
+                <div class="page-tabs-header-letters">
+                    <div>M</div>
+                    <div>O</div>
+                    <div>R</div>
+                    <div>E</div>
+                </div>
+                <img id="more-icon" class="icons" src="assets/img/more.svg" alt="more-icon">
+            </div>
+        </div>
+    </div>    
 </section>
 
 <section id="demo">

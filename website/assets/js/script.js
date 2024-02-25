@@ -29,3 +29,29 @@ function showSlides() {
     slides[slideIndex-1].style.opacity = "1";  
     setTimeout(showSlides, 4000); // Change image every 4 seconds
 }
+
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+        tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+    }
+
+    // Get all elements with class="page-tabs-header" and remove the class "active"
+    tablinks = document.getElementsByClassName("page-tabs-header");
+    tabletterlinks = document.getElementsByClassName("page-tabs-header-container")
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+        tabletterlinks[i].className = tabletterlinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab and to the tab content
+    document.getElementById(tabName).style.display = "flex";
+    document.getElementById(tabName).className += " active";
+    document.getElementById(tabName+"-letters").className += " active";
+    evt.currentTarget.className += " active";
+}
+
