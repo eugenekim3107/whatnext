@@ -87,21 +87,35 @@ document.querySelectorAll('.sidebar a').forEach(link => {
 });
 document.querySelectorAll('.sidebar a').forEach(link => {
     link.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent the default link behavior
+        e.preventDefault(); // Prevent default action
 
-        // Remove existing arrows if any
-        document.querySelectorAll('.sidebar a .arrow').forEach(arrow => {
-            arrow.remove();
+        // Remove .clicked class and arrow from all items except the clicked one
+        document.querySelectorAll('.sidebar a').forEach(item => {
+            if (item !== this) {
+                item.classList.remove('clicked');
+                let existingArrow = item.querySelector('.arrow');
+                if (existingArrow) {
+                    existingArrow.remove();
+                }
+            }
         });
 
-        // Create a new arrow element pointing left
-        let arrow = document.createElement('span');
-        arrow.className = 'arrow';
-        arrow.innerHTML = '←';
+        // Toggle .clicked class on this item
+        this.classList.toggle('clicked');
 
-        this.appendChild(arrow);
+        // Manage the arrow for the clicked item
+        let arrow = this.querySelector('.arrow');
+        if (!arrow) {
+            // If no arrow exists, create and append it
+            arrow = document.createElement('span');
+            arrow.className = 'arrow';
+            arrow.innerHTML = '←'; // Left-pointing arrow
+            this.insertBefore(arrow, this.firstChild);
+        } else {
+            // If arrow exists, remove it to simulate a toggle
+            arrow.remove();
+        }
 
-        // Your existing code to change the video-container text
+        // Adjust video-container text or other actions here
     });
-});
-
+})

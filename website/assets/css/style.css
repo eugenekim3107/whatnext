@@ -319,29 +319,36 @@ section {
   
   
   .sidebar a {
+    position: relative; /* Add this to ensure a positioning context for the arrows */
     display: block;
     font-size: 48px;
     text-decoration: none;
-    margin-bottom:60px;
-    color:black
-    /* Additional styles for the links */
+    margin-bottom: 60px;
+    color: black; /* Missing semicolon in your provided CSS */
+    /* Other styles as needed */
+    text-align: right;
   }
+
   .sidebar a .arrow {
     display: inline-block;
-    margin-left: 5px; /* Space between the text and the arrow */
+    position: absolute; /* Position the arrow absolutely within the link */
+    right: -50px; /* Position the arrow to the right of the text */
+    top: 50%; /* Center the arrow vertically */
+    transform: translateY(-50%); /* Ensure the arrow is centered with the text */
+    /* Remove margin-left as it's no longer needed */
     transition: transform 0.5s ease; /* Smooth animation for any movement */
   }
-  
-  /* Animation on click - making the arrow "bounce" to draw attention */
   @keyframes arrow-bounce {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(5px); } /* Adjust to move the arrow right on bounce */
-    100% { transform: translateX(0); }
+    0% { transform: translateX(0) translateY(-50%); }
+    50% { transform: translateX(5px) translateY(-50%); } /* Keep the arrow centered */
+    100% { transform: translateX(0) translateY(-50%); }
   }
   
   .sidebar a .arrow {
     animation: arrow-bounce 0.5s ease-out;
   }
+  
+  /* Animation on click - making the arrow "bounce" to draw attention */
   
   
   /* Remember to add any additional styles as needed for your specific design */
