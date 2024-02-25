@@ -16,7 +16,7 @@ struct FoodAndDrinksView: View {
     var body: some View {
         
         VStack {
-            SplitProgressBar(leftProgress: 0, rightProgress: 1)
+            SplitProgressBarView(leftProgress: 0, rightProgress: 1)
                                 .frame(height: 4)
                                 .padding(.vertical)
             
