@@ -106,7 +106,7 @@ struct AnnotationView: View {
             }
         } else {
             // Provide a fallback view in case the URL is invalid
-            Image(systemName: "logo-icon")
+            Image(systemName: "logo-1")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 30, height: 30)
@@ -126,4 +126,3 @@ struct MapView_Previews: PreviewProvider {
         MapView()
     }
 }
-

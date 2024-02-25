@@ -2,11 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to show it on the map</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We need your location to provide continuous navigation</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.499657879890-i7rhmp38umsnurjbleqspt8nm8tamkgv</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

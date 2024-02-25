@@ -36,18 +36,18 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
         }
-        //loadDummyLocations()
+//        loadDummyLocations()
         // Fetch locations using LocationRowViewModel
         loadLocationsForMapView(from: location.coordinate)
     }
-
+    
     func searchInNewArea(center: CLLocationCoordinate2D) {
         // Perform the search using the center of the map view
         print("Searching near the center location: \(center.latitude), \(center.longitude)")
         loadDummyLocations()
         loadLocationsForMapView(from: center)
     }
-
+    
     private func loadLocationsForMapView(from coordinate: CLLocationCoordinate2D) {
         // Initially clear the locations if you want to refresh the data
         self.locations.removeAll()
@@ -62,7 +62,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             longitude: coordinate.longitude,
             limit: 10,
             radius: 30000.0,
-            categories: "food",
+            categories: ["food"],
             curOpen: 0,
             sortBy: "rating"
         ) { [weak self] result in
@@ -84,7 +84,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             longitude: coordinate.longitude,
             limit: 10,
             radius: 30000.0,
-            categories: "fitness",
+            categories: ["fitness"],
             curOpen: 1,
             sortBy: "rating"
         ) { [weak self] result in
