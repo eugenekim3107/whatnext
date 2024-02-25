@@ -10,7 +10,6 @@ struct ContentView: View {
         if logStatus {
             AfterLoginView()
         } else {
-            
             LoginView()
             
         }
