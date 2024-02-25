@@ -14,7 +14,6 @@ struct UploadProfileImageView: View {
                 .padding(.top)
                 Spacer()
                 
-
             Button(action: {
                 // Action for the camera button
             }) {

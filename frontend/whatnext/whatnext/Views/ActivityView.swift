@@ -4,6 +4,10 @@ struct ActivityView: View {
     @StateObject private var viewModel = PreferenceViewModel(allTags: ["Shopping", "Yoga", "Italian Food", "Swimming", "Hiking"])
     @State private var isNavigatingToFoodAndDrinks = false
 
+    
+    
+    
+
     var body: some View {
         NavigationView{
             VStack {
@@ -98,26 +102,10 @@ struct ProgressBar: View {
         }
     }
 }
-struct TagView: View {
-    var text: String
-    var isSelected: Bool
-    var icon: String
-    
-    var body: some View {
-        Text(text)
-            .font(Font.custom("Inter", size: 12).weight(isSelected ? .bold : .semibold))
-            .frame(width: 140, height: 45)
-            .foregroundColor(isSelected ? .white : .black)
-            .background(isSelected ? Color(red: 0.28, green: 0.64, blue: 0.91) : .white)
-            .cornerRadius(15)
-            .overlay(
-                RoundedRectangle(cornerRadius: 15)
-                    .inset(by: isSelected ? 0.5 : 0)
-                    .stroke(Color(red: 0.91, green: 0.90, blue: 0.92), lineWidth: 2)
-            )
-            .shadow(color: isSelected ? Color(red: 0.28, green: 0.64, blue: 0.91).opacity(0.2) : Color(red: 0.91, green: 0.90, blue: 0.92), radius: 2,x:0, y: 1)
-    }
-}
+
+
+
+
 extension PreferenceViewModel {
     // Toggles the selection of a tag and updates the stored tags accordingly
     func toggleACTagSelection(_ tag: String) {

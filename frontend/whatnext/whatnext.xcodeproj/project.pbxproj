@@ -47,6 +47,7 @@
 		B908DC782B8B042C00AC9C59 /* PreferenceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B908DC772B8B042C00AC9C59 /* PreferenceViewModel.swift */; };
 		B908DC7A2B8B371800AC9C59 /* FoodAndDrinksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B908DC792B8B371800AC9C59 /* FoodAndDrinksView.swift */; };
 		B908DC7C2B8B496F00AC9C59 /* UploadProfileImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B908DC7B2B8B496F00AC9C59 /* UploadProfileImageView.swift */; };
+		B908DC7E2B8B57DA00AC9C59 /* TagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B908DC7D2B8B57DA00AC9C59 /* TagView.swift */; };
 		B9F03B422B87D571009A16B1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B9F03B412B87D571009A16B1 /* GoogleService-Info.plist */; };
 		B9F03B442B87D656009A16B1 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F03B432B87D656009A16B1 /* LoginViewModel.swift */; };
 		B9F03B472B87D692009A16B1 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B9F03B462B87D692009A16B1 /* GoogleSignIn */; };
@@ -121,6 +122,7 @@
 		B908DC772B8B042C00AC9C59 /* PreferenceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceViewModel.swift; sourceTree = "<group>"; };
 		B908DC792B8B371800AC9C59 /* FoodAndDrinksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodAndDrinksView.swift; sourceTree = "<group>"; };
 		B908DC7B2B8B496F00AC9C59 /* UploadProfileImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadProfileImageView.swift; sourceTree = "<group>"; };
+		B908DC7D2B8B57DA00AC9C59 /* TagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagView.swift; sourceTree = "<group>"; };
 		B9F03B412B87D571009A16B1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B9F03B432B87D656009A16B1 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		B9F03B512B87D6FE009A16B1 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				B908DC752B8AD50500AC9C59 /* ActivityView.swift */,
 				B908DC792B8B371800AC9C59 /* FoodAndDrinksView.swift */,
 				B908DC7B2B8B496F00AC9C59 /* UploadProfileImageView.swift */,
+				B908DC7D2B8B57DA00AC9C59 /* TagView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -474,6 +477,7 @@
 				8ADEA55D2B85D6280031BA33 /* ProfileInfo.swift in Sources */,
 				8A87045E2B5E042200183191 /* LoadingView.swift in Sources */,
 				8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */,
+				B908DC7E2B8B57DA00AC9C59 /* TagView.swift in Sources */,
 				8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */,
 				8ACD17B92B61F18A0029487A /* LocationInfo.swift in Sources */,
 				B9F03B522B87D6FE009A16B1 /* LoginView.swift in Sources */,

@@ -1,12 +1,23 @@
 import SwiftUI
 
 struct FoodAndDrinksView: View {
-    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Korean","Chinese","Japanese"])
-
+    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Korean Food","Chinese Food","Japanese Food","Italian Food","Mexican Food","Burgers","Tacos","Hot Pot","Sushi"])
+    let tagIconLinks: [String: String] = [
+        "Chinese Food": "🍜",
+        "Korean Food": "🍱",
+        "Italian Food": "🍕",
+        "Japanese Food": "🍣",
+        "Burgers": "🍔",
+        "Mexican Food": "🥙",
+        "Hot Pot":"🫕",
+        "Sushi":"🍣",
+        "Tacos":"🌮"
+    ]
     var body: some View {
         
         VStack {
             ProgressBar(step: 1).frame(height: 4).padding(.vertical)
+            
 
 //            HStack {
 //                Button(action: {}) {
@@ -19,7 +30,7 @@ struct FoodAndDrinksView: View {
 //                }
 //                Spacer()
 //                Button(action: {}) {
-//                    Image(systemName: "arrow.right")
+//Image(systemName: "arrow.right")
 //                        .foregroundColor(.black)
 //                        .padding()
 //                        .background(Color.white)
@@ -52,7 +63,7 @@ struct FoodAndDrinksView: View {
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(Array(viewModel.FDtags.enumerated()), id: \.element.0) { index, tag in
-                        TagView(text: tag.0, isSelected: tag.1,icon:"")
+                        TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
                             .onTapGesture {
                                 // Implement tag selection toggle logic here
                                 viewModel.toggleFDTagSelection(tag.0)
