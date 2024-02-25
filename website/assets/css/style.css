@@ -294,7 +294,60 @@ section {
 /*--------------------------------------------------------------
 # Demo Section
 --------------------------------------------------------------*/
-
+/* Ensure the .demo-section fills the screen and is flexibly laid out */
+#demo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    
+  }
+  
+  .video-container {
+    margin-top: 50px;
+    flex-grow: 2; /* Adjust as needed */
+    font-size: 24px;
+    /* Additional styles for the video container */
+  }
+  
+  .sidebar {
+    margin-top:50px;
+    margin-left: auto; /* This keeps the sidebar to the right */
+    padding-left: 100px; /* This will push the sidebar to the right */
+    /* Other styles for the sidebar */
+    margin-right: 100px;
+  }
+  
+  
+  .sidebar a {
+    display: block;
+    font-size: 48px;
+    text-decoration: none;
+    margin-bottom:60px;
+    color:black
+    /* Additional styles for the links */
+  }
+  .sidebar a .arrow {
+    display: inline-block;
+    margin-left: 5px; /* Space between the text and the arrow */
+    transition: transform 0.5s ease; /* Smooth animation for any movement */
+  }
+  
+  /* Animation on click - making the arrow "bounce" to draw attention */
+  @keyframes arrow-bounce {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(5px); } /* Adjust to move the arrow right on bounce */
+    100% { transform: translateX(0); }
+  }
+  
+  .sidebar a .arrow {
+    animation: arrow-bounce 0.5s ease-out;
+  }
+  
+  
+  /* Remember to add any additional styles as needed for your specific design */
+  
+  
+  
 /*--------------------------------------------------------------
 # Team Section
 --------------------------------------------------------------*/

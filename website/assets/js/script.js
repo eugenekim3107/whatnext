@@ -55,3 +55,53 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += " active";
 }
 
+// Assuming your sidebar links have unique IDs or classes
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent default anchor behavior
+
+        const contentId = this.getAttribute('href').substring(1); // Get the content identifier from the href
+        const videoContainer = document.querySelector('.video-container');
+
+        // Update the video-container based on the clicked link
+        switch (contentId) {
+            case 'Map_demo':
+                videoContainer.textContent = 'Map content goes here';
+                break;
+            case 'Search_demo':
+                videoContainer.textContent = 'Search content goes here';
+                break;
+            case 'Profile_demo':
+                videoContainer.textContent = 'Profile content goes here';
+                break;
+            case 'More_demo':
+                videoContainer.textContent = 'More content goes here';
+                break;
+            case 'Explore_demo':
+                videoContainer.textContent = 'Explore content goes here';
+                break;
+            default:
+                videoContainer.textContent = 'Select an option';
+        }
+    });
+});
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent the default link behavior
+
+        // Remove existing arrows if any
+        document.querySelectorAll('.sidebar a .arrow').forEach(arrow => {
+            arrow.remove();
+        });
+
+        // Create a new arrow element pointing left
+        let arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.innerHTML = '←';
+
+        this.appendChild(arrow);
+
+        // Your existing code to change the video-container text
+    });
+});
+
