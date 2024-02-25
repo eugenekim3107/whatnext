@@ -147,4 +147,3 @@ struct TermsAndConditionsSection: Hashable {
     let imageName: String
     let color: Color
 }
-

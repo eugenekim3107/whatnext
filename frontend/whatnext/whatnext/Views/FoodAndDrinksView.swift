@@ -16,7 +16,9 @@ struct FoodAndDrinksView: View {
     var body: some View {
         
         VStack {
-            ProgressBar(step: 1).frame(height: 4).padding(.vertical)
+            SplitProgressBar(leftProgress: 0, rightProgress: 1)
+                                .frame(height: 4)
+                                .padding(.vertical)
             
 
 //            HStack {
@@ -37,8 +39,8 @@ struct FoodAndDrinksView: View {
 //                        .cornerRadius(10)
 //                        .shadow(radius: 1)
 //                }
-//                
-//                
+//
+//
 //            }.padding(.horizontal,30)
             let columns = [
                 GridItem(.flexible(), spacing: 8),
@@ -91,8 +93,3 @@ struct FoodAndDrinksView_Previews: PreviewProvider {
         FoodAndDrinksView()
     }
 }
-
-
-
-
-
