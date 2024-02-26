@@ -48,7 +48,13 @@ struct MoreView: View {
                                     secondaryButton: .cancel()
                                 )
                             }
-                        } else {
+                        } else if setting.name == "Preferences" {
+                            NavigationLink(destination: ActivityView()) {
+                                Label(setting.name, systemImage: setting.imageName)
+                                    .foregroundColor(setting.color)
+                            }
+                        }
+                        else {
                             NavigationLink(value: setting) {
                                 Label(setting.name, systemImage: setting.imageName)
                                     .foregroundColor(setting.color)
@@ -141,4 +147,3 @@ struct TermsAndConditionsSection: Hashable {
     let imageName: String
     let color: Color
 }
-
