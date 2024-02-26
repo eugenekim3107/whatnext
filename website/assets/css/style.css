@@ -114,7 +114,7 @@ section {
   top: 50%;
   transform: translateY(-50%);
   color: #fff;
-  font-size: 7em;
+  font-size: 8vw;
   font-weight: bold;
   line-height: 1.2;
   padding: 20px;
@@ -231,7 +231,7 @@ section {
 
 .page-tabs-header-letters div {
   font-family: "Kelson-Medium";
-  font-size: 3rem;
+  font-size: 3vw;
   color: #333;
   margin: 0.2rem;
   text-transform: uppercase;
