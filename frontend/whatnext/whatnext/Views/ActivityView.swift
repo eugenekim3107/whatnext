@@ -82,11 +82,11 @@ struct ActivityView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(Array(viewModel.FDtags.enumerated()), id: \.element.0) { index, tag in
+                        ForEach(Array(viewModel.ACtags.enumerated()), id: \.element.0) { index, tag in
                             TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
                                 .onTapGesture {
                                     // Implement tag selection toggle logic here
-                                    viewModel.toggleFDTagSelection(tag.0)
+                                    viewModel.toggleACTagSelection(tag.0)
                                 }
                         }
                     }
