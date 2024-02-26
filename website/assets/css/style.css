@@ -299,14 +299,14 @@ section {
    Team Section
    ===================================== */
 #team {
-    background-color: #f9f9f9; 
+    background-color: #ffffff; 
     padding: 50px 0;
     text-align: center;
 }
 
 .team-section h2 {
     text-align: center;
-    margin-bottom: 20px; 
+    margin-bottom: 1.25rem; 
   }
   
 .team-container {
@@ -316,13 +316,13 @@ section {
 }
 
 .team-member {
-    margin: 20px;
-    padding: 20px;
+    margin: 1.25rem;
+    padding: 1.25rem;
     background-color: #ffffff; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    border-radius: 10px;
-    width: 300px; 
-    height: 400px;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); 
+    border-radius: 0.625rem;
+    width: 18.75rem; 
+    height: 25rem;
 }
 
 .team-member-photo {
@@ -351,32 +351,32 @@ section {
     display: flex;
     align-items: center; 
     text-align: center; 
-    margin-top: -200px;
+    margin-top: -14.5rem;
 }
 
-.download {
+.download-info {
     flex: 1; 
     justify-content: space-around; 
     width: 100%; 
-    max-width: 1200px; 
+    max-width: 1300px; 
 }
 
-.download h1 {
-    font-size: 3em;
+.download-info h1 {
+    font-size: 6em;
     text-align: left;
     color: #333; 
 }
 
-.download h2 {
-    font-size: 2em;
+.download-info h2 {
+    font-size: 3em;
     text-align: left;
     margin: 20px 0;
 }
 
-.download p {
+.download-info p {
     margin-bottom: 30px;
-    width: 200px;
-    font-size: 0.75em;
+    width: 500px;
+    font-size: 1em;
     text-align: left;
     color: #666; 
 }
@@ -388,40 +388,40 @@ section {
 }
 
 .qr-code {
-    margin-right: 20px; 
-    width: 150px; 
+    margin-right: 1.25rem; 
+    width: 12.5rem; 
     height: auto;
 }
 
 .app-store-icon {
-    width: 150px; 
+    width: 12.5rem; 
     height: auto; 
 }
 
 .app-screenshots {
     position: relative;
     display: flex;
-    left: -10rem;
+    left: -20rem;
     top: 6rem;
     justify-content: center;
     align-items: center;
-    height: 350px; 
-    margin-top: 30px;
+    height: auto;
+    margin-top: 1.875rem;
 }
 
 .app-screenshots .screenshot {
-    max-width: 300px; 
+    max-width: 18.75rem; 
     position: absolute;
     transition: all .3s ease;
 }
 
 .app-screenshots .screenshot:nth-child(1) {
-    transform: translateX(-300px) scale(0.8);
+    transform: translateX(-18.75rem) scale(0.8);
     z-index: 1; 
 }
 
 .app-screenshots .screenshot:nth-child(2) {
-    transform: translateX(-150px) scale(0.9);
+    transform: translateX(-9.375rem) scale(0.9);
     z-index: 2;
 }
 
@@ -431,12 +431,12 @@ section {
 }
 
 .app-screenshots .screenshot:nth-child(4) {
-    transform: translateX(150px) scale(0.9);
+    transform: translateX(9.375rem) scale(0.9);
     z-index: 2;
 }
 
 .app-screenshots .screenshot:nth-child(5) {
-    transform: translateX(300px) scale(0.8);
+    transform: translateX(18.75rem) scale(0.8);
     z-index: 1;
 }
 /* ===================================== */
