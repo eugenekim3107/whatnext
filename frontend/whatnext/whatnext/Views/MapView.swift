@@ -86,7 +86,7 @@ struct MapView: View {
         } else if categories.contains("fitness") {
             return Image("fitness.pin")
         } else {
-            return Image("heart.pin")
+            return Image("heart.pin") // A default pin for other categories
         }
     }
 }
