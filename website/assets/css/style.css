@@ -295,10 +295,150 @@ section {
 # Demo Section
 --------------------------------------------------------------*/
 
-/*--------------------------------------------------------------
-# Team Section
---------------------------------------------------------------*/
+/* =====================================
+   Team Section
+   ===================================== */
+#team {
+    background-color: #f9f9f9; 
+    padding: 50px 0;
+    text-align: center;
+}
 
-/*--------------------------------------------------------------
-# Download Section
---------------------------------------------------------------*/
+.team-section h2 {
+    text-align: center;
+    margin-bottom: 20px; 
+  }
+  
+.team-container {
+    display: flex;
+    justify-content: space-around; 
+    flex-wrap: wrap; 
+}
+
+.team-member {
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff; /* Adjust the color to match your design */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    border-radius: 10px;
+    width: 300px; 
+    height: 400px;
+}
+
+.team-member-photo {
+    width: 150px; 
+    height: 150px;
+    border-radius: 50%; 
+    background-color: #ddd; 
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.team-member h2 {
+    margin-top: 0;
+}
+
+.team-member p {
+    margin-top: 5px;
+}
+
+/* =====================================
+   Download Section
+   ===================================== */
+#download {
+    display: flex;
+    align-items: center; /* Aligns items to the center */
+    text-align: center; /* Centers the text */
+    margin-top: -200px;
+}
+
+.download {
+    flex: 1; /* Allows the download div to grow and fill the space */
+    justify-content: space-around; /* Distributes space around items */
+    width: 100%; /* Sets the width of the .download div to full container width */
+    max-width: 1200px; /* You can set a max-width to prevent the content from spreading too wide */
+}
+
+.download h1 {
+    font-size: 3em;
+    text-align: left;
+    color: #333; /* Adjust the color to match your design */
+}
+
+.download h2 {
+    font-size: 2em;
+    text-align: left;
+    margin: 20px 0;
+}
+
+.download p {
+    margin-bottom: 30px;
+    width: 200px;
+    font-size: 0.75em;
+    text-align: left;
+    color: #666; 
+}
+
+.download-content {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.qr-code {
+    margin-right: 20px; /* Add margin to the right of the QR code */
+    width: 150px; /* Example size - adjust as needed */
+    height: auto;
+}
+
+.app-store-icon {
+    width: 150px; /* Example size - set this to whatever size you want */
+    height: auto; /* This will maintain the aspect ratio of the images */
+}
+
+.app-screenshots {
+    position: relative;
+    display: flex;
+    left: -10rem;
+    top: 6rem;
+    justify-content: center;
+    align-items: center;
+    height: 350px; /* Adjust the height as needed */
+    margin-top: 30px; /* Adjust the margin as needed */
+}
+
+.app-screenshots .screenshot {
+    max-width: 300px; /* Adjust based on your screenshot width */
+    position: absolute;
+    transition: all .3s ease;
+    /* Ensure there is enough space for the screenshots to not overflow the container */
+}
+
+/* Adjust the translation values based on the actual width of your screenshots */
+.app-screenshots .screenshot:nth-child(1) {
+    transform: translateX(-300px) scale(0.8);
+    z-index: 1; /* Lower z-index for screenshots in the back */
+}
+
+.app-screenshots .screenshot:nth-child(2) {
+    transform: translateX(-150px) scale(0.9);
+    z-index: 2;
+}
+
+.app-screenshots .screenshot:nth-child(3) {
+    transform: translateX(0px);
+    z-index: 3; /* Highest z-index for the screenshot in the front */
+}
+
+.app-screenshots .screenshot:nth-child(4) {
+    transform: translateX(150px) scale(0.9);
+    z-index: 2;
+}
+
+.app-screenshots .screenshot:nth-child(5) {
+    transform: translateX(300px) scale(0.8);
+    z-index: 1;
+}
+/* ===================================== */
