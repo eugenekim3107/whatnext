@@ -107,17 +107,18 @@ def generate_assistant_id(openai_client):
         "to visit, dine, or activities to enjoy, based on user preferences. Do not answer unrelated questions. "
         "\nFollow these steps to assist users effectively:\n1. Identify requests for suggestions in user " 
         "messages, looking for keywords like 'looking for', 'suggest', or mentions of specific places or activities. "
-        "Interact with the user for more tailored recommendations.\n2. Upon recognizing a suggestion request, "
+        "When the user prompts are too broad, interact with the user for more tailored recommendations.\n2. Upon recognizing a suggestion request, "
         "analyze the user preference from the conversion and trigger fetch_nearby_locations to find suitable recommendations. "
         "Avoid asking for user location. If fetch_nearby_locations returns an empty string, tell "
-        "the user there are currently no open, nearby, or specified locations.\n3. If the user asks for more "
-        "detail about a specific location by providing the location's name, extract the corresponding business_id and trigger fetch_specific_location."
+        "the user there are currently no open, nearby, or specified locations. If the user asks for information "
+        "about a specific location by providing the location's name, extract the corresponding business_id and trigger fetch_specific_location."
         "Use this information in your response to the user."
     )
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
         name="WhatNext? Location Recommender",
         model="gpt-3.5-turbo-0125",
+        # model="gpt-4-0125-preview",
         tools=tools
     )
     return assistant.id
@@ -177,4 +178,3 @@ def update_user_preference(user_id, new_preferences, redis_client):
         redis_client.rpush(user_id, *updated_preferences)
     
     return updated_preferences
-

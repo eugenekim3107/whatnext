@@ -308,6 +308,7 @@ async def chatgpt_response(request: ChatRequest,
 
     output_nearby_locations = None
     output_specific_location = None
+    output_specific_location_condition = True
 
     while run_status.status != 'completed':
 
@@ -399,7 +400,8 @@ async def chatgpt_response(request: ChatRequest,
                     print(f"BUSINESS_ID: {output_specific_location}")
 
                     if output_specific_location is None:
-                        business_info = "No additional information about location"
+                        output_specific_location_condition = False
+                        business_info = "No additional information about location in database. Please respond with GPT's internal knowledge. Limit response to couple, concise sentences."
                     else:
                         business_info = f"{output_specific_location}"
                     tool_output = {
@@ -422,7 +424,7 @@ async def chatgpt_response(request: ChatRequest,
         else:
             continue
     
-    if output_nearby_locations is None or len(output_nearby_locations) == 0:
+    if output_specific_location_condition == False or output_nearby_locations is None or len(output_nearby_locations) == 0:
         print("Generating regular response...")
         chat_type = "regular"
         messages = openai_client.beta.threads.messages.list(
@@ -435,7 +437,14 @@ async def chatgpt_response(request: ChatRequest,
     
     else:
         # Additional steps when locations are recommended
-        sort_message = f"{output_nearby_locations}"
+        sort_message = (
+            f"Locations: {output_nearby_locations}\n\n"
+            "Identify and rank, from highest to lowest ranked, the locations that best match my preference based on conversation history. "
+            "Your response should be a comma-separated list of business_id associated with these locations, "
+            "with a single space after each comma, and no spaces before the IDs or additional characters. "
+            "The format must be exactly as follows: 'business_id1, business_id2, business_id3, ...'. "
+            "Ensure the output adheres strictly to this structure, without any prefixes, bullet points, explanation, and additional text."
+        )
         openai_client.beta.threads.messages.create(
             thread_id = thread_id,
             role="user",
