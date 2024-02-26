@@ -30,7 +30,7 @@ struct TagView: View {
             RoundedRectangle(cornerRadius: 15)
                 .stroke(Color(red: 0.91, green: 0.90, blue: 0.92), lineWidth: isSelected ? 0 : 2)
         )
-        .shadow(color: isSelected ? Color(red: 0.28, green: 0.64, blue: 0.91).opacity(0.2) : Color.clear, radius: 2, x: 0, y: 1)
+        .shadow(color: isSelected ? Color(red: 0.28, green: 0.64, blue: 0.91).opacity(0.2) : Color.clear, radius: 2, x: 0, y: 2)
     }
 }
 

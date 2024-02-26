@@ -13,6 +13,7 @@ struct FoodAndDrinksView: View {
         "Sushi":"🍣",
         "Tacos":"🌮"
     ]
+    @State private var isSaveButtonDisabled = false
     var body: some View {
         
         VStack {
@@ -74,17 +75,30 @@ struct FoodAndDrinksView: View {
                 }
                 .padding(.horizontal)
             }
-            Button(action: {}) {
-                Text("Save")
-                    .foregroundColor(.white)
-                    .frame(width: 295, height: 56)
-                    .background(Color.blue)
-                    .cornerRadius(15)
-            }
+            
+            Button(action: saveButtonAction) {
+                 Text("Save")
+                     .foregroundColor(isSaveButtonDisabled ? .gray : .white) // Change text color based on button state
+                     .frame(width: 295, height: 56)
+                     .background(isSaveButtonDisabled ? Color.gray : Color.blue) // Change background color based on button state
+                     .cornerRadius(15)
+             }
+            .disabled(isSaveButtonDisabled)
             .padding(.bottom,50)
         }
         .padding(.horizontal)
     }
+    private func saveButtonAction() {
+            isSaveButtonDisabled = true // Disable the button
+            
+            // Re-enable the button after 0.3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                isSaveButtonDisabled = false
+            }
+            
+            // Your save action logic here
+        
+        }
 }
 
 

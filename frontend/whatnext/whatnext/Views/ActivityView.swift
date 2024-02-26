@@ -1,9 +1,29 @@
 import SwiftUI
 
 struct ActivityView: View {
-    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Shopping", "Yoga", "Italian Food", "Swimming", "Hiking"])
+    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Shopping", "Yoga", "Beaches", "Hiking","Spa","Aquariums","Beautysvc"])
     @State private var isNavigatingToFoodAndDrinks = false
-
+    @State private var isSaveButtonDisabled = false
+    let tagIconLinks: [String: String] = [
+        "Shopping": "🍜",
+        "Spa": "💆‍♂️",
+        "Hiking": "⛰️",
+        "Beaches": "🏖️",
+        "Restaurant":"🍴",
+        "Yoga":"🧘",
+        "Aquariums":"🐠",
+        "Beautysvc":"💅",
+    ]
+    
+    //Shopping to be shopping
+    //Spa to be spas
+    //Hiking to be hiking
+    //Restaurant to be restaurant
+    //Yoga to be yoga
+    //Beaches to be beaches
+    //Beautysvc to be beautysvc
+    //Aquariums to be aquariums
+    
     
     
     
@@ -62,28 +82,41 @@ struct ActivityView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(Array(viewModel.ACtags.enumerated()), id: \.element.0) { index, tag in
-                            TagView(text: tag.0, isSelected: tag.1,icon:"")
+                        ForEach(Array(viewModel.FDtags.enumerated()), id: \.element.0) { index, tag in
+                            TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
                                 .onTapGesture {
                                     // Implement tag selection toggle logic here
-                                    viewModel.toggleACTagSelection(tag.0)
+                                    viewModel.toggleFDTagSelection(tag.0)
                                 }
                         }
                     }
                     .padding(.horizontal)
                 }
-                Button(action: {}) {
-                    Text("Save")
-                        .foregroundColor(.white)
-                        .frame(width: 295, height: 56)
-                        .background(Color.blue)
-                        .cornerRadius(15)
-                }
+                Button(action: saveButtonAction) {
+                     Text("Save")
+                         .foregroundColor(isSaveButtonDisabled ? .gray : .white) // Change text color based on button state
+                         .frame(width: 295, height: 56)
+                         .background(isSaveButtonDisabled ? Color.gray : Color.blue) // Change background color based on button state
+                         .cornerRadius(15)
+                 }
+                .disabled(isSaveButtonDisabled)
                 .padding(.bottom,50)
             }
             .padding(.horizontal)
         }
     }
+    
+    
+    private func saveButtonAction() {
+            isSaveButtonDisabled = true // Disable the button
+            
+            // Re-enable the button after 0.3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                isSaveButtonDisabled = false
+            }
+            
+            // Your save action logic here
+        }
 }
 
 
