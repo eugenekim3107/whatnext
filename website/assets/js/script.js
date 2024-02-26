@@ -66,28 +66,79 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         // Update the video-container based on the clicked link
         switch (contentId) {
             case 'Map_demo':
-                videoContainer.textContent = 'Map content goes here';
+                videoContainer.textContent = 'Map Features';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://youtube.com/embed/fgXpfscnhNY?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
                 break;
             case 'Search_demo':
-                videoContainer.textContent = 'Search content goes here';
+                videoContainer.textContent = 'Search Feature';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/-opEzttdqPw?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
                 break;
             case 'Profile_demo':
-                videoContainer.textContent = 'Profile content goes here';
+                videoContainer.textContent = 'Profile Feature';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/MmkipIj1EZE?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
                 break;
             case 'More_demo':
-                videoContainer.textContent = 'More content goes here';
+                videoContainer.textContent = 'More';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/S5-cXhSLH08?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
                 break;
             case 'Explore_demo':
-                videoContainer.textContent = 'Explore content goes here';
+                videoContainer.textContent = 'Explore Feature';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/-E5j0AFWrjY?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
                 break;
             default:
-                videoContainer.textContent = 'Select an option';
+                videoContainer.textContent = 'Project Overview';
+                var iframe = document.createElement('iframe');
+                iframe.setAttribute('width', '300');
+                iframe.setAttribute('height', '600');
+                iframe.setAttribute('src', 'https://www.youtube.com/embed/IA7WOT-locw?autoplay=1');
+                iframe.setAttribute('frameborder', '0');
+                iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+                iframe.setAttribute('allowfullscreen', true);
+                videoContainer.appendChild(iframe);
+                break;
         }
     });
 });
 document.querySelectorAll('.sidebar a').forEach(link => {
     link.addEventListener('click', function(e) {
+
         e.preventDefault(); // Prevent default action
+        
 
         // Remove .clicked class and arrow from all items except the clicked one
         document.querySelectorAll('.sidebar a').forEach(item => {
@@ -119,3 +170,10 @@ document.querySelectorAll('.sidebar a').forEach(link => {
         // Adjust video-container text or other actions here
     });
 })
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const overviewLink = document.querySelector('.sidebar a[href="#Overview_demo"]'); // Adjust the selector as needed
+    if (overviewLink) {
+        overviewLink.click();
+    }
+});
