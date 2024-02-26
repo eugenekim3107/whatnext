@@ -318,7 +318,7 @@ section {
 .team-member {
     margin: 20px;
     padding: 20px;
-    background-color: #ffffff; /* Adjust the color to match your design */
+    background-color: #ffffff; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
     border-radius: 10px;
     width: 300px; 
@@ -349,22 +349,22 @@ section {
    ===================================== */
 #download {
     display: flex;
-    align-items: center; /* Aligns items to the center */
-    text-align: center; /* Centers the text */
+    align-items: center; 
+    text-align: center; 
     margin-top: -200px;
 }
 
 .download {
-    flex: 1; /* Allows the download div to grow and fill the space */
-    justify-content: space-around; /* Distributes space around items */
-    width: 100%; /* Sets the width of the .download div to full container width */
-    max-width: 1200px; /* You can set a max-width to prevent the content from spreading too wide */
+    flex: 1; 
+    justify-content: space-around; 
+    width: 100%; 
+    max-width: 1200px; 
 }
 
 .download h1 {
     font-size: 3em;
     text-align: left;
-    color: #333; /* Adjust the color to match your design */
+    color: #333; 
 }
 
 .download h2 {
@@ -388,14 +388,14 @@ section {
 }
 
 .qr-code {
-    margin-right: 20px; /* Add margin to the right of the QR code */
-    width: 150px; /* Example size - adjust as needed */
+    margin-right: 20px; 
+    width: 150px; 
     height: auto;
 }
 
 .app-store-icon {
-    width: 150px; /* Example size - set this to whatever size you want */
-    height: auto; /* This will maintain the aspect ratio of the images */
+    width: 150px; 
+    height: auto; 
 }
 
 .app-screenshots {
@@ -405,21 +405,19 @@ section {
     top: 6rem;
     justify-content: center;
     align-items: center;
-    height: 350px; /* Adjust the height as needed */
-    margin-top: 30px; /* Adjust the margin as needed */
+    height: 350px; 
+    margin-top: 30px;
 }
 
 .app-screenshots .screenshot {
-    max-width: 300px; /* Adjust based on your screenshot width */
+    max-width: 300px; 
     position: absolute;
     transition: all .3s ease;
-    /* Ensure there is enough space for the screenshots to not overflow the container */
 }
 
-/* Adjust the translation values based on the actual width of your screenshots */
 .app-screenshots .screenshot:nth-child(1) {
     transform: translateX(-300px) scale(0.8);
-    z-index: 1; /* Lower z-index for screenshots in the back */
+    z-index: 1; 
 }
 
 .app-screenshots .screenshot:nth-child(2) {
@@ -429,7 +427,7 @@ section {
 
 .app-screenshots .screenshot:nth-child(3) {
     transform: translateX(0px);
-    z-index: 3; /* Highest z-index for the screenshot in the front */
+    z-index: 3; 
 }
 
 .app-screenshots .screenshot:nth-child(4) {
