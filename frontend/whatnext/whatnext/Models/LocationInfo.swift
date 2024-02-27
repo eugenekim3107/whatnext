@@ -16,6 +16,24 @@ struct GeoJSON: Codable, Hashable {
 // Define the structure for the opening hours
 struct Hours: Codable, Hashable {
     let Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday: [String]?
+    
+    // Add a computed property to get a dictionary with formatted strings
+    var formattedHours: [String: String] {
+        Dictionary(uniqueKeysWithValues: [
+            ("Monday", Monday),
+            ("Tuesday", Tuesday),
+            ("Wednesday", Wednesday),
+            ("Thursday", Thursday),
+            ("Friday", Friday),
+            ("Saturday", Saturday),
+            ("Sunday", Sunday)
+        ].compactMap { day, hours in
+            guard let hours = hours, hours.count == 2 else { return nil }
+            let openTime = String(hours[0].prefix(2) + ":" + hours[0].suffix(2)) + "AM"
+            let closeTime = String(hours[1].prefix(2) + ":" + hours[1].suffix(2)) + "PM"
+            return (day, "\(openTime) - \(closeTime)")
+        })
+    }
 }
 
 // Define the main Location structure

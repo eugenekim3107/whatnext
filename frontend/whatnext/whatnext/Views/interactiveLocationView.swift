@@ -228,7 +228,7 @@ struct InteractiveLocationView: View {
 
 }
 
-struct LocationSearchSimpleView: View {
+struct LocationSearchSimpleView: View { // add detail page here
     var location: Location
 
     var body: some View {

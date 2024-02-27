@@ -21,6 +21,7 @@ struct LocationRowView: View {
     @State private var scrollIndex = 0
     @State private var timer: Timer?
     @State private var isManuallyScrolling = false
+    @State private var showingLocationDetail: Location?
     
     init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
         self.viewModel = viewModel
@@ -50,6 +51,9 @@ struct LocationRowView: View {
                         HStack(spacing: 5) {
                             ForEach(viewModel.locations, id: \.businessId) { location in
                                 LocationRowSimpleView(location: location)
+                                    .onTapGesture {
+                                        self.showingLocationDetail = location
+                                    }
                             }
                         }
                         .gesture(
@@ -62,6 +66,9 @@ struct LocationRowView: View {
                                     startTimer(scrollView: scrollView)
                                 }
                         )
+                    }
+                    .sheet(item: $showingLocationDetail) { location in
+                        LocationDetailView(location: location)
                     }
                     .padding([.leading, .trailing])
                     .onAppear {
