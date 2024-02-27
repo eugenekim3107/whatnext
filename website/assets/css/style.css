@@ -1,86 +1,120 @@
-@font-face {
-  font-family: 'Kelson-Light';
-  src: url('../fonts/Armasen-Kelson-Light.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Kelson-Medium';
-  src: url('../fonts/Armasen-Kelson-Medium.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
 @import url('https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&display=swap');
 
+@font-face {
+    font-family: 'Kelson-Light';
+    src: url('../fonts/Armasen-Kelson-Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Kelson-Medium';
+    src: url('../fonts/Armasen-Kelson-Medium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 body, html {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-  font-family: 'Kelson-Light', 'Kelson-Medium', 'Abhaya Libre', serif;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    font-family: 'Kelson-Medium', serif;
 }
 
 header {
-  background-color: rgba(64, 163, 213, 0.7); /* Full opacity */
-  color: #fff;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
-  z-index: 100;
-  transition: background-color 2s ease; /* Smooth transition for color change */
+    background-color: #AAD3DF;
+    position: fixed;
+    top: 1vw;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 100;
+    transition: background-color 2s ease;
 }
 
 .logo-name {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
-
+  
 .logo-name .logo {
-  width: 150px; /* Adjust based on your logo's size */
-  margin-right: 10px;
-  padding: 10px;
+    width: 150px;
+    margin-right: 10px;
+    padding: 10px;
 }
-
+  
 nav#navbar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
 }
-
+  
 nav#navbar ul li {
-  margin: 0 10px;
+    margin: 0 10px;
 }
-
+  
 nav#navbar ul li a {
-  color: white;
-  text-decoration: none;
-  font-size: 20px;
-  font-weight: 500; /* Make text bolder */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add shadow for depth */
-  transition: color 0.3s ease; /* Smooth transition for hover effect */
+    color: #2C302E;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
-
+  
 nav#navbar ul li a:hover {
-  color: #adefff; /* Lighter blue for hover, adjust as needed */
+    color: #EDEDD7;
+}
+  
+@media (max-width: 700px) {
+    header {
+        flex-direction: column;
+        padding: 10px 0;
+        max-width: 100%;
+    }
+  
+    .logo-name, nav#navbar ul {
+        justify-content: center;
+        text-align: center;
+    }
+
+    nav#navbar ul li {
+        margin-right: 0;
+    }
+
+    #navbar ul li:last-child {
+        margin-right: 0;
+    }
+  
+    .logo-name .logo {
+        width: clamp(150px, 30vw, 250px);
+    }
+  
+    nav#navbar ul li a {
+        font-size: clamp(12px, 4vw, 22px);
+    }
 }
 
 section {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  box-sizing: border-box;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
 }
 
 /*--------------------------------------------------------------
@@ -88,223 +122,171 @@ section {
 --------------------------------------------------------------*/
 
 #home .carousel {
-  position: relative;
-  width: 100%;
-  height: 100vh; /* Make the carousel full screen */
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Make the carousel full screen */
+    overflow: hidden;
 }
-
+  
 #home .carousel-slide {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  transition: opacity 0.5s ease;
-  opacity: 0; /* Hide all slides initially */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 0.5s ease;
+    opacity: 0; /* Hide all slides initially */
 }
-
+  
 #home .carousel-slide.active {
-  opacity: 1; /* Only show the active slide */
+    opacity: 1; /* Only show the active slide */
 }
-
+  
 .carousel-text {
-  position: absolute;
-  left: 20px; /* Left alignment padding */
-  top: 50%;
-  transform: translateY(-50%);
-  color: #fff;
-  font-size: 8vw;
-  font-weight: bold;
-  line-height: 1.2;
-  padding: 20px;
-  border-radius: 10px; /* Optional: adds rounded corners */
+    position: absolute;
+    left: 20px; /* Left alignment padding */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #EDEDD7;
+    font-size: calc(4vw + 4vh);
+    font-weight: bold;
+    line-height: 1.2;
+    padding: 20px;
+    border-radius: 10px; /* Optional: adds rounded corners */
 }
-
+  
 .carousel-text div {
-  text-align: left; /* Ensures text alignment is uniform */
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Black shadow for contrast */
-  padding-left: 0; /* Adjust based on overall .carousel-text padding */
+    text-align: left; /* Ensures text alignment is uniform */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7); /* Black shadow for contrast */
+    padding-left: 0; /* Adjust based on overall .carousel-text padding */
 }
 
 /*--------------------------------------------------------------
 # Feature Section
 --------------------------------------------------------------*/
 
-/* General styling for the feature section container */
 #features {
-  background: #f9f9f9;
-  min-height: 100vh;
-  box-sizing: border-box;
-  font-weight: 500;
-  max-height: 100vh;
+    background-color: #D6D6B3;
 }
 
-/* Styling for the tabs container */
-.page-tabs {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  height: 100vh;
-  width: 100vw;
+#features .page-tabs{
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start; 
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* Default styling for each tab header */
-.page-tabs-header {
-  display: flex;
-  flex-grow: 1;
-  background-color: #ffffff;
-  border-right: 3px solid #dcdcdc;
-  transition: all 0.3s ease-in-out;
-  padding-top: 60px;
+#features .page-tabs-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 7vh;
+    max-height: 52vh;
+    background-color: #ffffff;
+    border-bottom: 3px solid #dcdcdc;
+    transition: all 0.3s ease-in-out;
 }
 
-.page-tabs-header:hover {
-  background-color: #88D4F4;
+#features .page-tabs-header:hover {
+    background-color: #D6D6B3;
 }
 
-.page-tabs-header.active {
-  background-color: #88D4F4;
+#features .page-tabs-header.active {
+    position: relative; /* Ensures the child (pseudo-element) is positioned relative to this */
+    background-color: #D6D6B3;
 }
 
-.page-tabs-header-container {
-  cursor: pointer;
-  position: relative;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+#features .page-tabs-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-left: 3vw;
 }
 
-.page-tabs-header-container.active::before {
-  content: '';
-  display: inline-block;
-  transform: translateX(12%);
-  width: 40px;
-  height: 40px;
-  background-image: url('../img/pin.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
+#features .icons {
+    margin-left: auto;
+    height: 5vh;
+    width: 5vh;
+    padding-right: 3vw;
 }
 
-.page-tabs-header-container:hover::before {
-  content: '';
-  display: inline-block;
-  transform: translateX(12%);
-  width: 40px;
-  height: 40px;
-  background-image: url('../img/pin.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  animation: fallDownAnimation 1s ease forwards;
+#features .page-tabs-header-letters {
+    font-size: 3.5vh;
 }
 
-@keyframes fallDownAnimation {
-  0% {
-      opacity: 0;
-      transform: translateX(12%) translateY(-30px);
-  }
-  100% {
-      opacity: 1;
-      transform: translateX(12%) translateY(0);
-  }
+#features .tabcontent {
+    max-height: 50vh;
+    padding: 1vh;
+    font-size: clamp(12px, calc(0.5vw + 1vh), 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto; /* This will help in centering the tabcontent itself within its parent */
+    width: 90%;
+    text-align: start;
+    overflow-y: auto;
 }
 
-.page-tabs-header-container.active {
-  font-weight: bold;
-  position: relative;
-  justify-content: flex-end;
-  align-items: center;
-  width: 100%;
+#features .info-content {
+    border: 1px solid #ccc; /* Adds a border around the content */
+    padding: 10px;
+    margin: auto;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 80%;
+    background-color: #fff;
+    border-radius: 10px;
 }
 
-.page-tabs-header-container:hover {
-  font-weight: bold;
+#features .info-content h3 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-decoration: underline;
 }
 
-.icons {
-  height: 40px;
-  width: 40px;
-  position: absolute;
-  transform: translateX(-50%);
-  bottom: 10px;
+#features .info-content p {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
-.page-tabs-header-letters div {
-  font-family: "Kelson-Medium";
-  font-size: 2.5vw;
-  color: rgb(0, 0, 0);
-  margin: 0.2rem;
-  text-transform: uppercase;
+#features .iphone-screen img {
+    width: 100%;
+    height: 50vh;
+    object-fit: contain;
 }
 
-.tabcontent {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  height: auto;
-  width: 100%;
-  min-width: 70vw;
-  text-align: center;
-  display: none;
-  max-height: 100vh;
+@media (max-width: 700px) {
+    #features .page-tabs-header-letters {
+        font-size: calc(2.5vh);
+    }
+    #features .icons {
+        margin-left: auto;
+        height: 3vh;
+        width: 3vh;
+        padding-right: 3vw;
+    }
 }
 
-.iphone-screen img {
-  width: 100%;
-  height: auto;
-  max-width: 300px;
-}
-
-.info-content {
-  color: rgb(0, 0, 0);
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.info-content p {
-  font-size: 20px;
-  background: #E9ECEF;
-  margin-bottom: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 15px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-}
-
-.info-content ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.info-content li {
-  font-size: 20px;
-  background: #E9ECEF;
-  margin-bottom: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 15px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
 
 /*--------------------------------------------------------------
 # Demo Section
 --------------------------------------------------------------*/
 
 #demo {
-  display: flex;
-  justify-content: space-between; /* Maintains current horizontal spacing */
-  align-items: center; /* Centers all children vertically */
-  height: 100vh;
-  width: 100vw;
+    display: flex;
+    justify-content: space-between; /* Maintains current horizontal spacing */
+    align-items: center; /* Centers all children vertically */
+    /* height: 100vh; */
+    height: 100vh;
+    width: 100vw;
+    background-color: #fff;
+    padding-top: 10vh;
 }
-
 
 .video-container {
     display: flex;
@@ -312,52 +294,66 @@ section {
     justify-content: center; /* Center children vertically */
     align-items: center; /* Center children horizontally */
     flex-grow: 2; /* Adjust as needed */
-    font-size: 24px;
+    font-size: 3.5vh;;
     width: 100%;
 }
 
 .sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: flex-end;
-  height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    height: 100%;
 
-  margin-left: auto;
-  padding-left: 5vw;
-  margin-right: 5vw;
-  padding-top: 0;
-  margin-top: 0;
+    margin-left: auto;
+    padding-right: 5vw;
+    margin-right: 5vw;
+    padding-top: 0;
+    margin-top: 0;
 }
 
 
 .sidebar a {
-  position: relative;
-  display: block;
-  text-decoration: none;
-  text-align: right;
-  font-family: "Kelson-Medium";
-  font-size: 2.5vw;
-  color: rgb(0, 0, 0);
-  text-transform: uppercase;
+    position: relative;
+    display: block;
+    text-decoration: none;
+    text-align: right;
+    font-family: "Kelson-Medium";
+    font-size: 3vh;
+    color: rgb(0, 0, 0);
+    text-transform: uppercase;
 }
 
 .sidebar a .arrow {
-  display: inline-block;
-  position: absolute;
-  right: -2.5vw;
-  top: 50%;
-  transform: translateY(-50%);
-  transition: transform 0.5s ease;
+    display: inline-block;
+    position: absolute;
+    right: -3.5vh;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.5s ease;
 }
+
+.video-iframe {
+    width: 80vw;
+    height: 70vh;
+    max-width: 80%;
+    border: none;
+}
+
 @keyframes arrow-bounce {
-  0% { transform: translateX(0) translateY(-50%); }
-  50% { transform: translateX(5px) translateY(-50%); }
-  100% { transform: translateX(0) translateY(-50%); }
+    0% { transform: translateX(0) translateY(-50%); }
+    50% { transform: translateX(5px) translateY(-50%); }
+    100% { transform: translateX(0) translateY(-50%); }
 }
 
 .sidebar a .arrow {
-  animation: arrow-bounce 0.5s ease-out;
+    animation: arrow-bounce 0.5s ease-out;
+}
+
+@media (max-width: 700px) {
+    .video-iframe {
+        height: 60vh;
+    }
 }
 
 /*--------------------------------------------------------------
@@ -365,147 +361,134 @@ section {
 --------------------------------------------------------------*/
 
 #team {
-  background-color: #E9ECEF; 
-  text-align: center;
-  height: 100vh;
-  width: 100vw;
+    background-color: #EDEDD7; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    min-height: 100vh;
+    width: 100vw;
+    padding-top: 12vh;
+    padding-bottom: 3vh;
+    color: #2C302E;
 }
-
-.team-section h2 {
-  text-align: center;
-  margin-bottom: 1.25rem; 
-}
-
+  
 .team-container {
-  display: flex;
-  justify-content: space-around; 
-  flex-wrap: wrap; 
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap; 
+    margin: auto;
 }
-
+  
 .team-member {
-  margin: 1.25rem;
-  padding: 1.25rem;
-  background-color: #ffffff; 
-  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); 
-  border-radius: 0.625rem;
-  width: 18.75rem; 
-  height: 25rem;
+    margin: 1vh;
+    padding: 1vh;
+    background-color: #ffffff; 
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); 
+    border-radius: 15px;
+    width: calc(10vw + 15vh);
+    min-height: calc(10vw + 40vh);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+@media (max-width: 1200px) {
+    .team-member {
+        flex: 0 0 calc(50% - 5vh);
+        max-width: calc(50% - 5vh);
+        margin: 10px;
+    }
+}
+  
 .team-member-photo {
-  width: 150px; 
-  height: 150px;
-  border-radius: 50%; 
-  background-color: #E9ECEF; 
-  margin-bottom: 20px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+    width: calc(13vh + 5vw); 
+    height: calc(13vh + 5vw);
+    border-radius: 50%; 
+    background-color: #E9ECEF; 
+    margin-bottom: 30px;
+    margin-top: 30px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+  
+h2, .team-member p {
+    text-align: center;
+    font-size: clamp(12px, calc(0.75vw + 0.75vh), 100px);
 }
 
-.team-member h2 {
-  margin-top: 0;
+h2 {
+    font-size: calc(1vw + 1vh);
+    text-decoration: underline;
 }
-
+  
 .team-member p {
-  margin-top: 5px;
+    font-size: calc(0.75vw + 0.75vh)
 }
 
 /*--------------------------------------------------------------
 # Download Section
 --------------------------------------------------------------*/
 
- #download {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 100vh;
-  width: 100vw;
+#download {
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    height: auto;
+    text-align: left;
+    color: #2C302E;
+    padding-left: 5vh;
+    padding-right: 5vh;
 }
 
-.download-info {
-  flex: 1; 
-  justify-content: space-around; 
-  width: 100%; 
-  max-width: 1300px; 
+#download .download-info h1 {
+    text-align: left;
+    margin-bottom: 0;
+    font-size: calc(5vh + 5vw);
+    font-family: 'Abhaya Libre', serif;
 }
 
-.download-info h1 {
-  font-size: 6em;
-  text-align: left;
-  margin-bottom: 0em;
-  font-family: 'Abhaya Libre', serif;
+#download .download-info h2 {
+    text-align: left;
+    font-size: calc(2vh + 2vw);
+    text-decoration: none;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
-.download-info h2 {
-  font-size: 3em;
-  text-align: left;
+#download .download-info div {
+    margin-bottom: 5vh;
+    font-size: calc(1vh + 1vw);
+    align-items: center;
 }
 
-.download-info div {
-  margin-bottom: 30px;
-  width: 500px;
-  font-size: 20px;
-  text-align: left;
-  color: #666; 
+#download .download-info .qr-code {
+    height: calc(6vh + 5vw);
 }
 
-.download-content {
-  display: flex;
-  justify-content: start;
-  align-items: center;
+#download .download-info .app-store-icon {
+    height: calc(3vh + 2.5vw);
 }
 
-.qr-code {
-  margin-right: 1.25rem; 
-  width: 12.5rem; 
-  height: auto;
+#download #iphone-cluster {
+    padding-top: 10vh;
+    width: calc(25vw + 25vh);
+    margin: 0 auto;
 }
 
-.app-store-icon {
-  width: 12.5rem; 
-  height: auto; 
-}
-
-.app-screenshots {
-  position: relative;
-  display: flex;
-  left: -20rem;
-  top: 6rem;
-  justify-content: center;
-  align-items: center;
-  height: auto;
-  margin-top: 1.875rem;
-}
-
-.app-screenshots .screenshot {
-  max-width: 18.75rem; 
-  position: absolute;
-  transition: all .3s ease;
-}
-
-.app-screenshots .screenshot:nth-child(1) {
-  transform: translateX(-18.75rem) scale(0.8);
-  z-index: 1; 
-}
-
-.app-screenshots .screenshot:nth-child(2) {
-  transform: translateX(-9.375rem) scale(0.9);
-  z-index: 2;
-}
-
-.app-screenshots .screenshot:nth-child(3) {
-  transform: translateX(0px);
-  z-index: 3; 
-}
-
-.app-screenshots .screenshot:nth-child(4) {
-  transform: translateX(9.375rem) scale(0.9);
-  z-index: 2;
-}
-
-.app-screenshots .screenshot:nth-child(5) {
-  transform: translateX(18.75rem) scale(0.8);
-  z-index: 1;
+@media (max-width: 1300px) {
+    #download {
+        flex-direction: column;
+        align-items: center;
+    }
+    #download #iphone-cluster {
+        padding-top: 0;
+    }
 }

@@ -22,7 +22,11 @@ ssh -i whatnext/backend/WhatNextAdminKey.pem -L 8000:localhost:27017 ubuntu@<Ela
 ```
 - `8000`: Local port on your machine for MongoDB.
 - `localhost:27017`: Remote destination (MongoDB port on EC2 instance).
-- `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance.
+- `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance (Our current Elastic IP: 35.161.8.117).
+3. Login to MongoDB (within EC2):
+```
+mongosh -u eugenekim -p whatnext -authenticationDatabase admin
+```
 
 ### Redis-server SSH Port Forwarding
 
@@ -37,7 +41,7 @@ ssh -i whatnext/backend/WhatNextAdminKey.pem -L 8001:localhost:6379 ubuntu@<Elas
 ```
 - `8001`: Local port on your machine for Redis-server.
 - `localhost:6379`: Remote destination (Redis-server port on EC2 instance).
-- `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance.
+- `Elastic-IP`: Replace with the actual Elastic IP address of your EC2 instance (Our current Elastic IP: 35.161.8.117).
 
 ### Running FastAPI Server
 To start the FastAPI server locally:
@@ -57,6 +61,11 @@ curl -X 'GET' 'http://localhost:8080/api/nearby_locations' -H 'accept: applicati
 
 ```
 curl -X POST "http://localhost:8080/api/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "eugenekim", "message": "I would like to drink some coffee", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
+```
+
+To continue a conversation, input the session_id into the POST:
+```
+curl -X POST "http://localhost:8080/api/chatgpt_response" -H "Content-Type: application/json" -H "whatnext_token: whatnext" -d '{"user_id": "eugenekim", "session_id": <session-id>, "message": "Thank you for the information!", "latitude": 32.8723812680163, "longitude": -117.21242234341588}'
 ```
 
 ## Production

@@ -87,6 +87,17 @@ class LocationCondensed(BaseModel):
 class ProfileRequest(BaseModel):
     user_id: str
 
+class ProfileInfo(BaseModel):
+    user_id: str
+    display_name: Optional[str]
+    image_url: Optional[str]
+    tags: Optional[List[str]]
+    food_and_drinks_tag: Optional[List[str]]
+    activities_tag: Optional[List[str]]
+    friends: Optional[List[str]]
+    visited: Optional[List[str]]
+    favorites: Optional[List[str]]
+
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
@@ -571,3 +582,28 @@ async def favorites_info(request: ProfileRequest,
     user_id = request.user_id
     locations = await fetch_favorites_info(user_id)
     return {"user_id": user_id, "favorites_locations": locations}
+
+@app.post("/api/check_user_exist")
+async def check_user_exist(request: ProfileRequest,
+                           api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    user_info = await fetch_user_info(user_id)
+    if user_info is None:
+        return {"check_user_exist": False}
+    else:
+        return {"check_user_exist": True}
+
+@app.post("/api/")
+async def add_user_info_to_db(request: ProfileInfo,
+                              api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    display_name = request.display_name
+    image_url = request.image_url
+    tags = request.tags
+    food_and_drinks_tag = request.food_and_drinks_tag
+    activities_tag = request.activities_tag
+    friends = request.friends
+    visited = request.visited
+    favorites = request.favorites
+
+
