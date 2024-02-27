@@ -12,10 +12,12 @@ import AuthenticationServices
 import GoogleSignIn
 
 class LoginViewModel: ObservableObject {
+    
     @Published var mobileNo: String = ""
     @Published var otpCode: String = ""
     @Published var CLIENT_CODE: String = ""
     @Published var showOTPField: Bool = false
+    @AppStorage("userID") var storedUserID: String = ""
     
     
     @Published var showError:Bool = false
@@ -76,6 +78,11 @@ class LoginViewModel: ObservableObject {
                 let credential = GoogleAuthProvider.credential(withIDToken: idToken.tokenString, accessToken: accesToken.tokenString)
                 
                 try await Auth.auth().signIn(with: credential)
+                
+                guard let userID = Auth.auth().currentUser?.uid else {
+                    return}
+                storedUserID = userID
+                print(storedUserID)
                 
                 print("Sucess Google!")
                 await MainActor.run(body: {
