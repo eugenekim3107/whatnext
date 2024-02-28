@@ -18,9 +18,6 @@ struct LocationRowView: View {
     var tag: [String]? = nil
     let sortBy: String
     let limit: Int
-    @State private var scrollIndex = 0
-    @State private var timer: Timer?
-    @State private var isManuallyScrolling = false
     
     init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
         self.viewModel = viewModel
@@ -52,24 +49,8 @@ struct LocationRowView: View {
                                 LocationRowSimpleView(location: location)
                             }
                         }
-                        .gesture(
-                            DragGesture().onChanged { _ in
-                                isManuallyScrolling = true
-                                timer?.invalidate()
-                            }
-                                .onEnded { _ in
-                                    isManuallyScrolling = false
-                                    startTimer(scrollView: scrollView)
-                                }
-                        )
                     }
                     .padding([.leading, .trailing])
-                    .onAppear {
-                        startTimer(scrollView: scrollView)
-                    }
-                    .onDisappear {
-                        timer?.invalidate()
-                    }
                 }
             }
         }
@@ -82,16 +63,6 @@ struct LocationRowView: View {
                                        curOpen: curOpen,
                                        tag: tag ?? [],
                                        sortBy: self.sortBy)
-        }
-    }
-    
-    private func startTimer(scrollView: ScrollViewProxy) {
-        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
-            withAnimation {
-                guard !isManuallyScrolling, viewModel.locations.count > 0 else { return }
-                scrollIndex = (scrollIndex + 1) % viewModel.locations.count
-                scrollView.scrollTo(viewModel.locations[scrollIndex].businessId, anchor: .leading)
-            }
         }
     }
 }

@@ -1,8 +1,13 @@
 import SwiftUI
 
+enum NavigationDestination {
+    case foodAndDrinks
+}
+
 struct ActivityView: View {
     @StateObject private var viewModel = PreferenceViewModel(allTags: ["Shopping", "Yoga", "Beaches", "Hiking","Spa","Aquariums","Beautysvc"])
-    @State private var isNavigatingToFoodAndDrinks = false
+//    @State private var isNavigatingToFoodAndDrinks = false
+    @State private var navigationPath = NavigationPath()
     @State private var isSaveButtonDisabled = false
     let tagIconLinks: [String: String] = [
         "Shopping": "🍜",
@@ -24,42 +29,28 @@ struct ActivityView: View {
     //Beautysvc to be beautysvc
     //Aquariums to be aquariums
     
-    
-    
-    
-
     var body: some View {
-        NavigationView{
+        NavigationStack(path: $navigationPath) {
             VStack {
                 SplitProgressBarView(leftProgress: 1, rightProgress: 0)
-                                    .frame(height: 4)
-                                    .padding(.vertical)
+                    .frame(height: 4)
+                    .padding(.vertical)
                 
                 HStack {
-//                    Button(action: {}) {
-//                        Image(systemName: "arrow.left")
-//                            .foregroundColor(.black)
-//                            .padding()
-//                            .background(Color.white)
-//                            .cornerRadius(10)
-//                            .shadow(radius: 1)
-//                    }
                     Spacer()
-                    NavigationLink(destination: FoodAndDrinksView(), isActive: $isNavigatingToFoodAndDrinks) {
-                        Button(action: {
-                            isNavigatingToFoodAndDrinks = true
-                        }) {
-                            Image(systemName: "arrow.right")
-                                .foregroundColor(.black)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(10)
-                                .shadow(radius: 1)
-                        }
+                    Button(action: {
+                        let destination: NavigationDestination = .foodAndDrinks
+                        navigationPath.append(destination)
+                    }) {
+                        Image(systemName: "arrow.right")
+                            .foregroundColor(.black)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .shadow(radius: 1)
                     }
-                    
-                    
-                }.padding(.horizontal,30)
+                }
+                .padding(.horizontal,30)
                 let columns = [
                     GridItem(.flexible(), spacing: 8),
                     GridItem(.flexible(), spacing: 8)
@@ -85,7 +76,6 @@ struct ActivityView: View {
                         ForEach(Array(viewModel.ACtags.enumerated()), id: \.element.0) { index, tag in
                             TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
                                 .onTapGesture {
-                                    // Implement tag selection toggle logic here
                                     viewModel.toggleACTagSelection(tag.0)
                                 }
                         }
@@ -93,20 +83,23 @@ struct ActivityView: View {
                     .padding(.horizontal)
                 }
                 Button(action: saveButtonAction) {
-                     Text("Save")
-                         .foregroundColor(isSaveButtonDisabled ? .gray : .white) // Change text color based on button state
-                         .frame(width: 295, height: 56)
-                         .background(isSaveButtonDisabled ? Color.gray : Color.blue) // Change background color based on button state
-                         .cornerRadius(15)
-                 }
+                    Text("Save")
+                        .foregroundColor(isSaveButtonDisabled ? .gray : .white)
+                        .frame(width: 295, height: 56)
+                        .background(isSaveButtonDisabled ? Color.gray : Color.blue)
+                        .cornerRadius(15)
+                }
                 .disabled(isSaveButtonDisabled)
                 .padding(.bottom,50)
             }
             .padding(.horizontal)
+            .navigationDestination(for: NavigationDestination.self) { destination in switch destination {
+            case .foodAndDrinks:
+                FoodAndDrinksView()
+            }
+            }
         }
     }
-    
-    
     private func saveButtonAction() {
             isSaveButtonDisabled = true // Disable the button
             
@@ -116,7 +109,7 @@ struct ActivityView: View {
             }
             
             // Your save action logic here
-        }
+    }
 }
 
 

@@ -80,15 +80,17 @@ class LoginViewModel: ObservableObject {
                 try await Auth.auth().signIn(with: credential)
                 
                 guard let userID = Auth.auth().currentUser?.uid else {
-                    return}
-                storedUserID = userID
-                print(storedUserID)
+                    return
+                }
                 
-                print("Sucess Google!")
+                await MainActor.run {
+                    storedUserID = userID
+                }
+
                 await MainActor.run(body: {
                     withAnimation(.easeInOut){logStatus = true}
                 })
-            }catch{
+            } catch {
                 await handleError(error: error)
             }
         }
