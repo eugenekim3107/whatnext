@@ -36,9 +36,9 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
         }
-//        loadDummyLocations()
+        loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-        loadLocationsForMapView(from: location.coordinate)
+        //loadLocationsForMapView(from: location.coordinate)
     }
     
     func searchInNewArea(center: CLLocationCoordinate2D) {
@@ -62,8 +62,8 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             longitude: coordinate.longitude,
             limit: 10,
             radius: 30000.0,
-            categories: ["food"],
-            curOpen: 0,
+            categories: ["all"],
+            curOpen: 1,
             sortBy: "rating"
         ) { [weak self] result in
             DispatchQueue.main.async {

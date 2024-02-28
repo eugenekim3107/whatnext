@@ -13,7 +13,6 @@ struct MapView: View {
     @State private var trackingMode: MapUserTrackingMode = .follow
     @State private var selectedLocation: Location?
     @State private var userHasInteracted = false
-    @State private var showingDetail = false
     @GestureState private var magnification: CGFloat = 1.0
 
     var body: some View {
@@ -27,7 +26,6 @@ struct MapView: View {
                         Button(action: {
                             DispatchQueue.main.async {
                                 self.selectedLocation = location
-                                self.showingDetail = true
                             }
                         }) {
                             pinImage(for: location.categories ?? [""]) // Now accepts [String]
@@ -60,26 +58,12 @@ struct MapView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-                        
-            if showingDetail, let selectedLocation = selectedLocation {
-                LocationDetailView(location: selectedLocation, dismissAction: {
-                    self.showingDetail = false // Set to false when dismissing the detail view
-                    self.selectedLocation = nil
-                    
-                })
-                .transition(.opacity)
-                .zIndex(2)
-            }
+        }
+        .sheet(item: $selectedLocation) { location in
+            LocationDetailView(location: location)
         }
     }
 
-    private func zoomMap(by delta: CGFloat) {
-        let span = viewModel.region.span
-        let newLatDelta = max(0.002, min(100, span.latitudeDelta / Double(delta)))
-        let newLonDelta = max(0.002, min(100, span.longitudeDelta / Double(delta)))
-        viewModel.region.span = MKCoordinateSpan(latitudeDelta: newLatDelta, longitudeDelta: newLonDelta)
-    }
-    
     private func pinImage(for categories: [String]) -> Image {
         if categories.contains("food") {
             return Image("food.pin")

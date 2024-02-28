@@ -47,9 +47,9 @@ struct LocationRowView: View {
                         HStack(spacing: 5) {
                             ForEach(viewModel.locations, id: \.businessId) { location in
                                 LocationRowSimpleView(location: location)
+                                    }
                             }
                         }
-                    }
                     .padding([.leading, .trailing])
                 }
             }
