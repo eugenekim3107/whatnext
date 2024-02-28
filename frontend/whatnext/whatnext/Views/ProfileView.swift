@@ -11,7 +11,6 @@ struct ProfileView: View {
     
     
     var body: some View {
-        let _ = print(LoginuserID)
         NavigationView {
             ScrollView {
                 VStack {
