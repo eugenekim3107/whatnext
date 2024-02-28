@@ -62,8 +62,8 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             longitude: coordinate.longitude,
             limit: 10,
             radius: 30000.0,
-            categories: ["food"],
-            curOpen: 0,
+            categories: ["all"],
+            curOpen: 1,
             sortBy: "rating"
         ) { [weak self] result in
             DispatchQueue.main.async {

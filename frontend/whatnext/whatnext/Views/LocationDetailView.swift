@@ -20,8 +20,8 @@ struct LocationDetailView: View {
             }
         }
         .background(Color.white)
-        .cornerRadius(20)
-        .shadow(radius: 5)
+        .cornerRadius(10)
+        //.shadow(radius: 5)
     }
 }
 
@@ -90,13 +90,13 @@ struct PriceAndCategoryView: View {
         Divider()
             .background(Color.blue)
         HStack {
-            Text(price ?? "")
+            Text(price ?? "Not Applicable")
                 .bold()
                 .padding(5)
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(5)
 
-            ForEach(categories ?? [], id: \.self) { category in
+            ForEach(categories?.filter { $0.lowercased() != "all" } ?? [], id: \.self) { category in
                 Text(category)
                     .padding(6)
                     .background(Color.blue)

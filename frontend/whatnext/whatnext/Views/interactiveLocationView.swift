@@ -16,6 +16,7 @@ struct InteractiveLocationView: View {
     @State private var currentlyDragging: String? = nil
     @State private var topLocation: String? = nil
     @State private var bottomLocation: String? = nil
+    @State private var showingLocationDetail: Location?
     
     private enum LocationState {
         case left(offset: CGSize, zIndex: Double)
@@ -101,8 +102,14 @@ struct InteractiveLocationView: View {
                                     }
                                 }
                         )
+                        .onTapGesture { // Tap gesture to show the detail view
+                            showingLocationDetail = location
+                        }
                 }
             }
+        }
+        .sheet(item: $showingLocationDetail) { // Sheet presentation for the location detail view
+            LocationDetailView(location: $0)
         }
     }
     
@@ -230,6 +237,7 @@ struct InteractiveLocationView: View {
 
 struct LocationSearchSimpleView: View { // add detail page here
     var location: Location
+    @State private var showingLocationDetail: Location?
 
     var body: some View {
         VStack(spacing: 0) {
