@@ -7,9 +7,11 @@ struct ProfileView: View {
     @StateObject private var friendModel = ProfileRowViewModel()
     @StateObject private var favoritesModel = LocationRowViewModel()
     @StateObject private var visitedModel = LocationRowViewModel()
+    @AppStorage("userID") var LoginuserID: String = ""
     
     
     var body: some View {
+        let _ = print(LoginuserID)
         NavigationView {
             ScrollView {
                 VStack {
@@ -44,30 +46,30 @@ struct ProfileView: View {
                     ProfileRowView(
                         viewModel: friendModel,
                         title: "Friends",
-                        userId: "eugenekim"
+                        userId: LoginuserID
                     )
                     FavoritesRowView(
                         viewModel: favoritesModel,
                         title: "Favorites",
-                        userId: "eugenekim"
+                        userId: LoginuserID
                     )
                     VisitedRowView(
                         viewModel: visitedModel,
                         title: "Visited",
-                        userId: "eugenekim"
+                        userId: LoginuserID
                     )
                 }
                 .navigationBarTitle("Profile", displayMode: .large)
                 .padding(.bottom, 50)
             }
             .onAppear {
-                viewModel.fetchUserInfo(userId: "eugenekim")
+                viewModel.fetchUserInfo(userId: LoginuserID)
             }
             .refreshable {
-                viewModel.refreshData(userId: "eugenekim")
-                friendModel.refreshData(userId: "eugenekim")
-                favoritesModel.refreshDataFavorites(userId: "eugenekim")
-                visitedModel.refreshDataFavorites(userId:"eugenekim")
+                viewModel.refreshData(userId: LoginuserID)
+                friendModel.refreshData(userId: LoginuserID)
+                favoritesModel.refreshDataFavorites(userId: LoginuserID)
+                visitedModel.refreshDataFavorites(userId:LoginuserID)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())

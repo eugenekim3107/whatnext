@@ -4,7 +4,9 @@ import GoogleSignIn
 
 struct MoreView: View {
     @AppStorage("log_status") var logStatus: Bool = false
+    @AppStorage("userID") var storedUserID: String = ""
     @State private var showingLogoutAlert = false // State to control alert presentation
+    
 
     var settings: [SettingsSection] = [
         .init(name: "Notifications", imageName: "bell.circle", color: .black),
@@ -117,6 +119,7 @@ struct MoreView: View {
             GIDSignIn.sharedInstance.signOut()
             withAnimation(.easeInOut) {
                 logStatus = false
+                storedUserID = ""   
             }
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)
