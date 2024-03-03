@@ -2,74 +2,69 @@ import Foundation
 import SwiftUI
 
 class PreferenceViewModel: ObservableObject {
-    @AppStorage("storedFDTags") private var storedFDTagsString: String = ""
-    @AppStorage("storedACTags") private var storedACTagsString: String = ""
-    
-    @Published var ACtags: [(String, Bool)]
-    @Published var FDtags: [(String, Bool)]
-    private var allTags: [String]
-    
-    var storedFDTags: [String] {
-        get {
-            storedFDTagsString.isEmpty ? [] : storedFDTagsString.split(separator: ",").map(String.init).map { $0.trimmingCharacters(in: .whitespaces) }
-        }
-        set {
-            storedFDTagsString = newValue.joined(separator: ",")
+    @Published var ACTags: [(String, Bool)] = []
+    @Published var FDTags: [(String, Bool)] = []
+
+    private let profileService = ProfileService() // Updated to use ProfileService
+
+    func fetchTags(userId: String,activityAllTags: [String], foodAndDrinkAllTags: [String]) {
+        let tagMappings: [String: String] = [
+            "Chinese Food": "chinese",
+            "Shopping": "shopping"
+        ]
+        profileService.fetchTags(userId: userId) { [weak self] result in // Using ProfileService's fetchTags
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let tagsResponse):
+                    self?.ACTags = activityAllTags.map { tag in
+                        let mappedTag = tagMappings[tag] ?? tag
+                        return (tag, tagsResponse.activitiesTag.contains(mappedTag))
+                    }
+                    self?.FDTags = foodAndDrinkAllTags.map { tag in
+                        let mappedTag = tagMappings[tag] ?? tag
+                        return (tag, tagsResponse.foodAndDrinksTag.contains(mappedTag))
+                                        }
+                case .failure(let error):
+                    print("Error fetching tags: \(error.localizedDescription)")
+                }
+            }
         }
     }
-    
-    var storedACTags: [String] {
-        get {
-            storedACTagsString.isEmpty ? [] : storedACTagsString.split(separator: ",").map(String.init).map { $0.trimmingCharacters(in: .whitespaces) }
-        }
-        set {
-            storedACTagsString = newValue.joined(separator: ",")
-        }
-    }
-    
-    init(allTags: [String]) {
-        // Temporarily initialize `tags` to satisfy property initialization requirements
-        self.ACtags = []
-        self.FDtags = []
-        self.allTags = allTags
+
+    func saveSelectionsToDatabase(userId:String) {
+        // Example: Combine all selected tags into one array
+        let selectedACTags = ACTags.filter { $0.1 }.map { $0.0 }
+        let selectedFDTags = FDTags.filter { $0.1 }.map { $0.0 }
         
-        // Properly initialize `tags` after all properties are initialized
-        self.ACtags = allTags.map { tag in
-            (tag, self.storedACTags.contains(tag))
-        }
-        self.FDtags = allTags.map { tag in
-            (tag, self.storedFDTags.contains(tag))
-        }
-        
-    }
-    
-    func updateACTagsForStoredTags() {
-        self.ACtags = allTags.map { tag in
-            (tag, storedACTags.contains(tag))
-        }
-        let concatenatedString = self.ACtags.filter { $0.1 }.map { $0.0 }.joined(separator: ",")
-        storedACTagsString = concatenatedString
-        let _  = print(storedACTagsString)
-        
-        
-    }
-    func updateFDTagsForStoredTags() {
-        self.FDtags = allTags.map { tag in
-            (tag, storedFDTags.contains(tag))
-        }
-        let concatenatedString = self.FDtags.filter { $0.1 }.map { $0.0 }.joined(separator: ",")
-        storedFDTagsString = concatenatedString
-        let _  = print(storedFDTagsString)
-        let _ = print(allTags)
-        
-        
-        
-    }
-    
-    
-    func addTagManually(_ tags: String) {
-        // Append the new tag to the existing storedTagsString, separated by a comma
-        storedFDTagsString = tags
+        // Example: Post these selections to your database
+        // This is a placeholder for your database logic
+        print(selectedACTags)
+        print(selectedFDTags)
+        profileService.updateTags(userId: userId, activitiesTag: selectedACTags, foodAndDrinksTag: selectedFDTags) { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success(let updateResponse):
+                        // Handle success, maybe update some state or show a success message
+                        print("Tags successfully updated: \(updateResponse)")
+                    case .failure(let error):
+                        // Handle error, maybe show an error message to the user
+                        print("Error updating tags: \(error.localizedDescription)")
+                    }
+                }
+            }
     }
 }
 
+extension PreferenceViewModel {
+    func toggleACTagSelection(for tag: String) {
+        if let index = ACTags.firstIndex(where: { $0.0 == tag }) {
+            ACTags[index].1.toggle()
+        }
+    }
+    
+    func toggleFDTagSelection(for tag: String) {
+        if let index = FDTags.firstIndex(where: { $0.0 == tag }) {
+            FDTags[index].1.toggle()
+        }
+    }
+}

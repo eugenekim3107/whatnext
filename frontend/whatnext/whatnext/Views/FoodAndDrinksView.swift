@@ -1,56 +1,32 @@
 import SwiftUI
 
 struct FoodAndDrinksView: View {
-    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Korean Food","Chinese Food","Japanese Food","Italian Food","Mexican Food","Burgers","Tacos","Hot Pot","Sushi"])
+    @StateObject var viewModel = PreferenceViewModel()
+    @AppStorage("userID") var LoginuserID: String = ""
     let tagIconLinks: [String: String] = [
-        "Chinese Food": "🍜",
-        "Korean Food": "🍱",
-        "Italian Food": "🍕",
-        "Japanese Food": "🍣",
-        "Burgers": "🍔",
-        "Mexican Food": "🥙",
+        "chinese": "🍜",
+        "korean": "🍱",
+        "italian": "🍕",
+        "japanese": "🍣",
+        "burgers": "🍔",
+        "mexican": "🥙",
         "Hot Pot":"🫕",
         "Sushi":"🍣",
-        "Tacos":"🌮"
+        "Tacos":"🌮",
+        "coffee":"☕️"
     ]
+    var activityTags = [(String, Bool)]()
     @State private var isSaveButtonDisabled = false
     var body: some View {
         
         VStack {
             SplitProgressBarView(leftProgress: 0, rightProgress: 1)
-                                .frame(height: 4)
-                                .padding(.vertical)
-            
-
-//            HStack {
-//                Button(action: {}) {
-//                    Image(systemName: "arrow.left")
-//                        .foregroundColor(.black)
-//                        .padding()
-//                        .background(Color.white)
-//                        .cornerRadius(10)
-//                        .shadow(radius: 1)
-//                }
-//                Spacer()
-//                Button(action: {}) {
-//Image(systemName: "arrow.right")
-//                        .foregroundColor(.black)
-//                        .padding()
-//                        .background(Color.white)
-//                        .cornerRadius(10)
-//                        .shadow(radius: 1)
-//                }
-//
-//
-//            }.padding(.horizontal,30)
-            let columns = [
-                GridItem(.flexible(), spacing: 8),
-                GridItem(.flexible(), spacing: 8)
-            ]
+                .frame(height: 4)
+                .padding(.vertical)
+            Spacer().frame(height: 50)
             ZStack() {
               Text("Food & Drinks")
                 .font(Font.custom("Inter", size: 34).weight(.semibold))
-//                .lineSpacing(51)
                 .foregroundColor(.black)
                 .offset(x:0, y: -10)
               Text("Let us know your preferences.")
@@ -64,41 +40,39 @@ struct FoodAndDrinksView: View {
             .padding(.bottom,30)
 
             ScrollView {
+                let columns = [GridItem(.flexible()), GridItem(.flexible())]
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(Array(viewModel.FDtags.enumerated()), id: \.element.0) { index, tag in
-                        TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
+                    ForEach(Array(viewModel.FDTags.enumerated()), id: \.element.0) { index, tag in
+                        TagView(text: tag.0, isSelected: tag.1, icon: tagIconLinks[tag.0] ?? "")
                             .onTapGesture {
-                                // Implement tag selection toggle logic here
-                                viewModel.toggleFDTagSelection(tag.0)
+                                viewModel.toggleFDTagSelection(for: tag.0)
                             }
                     }
                 }
                 .padding(.horizontal)
             }
+            .onAppear {
+                viewModel.fetchTags(userId:LoginuserID,activityAllTags:["shopping","spas","hiking","beaches","restaurant","yoga","aquariums","beautysvc","fitness"],foodAndDrinkAllTags: ["chinese","korean","japanese","italian","burgers","mexican","Hot Pot","Sushi","Tacos","coffee"])
+            }
             
             Button(action: saveButtonAction) {
                  Text("Save")
-                     .foregroundColor(isSaveButtonDisabled ? .gray : .white) // Change text color based on button state
+                     .foregroundColor(isSaveButtonDisabled ? .gray : .white)
                      .frame(width: 295, height: 56)
-                     .background(isSaveButtonDisabled ? Color.gray : Color.blue) // Change background color based on button state
+                     .background(isSaveButtonDisabled ? Color.gray : Color.blue)
                      .cornerRadius(15)
              }
             .disabled(isSaveButtonDisabled)
             .padding(.bottom,50)
         }
-        .padding(.horizontal)
     }
     private func saveButtonAction() {
-            isSaveButtonDisabled = true // Disable the button
-            
-            // Re-enable the button after 0.3 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                isSaveButtonDisabled = false
-            }
-            
-            // Your save action logic here
-        
+        isSaveButtonDisabled = true
+        viewModel.saveSelectionsToDatabase(userId: LoginuserID)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.isSaveButtonDisabled = false
         }
+    }
 }
 
 

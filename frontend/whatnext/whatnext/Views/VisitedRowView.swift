@@ -11,9 +11,6 @@ struct VisitedRowView: View {
     @ObservedObject var viewModel: LocationRowViewModel
     let title: String
     let userId: String
-    @State private var scrollIndex = 0
-    @State private var timer: Timer?
-    @State private var isManuallyScrolling = false
     @State private var showingLocationDetail: Location?
     
     init(viewModel: LocationRowViewModel, title: String, userId: String) {
@@ -46,42 +43,16 @@ struct VisitedRowView: View {
                                     }
                             }
                         }
-                        .gesture(
-                            DragGesture().onChanged { _ in
-                                isManuallyScrolling = true
-                                timer?.invalidate()
-                            }
-                                .onEnded { _ in
-                                    isManuallyScrolling = false
-                                    startTimer(scrollView: scrollView)
-                                }
-                        )
                     }
                     .sheet(item: $showingLocationDetail) { location in
                         LocationDetailView(location: location)
                     }
                     .padding([.leading, .trailing])
-                    .onAppear {
-                        startTimer(scrollView: scrollView)
-                    }
-                    .onDisappear {
-                        timer?.invalidate()
-                    }
                 }
             }
         }
         .onAppear {
             viewModel.fetchVisitedInfo(userId: userId)
-        }
-    }
-    
-    private func startTimer(scrollView: ScrollViewProxy) {
-        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
-            withAnimation {
-                guard !isManuallyScrolling, viewModel.visitedInfo.count > 0 else { return }
-                scrollIndex = (scrollIndex + 1) % viewModel.visitedInfo.count
-                scrollView.scrollTo(viewModel.visitedInfo[scrollIndex].businessId, anchor: .leading)
-            }
         }
     }
 }
@@ -92,7 +63,7 @@ struct VisitedRowView_Previews: PreviewProvider {
         return VisitedRowView(
             viewModel: viewModel,
             title: "Visited",
-            userId: "eugenekim"
+            userId: "wiVOrMOJ8COqs7d6OgCBNVTV9lt2"
         )
     }
 }

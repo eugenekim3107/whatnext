@@ -5,29 +5,21 @@ enum NavigationDestination {
 }
 
 struct ActivityView: View {
-    @StateObject private var viewModel = PreferenceViewModel(allTags: ["Shopping", "Yoga", "Beaches", "Hiking","Spa","Aquariums","Beautysvc"])
-//    @State private var isNavigatingToFoodAndDrinks = false
+    @StateObject private var viewModel = PreferenceViewModel()
     @State private var navigationPath = NavigationPath()
     @State private var isSaveButtonDisabled = false
+    @AppStorage("userID") var LoginuserID: String = ""
     let tagIconLinks: [String: String] = [
-        "Shopping": "🍜",
-        "Spa": "💆‍♂️",
-        "Hiking": "⛰️",
-        "Beaches": "🏖️",
-        "Restaurant":"🍴",
-        "Yoga":"🧘",
-        "Aquariums":"🐠",
-        "Beautysvc":"💅",
+        "shopping": "🍜",
+        "spas": "💆‍♂️",
+        "hiking": "⛰️",
+        "beaches": "🏖️",
+        "restaurant":"🍴",
+        "yoga":"🧘",
+        "aquariums":"🐠",
+        "beautysvc":"💅",
+        "fitness":"💪🏻"
     ]
-    
-    //Shopping to be shopping
-    //Spa to be spas
-    //Hiking to be hiking
-    //Restaurant to be restaurant
-    //Yoga to be yoga
-    //Beaches to be beaches
-    //Beautysvc to be beautysvc
-    //Aquariums to be aquariums
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -51,14 +43,9 @@ struct ActivityView: View {
                     }
                 }
                 .padding(.horizontal,30)
-                let columns = [
-                    GridItem(.flexible(), spacing: 8),
-                    GridItem(.flexible(), spacing: 8)
-                ]
                 ZStack() {
                     Text("Activities")
                         .font(Font.custom("Inter", size: 34).weight(.semibold))
-                    //                .lineSpacing(51)
                         .foregroundColor(.black)
                         .offset(x: -40, y: -10)
                     Text("Let us know your preferences.")
@@ -72,15 +59,18 @@ struct ActivityView: View {
                 .padding(.bottom,30)
                 
                 ScrollView {
+                    let columns = [GridItem(.flexible()), GridItem(.flexible())]
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(Array(viewModel.ACtags.enumerated()), id: \.element.0) { index, tag in
-                            TagView(text: tag.0, isSelected: tag.1,icon:tagIconLinks[tag.0] ?? "")
-                                .onTapGesture {
-                                    viewModel.toggleACTagSelection(tag.0)
-                                }
+                            ForEach(Array(viewModel.ACTags.enumerated()), id: \.element.0) { index, tag in
+                            TagView(text: tag.0, isSelected: tag.1, icon: tagIconLinks[tag.0] ?? "")
+                            .onTapGesture {
+                                viewModel.toggleACTagSelection(for: tag.0)
+                            }
                         }
                     }
-                    .padding(.horizontal)
+                }
+                .onAppear {
+                viewModel.fetchTags(userId:LoginuserID,activityAllTags: ["shopping","spas","hiking","beaches","restaurant","yoga","aquariums","beautysvc","fitness"], foodAndDrinkAllTags: ["chinese","korean","japanese","italian","burgers","mexican","Hot Pot","Sushi","Tacos","coffee"])
                 }
                 Button(action: saveButtonAction) {
                     Text("Save")
@@ -101,14 +91,11 @@ struct ActivityView: View {
         }
     }
     private func saveButtonAction() {
-            isSaveButtonDisabled = true // Disable the button
-            
-            // Re-enable the button after 0.3 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                isSaveButtonDisabled = false
-            }
-            
-            // Your save action logic here
+        isSaveButtonDisabled = true
+        viewModel.saveSelectionsToDatabase(userId: LoginuserID)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.isSaveButtonDisabled = false
+        }
     }
 }
 
@@ -128,29 +115,6 @@ struct ProgressBar: View {
             }
             .cornerRadius(45.0)
         }
-    }
-}
-
-
-
-
-extension PreferenceViewModel {
-    // Toggles the selection of a tag and updates the stored tags accordingly
-    func toggleACTagSelection(_ tag: String) {
-        if let index = storedACTags.firstIndex(of: tag) {
-            storedACTags.remove(at: index)
-        } else {
-            storedACTags.append(tag)
-        }
-        updateACTagsForStoredTags()
-    }
-    func toggleFDTagSelection(_ tag: String) {
-        if let index = storedFDTags.firstIndex(of: tag) {
-            storedFDTags.remove(at: index)
-        } else {
-            storedFDTags.append(tag)
-        }
-        updateFDTagsForStoredTags()
     }
 }
 

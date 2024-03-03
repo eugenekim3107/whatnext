@@ -10,7 +10,7 @@ import SwiftUI
 struct TagView: View {
     var text: String
     var isSelected: Bool
-    var icon: String // Emoji will be passed into this parameter
+    var icon: String
     
     var body: some View {
         HStack {

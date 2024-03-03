@@ -59,3 +59,26 @@ struct FavoritesInfo: Codable, Identifiable {
         case favoritesLocations = "favorites_locations"
     }
 }
+
+struct TagsResponse: Decodable {
+    let activitiesTag: [String]
+    let foodAndDrinksTag: [String]
+    let userId: String
+
+    enum CodingKeys: String, CodingKey {
+        case activitiesTag = "activities_tag"
+        case foodAndDrinksTag = "food_and_drinks_tag"
+        case userId = "user_id"
+    }
+}
+
+struct UpdateTagsResponse:Decodable{
+    let operation:Bool
+    let userId:String
+    
+    
+    enum CodingKeys: String, CodingKey {
+        case operation = "operation"
+        case userId = "user_id"
+    }
+}

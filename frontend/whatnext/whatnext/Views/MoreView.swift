@@ -35,7 +35,7 @@ struct MoreView: View {
                     ForEach(settings, id: \.name) { setting in
                         if setting.name == "Logout" {
                             Button(action: {
-                                showingLogoutAlert = true // Show logout confirmation alert
+                                showingLogoutAlert = true
                             }) {
                                 Label(setting.name, systemImage: setting.imageName)
                                     .foregroundColor(setting.color)
@@ -45,7 +45,7 @@ struct MoreView: View {
                                     title: Text("Confirm Logout"),
                                     message: Text("Are you sure you want to log out?"),
                                     primaryButton: .destructive(Text("Logout")) {
-                                        logout() // Call logout function if user confirms
+                                        logout()
                                     },
                                     secondaryButton: .cancel()
                                 )
@@ -119,7 +119,7 @@ struct MoreView: View {
             GIDSignIn.sharedInstance.signOut()
             withAnimation(.easeInOut) {
                 logStatus = false
-                storedUserID = ""   
+                storedUserID = ""
             }
         } catch let signOutError as NSError {
             print("Error signing out: %@", signOutError)

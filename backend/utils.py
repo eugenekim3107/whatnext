@@ -117,8 +117,8 @@ def generate_assistant_id(openai_client):
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
         name="WhatNext? Location Recommender",
-        model="gpt-3.5-turbo-0125",
-        # model="gpt-4-0125-preview",
+        # model="gpt-3.5-turbo-0125",
+        model="gpt-4-0125-preview",
         tools=tools
     )
     return assistant.id
@@ -126,7 +126,7 @@ def generate_assistant_id(openai_client):
 # Create sorting run
 def create_sorting_run(openai_client, thread_id, assistant_id):
     instructions = (
-            "As the WhatNext? app's location sorter, review the prior conversation history for details on user preference. "
+            "As the WhatNext? app's location sorter, review the prior conversation history and user bio for details on user preference. "
             "Identify and rank, from highest to lowest ranked, the locations that best match the user's preference. "
             "Your response should be a comma-separated list of business_id associated with these locations, "
             "with a single space after each comma, and no spaces before the IDs or additional characters. "
@@ -139,7 +139,8 @@ def create_sorting_run(openai_client, thread_id, assistant_id):
         assistant_id=assistant_id,
         instructions=instructions,
         tools=[],
-        model="gpt-3.5-turbo-0125"
+        # model="gpt-3.5-turbo-0125",
+        model="gpt-4-0125-preview"
     )
     return run_sort.id
 

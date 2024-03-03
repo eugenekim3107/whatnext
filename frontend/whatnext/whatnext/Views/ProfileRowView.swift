@@ -11,9 +11,6 @@ struct ProfileRowView: View {
     @ObservedObject var viewModel: ProfileRowViewModel
     let title: String
     let userId: String
-    @State private var scrollIndex = 0
-    @State private var timer: Timer?
-    @State private var isManuallyScrolling = false
     
     init(viewModel: ProfileRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
@@ -42,39 +39,13 @@ struct ProfileRowView: View {
                                 ProfileRowSimpleView(profile: profile)
                             }
                         }
-                        .gesture(
-                            DragGesture().onChanged { _ in
-                                isManuallyScrolling = true
-                                timer?.invalidate()
-                            }
-                                .onEnded { _ in
-                                    isManuallyScrolling = false
-                                    startTimer(scrollView: scrollView)
-                                }
-                        )
                     }
                     .padding([.leading, .trailing])
-                    .onAppear {
-                        startTimer(scrollView: scrollView)
-                    }
-                    .onDisappear {
-                        timer?.invalidate()
-                    }
                 }
             }
         }
         .onAppear {
             viewModel.fetchFriendsInfo(userId: userId)
-        }
-    }
-    
-    private func startTimer(scrollView: ScrollViewProxy) {
-        timer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
-            withAnimation {
-                guard !isManuallyScrolling, viewModel.friendsInfo.count > 0 else { return }
-                scrollIndex = (scrollIndex + 1) % viewModel.friendsInfo.count
-                scrollView.scrollTo(viewModel.friendsInfo[scrollIndex].userId, anchor: .leading)
-            }
         }
     }
 }
@@ -120,6 +91,6 @@ struct ProfileRowView_Previews: PreviewProvider {
         let viewModel = ProfileRowViewModel()
         return ProfileRowView(viewModel: viewModel,
                        title: "Friends",
-                       userId: "eugenekim")
+                       userId: "wiVOrMOJ8COqs7d6OgCBNVTV9lt2")
     }
 }

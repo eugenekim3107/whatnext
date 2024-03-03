@@ -24,6 +24,7 @@ import random
 API_KEY = "whatnext"
 API_KEY_NAME = "whatnext_token"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+timeout = 30
 
 # MongoDB (make sure to change the ip address to match the ec2 instance ip address)
 MONGO_DETAILS = "mongodb://eugenekim:whatnext@172.31.28.141:27017/"
@@ -86,6 +87,14 @@ class LocationCondensed(BaseModel):
 
 class ProfileRequest(BaseModel):
     user_id: str
+
+class TagsRequest(BaseModel):
+    user_id:str
+    activities_tag: Optional[List[str]]
+    food_and_drinks_tag: Optional[List[str]]
+    tags: Optional[List[str]]
+
+
 
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
@@ -308,13 +317,23 @@ async def chatgpt_response(request: ChatRequest,
 
     output_nearby_locations = None
     output_specific_location = None
+    output_specific_location_condition = True
 
     while run_status.status != 'completed':
-
+        current_time = time.time()
         run_status = openai_client.beta.threads.runs.retrieve(
             thread_id=thread_id,
             run_id=run.id
         )
+        if current_time - start > timeout:
+            print("Timeout exceeded. Cancelling the run...")
+            openai_client.beta.threads.runs.cancel(
+                thread_id=thread_id,
+                run_id=run.id
+            )
+            chat_type = "regular"
+            message_content = "Sorry for the inconvenience. It seems like your request took a bit longer than expected. Please try clearing the chat and messaging again. Thank you!"
+            return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
         
         if run_status.status == 'requires_action':
             required_actions = run_status.required_action.submit_tool_outputs.model_dump()
@@ -399,7 +418,8 @@ async def chatgpt_response(request: ChatRequest,
                     print(f"BUSINESS_ID: {output_specific_location}")
 
                     if output_specific_location is None:
-                        business_info = "No additional information about location"
+                        output_specific_location_condition = False
+                        business_info = "No additional information about location in database. Please respond with GPT's internal knowledge. Limit response to couple, concise sentences."
                     else:
                         business_info = f"{output_specific_location}"
                     tool_output = {
@@ -422,7 +442,7 @@ async def chatgpt_response(request: ChatRequest,
         else:
             continue
     
-    if output_nearby_locations is None or len(output_nearby_locations) == 0:
+    if output_specific_location_condition == False or output_nearby_locations is None or len(output_nearby_locations) == 0:
         print("Generating regular response...")
         chat_type = "regular"
         messages = openai_client.beta.threads.messages.list(
@@ -434,8 +454,16 @@ async def chatgpt_response(request: ChatRequest,
         return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
     
     else:
+        # Extract user_tags
+        tags = await fetch_tags(user_id)
+
         # Additional steps when locations are recommended
-        sort_message = f"{output_nearby_locations}"
+        sort_message = (
+            f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"
+            f"Locations: {output_nearby_locations}\n\n"
+            "Identify and rank, from highest to lowest ranked, the locations that best match my preference based on conversation history. "
+            "Ensure the output adheres strictly to this structure, without any prefixes, bullet points, explanation, and additional text."
+        )
         openai_client.beta.threads.messages.create(
             thread_id = thread_id,
             role="user",
@@ -517,6 +545,15 @@ async def fetch_favorites_info(user_id: str):
     locations = await fetch_locations_business_id(location_ids)
     return locations
 
+
+async def fetch_tags(user_id:str):
+    user_info = await fetch_user_info(user_id)
+    if not user_info:
+        return {"activities_tag":[],"food_and_drinks_tag":[]}
+    else:
+        return {"activities_tag":user_info['activities_tag'],"food_and_drinks_tag":user_info['food_and_drinks_tag']}
+    
+
 # Retrieve profile information given user_id
 @app.post("/api/user_info")
 async def user_info(request: ProfileRequest,
@@ -531,7 +568,9 @@ async def user_info(request: ProfileRequest,
         "display_name": user_info["display_name"], 
         "friends": user_info.get("friends", []),
         "visited": user_info.get("visited", []), 
-        "favorites": user_info.get("favorites", [])
+        "favorites": user_info.get("favorites", []),
+        "food_and_drinks_tag":user_info.get("food_and_drinks_tag",[]),
+        "activities_tag":user_info.get("activities_tag",[])
     }
 
 @app.post("/api/friends_info")
@@ -562,3 +601,30 @@ async def favorites_info(request: ProfileRequest,
     user_id = request.user_id
     locations = await fetch_favorites_info(user_id)
     return {"user_id": user_id, "favorites_locations": locations}
+
+
+@app.post("/api/tags_info")
+async def get_tags(request: ProfileRequest,
+                         api_key: str = Depends(get_api_key)):
+    user_id = request.user_id
+    tags = await fetch_tags(user_id)
+    tags['user_id'] = user_id
+    return tags
+
+
+@app.post("/api/update_tags")
+async def update_tags(request:TagsRequest,api_key:str=Depends(get_api_key)):
+    update_doc = {}
+    if request.activities_tag is not None:
+        update_doc["activities_tag"] = request.activities_tag
+    if request.food_and_drinks_tag is not None:
+        update_doc["food_and_drinks_tag"] = request.food_and_drinks_tag
+    if request.tags is not None:
+        update_doc["tags"] = request.tags
+    if not update_doc:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    result = await db.users.update_one({"user_id": request.user_id}, {"$set": update_doc})
+    if result.modified_count == 0:
+        # No document was updated; either the user_id doesn't exist or the data was the same
+        raise HTTPException(status_code=404, detail=f"No user found with user_id {request.user_id} or data was the same as existing")
+    return {"operation": True, "user_id": request.user_id}
