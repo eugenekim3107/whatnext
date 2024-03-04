@@ -1,8 +1,5 @@
 import SwiftUI
 
-enum NavigationDestination {
-    case foodAndDrinks
-}
 
 struct ActivityView: View {
     @StateObject private var viewModel = PreferenceViewModel()
@@ -22,7 +19,7 @@ struct ActivityView: View {
     ]
     
     var body: some View {
-        NavigationStack(path: $navigationPath) {
+        NavigationStack{
             VStack {
                 SplitProgressBarView(leftProgress: 1, rightProgress: 0)
                     .frame(height: 4)
@@ -30,10 +27,7 @@ struct ActivityView: View {
                 
                 HStack {
                     Spacer()
-                    Button(action: {
-                        let destination: NavigationDestination = .foodAndDrinks
-                        navigationPath.append(destination)
-                    }) {
+                    NavigationLink(destination: FoodAndDrinksView()) {
                         Image(systemName: "arrow.right")
                             .foregroundColor(.black)
                             .padding()
@@ -41,6 +35,7 @@ struct ActivityView: View {
                             .cornerRadius(10)
                             .shadow(radius: 1)
                     }
+                    
                 }
                 .padding(.horizontal,30)
                 ZStack() {
@@ -83,11 +78,7 @@ struct ActivityView: View {
                 .padding(.bottom,50)
             }
             .padding(.horizontal)
-            .navigationDestination(for: NavigationDestination.self) { destination in switch destination {
-            case .foodAndDrinks:
-                FoodAndDrinksView()
-            }
-            }
+
         }
     }
     private func saveButtonAction() {
@@ -123,4 +114,3 @@ struct ActivityView_Previews: PreviewProvider {
         ActivityView()
     }
 }
-

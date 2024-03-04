@@ -38,7 +38,7 @@ struct FoodAndDrinksView: View {
             .frame(width: 295, height: 71)
             .padding(.leading,-80)
             .padding(.bottom,30)
-
+            
             ScrollView {
                 let columns = [GridItem(.flexible()), GridItem(.flexible())]
                 LazyVGrid(columns: columns, spacing: 16) {
@@ -47,9 +47,9 @@ struct FoodAndDrinksView: View {
                             .onTapGesture {
                                 viewModel.toggleFDTagSelection(for: tag.0)
                             }
+                        
                     }
                 }
-                .padding(.horizontal)
             }
             .onAppear {
                 viewModel.fetchTags(userId:LoginuserID,activityAllTags:["shopping","spas","hiking","beaches","restaurant","yoga","aquariums","beautysvc","fitness"],foodAndDrinkAllTags: ["chinese","korean","japanese","italian","burgers","mexican","Hot Pot","Sushi","Tacos","coffee"])
