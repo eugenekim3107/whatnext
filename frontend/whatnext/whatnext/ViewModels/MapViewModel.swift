@@ -36,9 +36,9 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
         }
-        loadDummyLocations()
+//        loadDummyLocations()
         // Fetch locations using LocationRowViewModel
-        //loadLocationsForMapView(from: location.coordinate)
+        loadLocationsForMapView(from: location.coordinate)
     }
     
     func searchInNewArea(center: CLLocationCoordinate2D) {

@@ -33,6 +33,7 @@ db = mongo_client["locationDatabase"]
 
 # OpenAI
 openai_client = OpenAI(api_key="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")
+assistant_id = generate_assistant_id(openai_client)
 
 # Redis server for chat and user history
 redis_client = redis.Redis(host='localhost', port=8001, db=0, decode_responses=True)
@@ -291,10 +292,12 @@ async def chatgpt_response(request: ChatRequest,
     start = time.time()
     user_id = request.user_id
     session_id = request.session_id
+    # tags = await fetch_tags(user_id)
+    # user_bio = f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"
     message = request.message
     latitude = request.latitude
     longitude = request.longitude
-    session_id, thread_id, assistant_id = retrieve_chat_info(session_id, redis_client, openai_client)
+    session_id, thread_id = retrieve_chat_info(session_id, redis_client, openai_client, assistant_id)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
     openai_client.beta.threads.messages.create(
@@ -325,6 +328,12 @@ async def chatgpt_response(request: ChatRequest,
             thread_id=thread_id,
             run_id=run.id
         )
+
+        if run_status.status == "failed":
+            chat_type = "regular"
+            message_content = "Sorry for the inconvenience. It seems like you reached the maximum chat limit. Please try again later. Thank you!"
+            return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
+
         if current_time - start > timeout:
             print("Timeout exceeded. Cancelling the run...")
             openai_client.beta.threads.runs.cancel(
@@ -341,12 +350,12 @@ async def chatgpt_response(request: ChatRequest,
                 "limit": 10,
                 "radius": 10000,
                 "categories": "all",
-                "cur_open": 0,
-                "tag": None,
+                "cur_open": 1,
+                "tag": "",
                 "sort_by": "review_count"
             }
             # Validation ranges and sets
-            valid_limit_range = [3, 10]  # min, max
+            valid_limit_range = [5, 10]  # min, max
             valid_radius_range = [1000, 100000]  # min, max
             valid_cur_open_options = [0, 1]  # closed or open
             categories_file_path = "categories.json"
@@ -371,10 +380,14 @@ async def chatgpt_response(request: ChatRequest,
                     # Validate and update arguments
                     arguments["limit"] = max(min(int(arguments["limit"]), valid_limit_range[1]), valid_limit_range[0]) if "limit" in arguments else default_args["limit"]
                     arguments["radius"] = max(min(int(arguments["radius"]), valid_radius_range[1]), valid_radius_range[0]) if "radius" in arguments else default_args["radius"]
-                    arguments["categories"] = arguments["categories"] if arguments["categories"] in valid_categories else default_args["categories"]
                     arguments["cur_open"] = int(arguments["cur_open"]) if int(arguments["cur_open"]) in valid_cur_open_options else default_args["cur_open"]
-                    arguments["tag"] = arguments["tag"] if arguments["tag"] in valid_tags else default_args["tag"]
                     arguments["sort_by"] = arguments["sort_by"] if arguments["sort_by"] in valid_sort_by_options else default_args["sort_by"]
+                    tags_set = set([tag.strip() for tag in arguments["tag"].split(',')])
+                    categories_set = set([category.strip() for category in arguments["categories"].split(',')])
+                    arguments["tag"] = list(categories_set.intersection(set(valid_tags))) + list(tags_set.intersection(set(valid_tags)))
+                    arguments["tag"] = arguments["tag"] if len(arguments["tag"]) > 0 else [default_args["tag"]]
+                    arguments["categories"] = list(tags_set.intersection(set(valid_categories))) + list(categories_set.intersection(set(valid_categories)))
+                    arguments["categories"] = arguments["categories"] if len(arguments["categories"]) > 0 else [default_args["categories"]]
 
                     print(f"Arguments after default: {arguments}")
 
@@ -385,16 +398,16 @@ async def chatgpt_response(request: ChatRequest,
                         longitude=float(longitude), 
                         limit=30,
                         radius=int(arguments["radius"]), 
-                        categories=[arguments["categories"]], 
+                        categories=arguments["categories"], 
                         cur_open=int(arguments["cur_open"]), 
-                        tag=[arguments["tag"]],
+                        tag=arguments["tag"],
                         sort_by=arguments["sort_by"]
                     )
 
                     print(f"OUTPUT LENGTH: {len(output_nearby_locations)}")
 
                     if len(output_nearby_locations) == 0:
-                        business_info = "All nearby locations are either currently closed or unavaliable."
+                        business_info = "All nearby locations are either currently closed or unavaliable. Ask if the user wants to include closed locations in the search as well."
                     else:
                         business_info = ', '.join([location.name for location in output_nearby_locations if location.name is not None])
                     tool_output = {
@@ -460,9 +473,10 @@ async def chatgpt_response(request: ChatRequest,
         # Additional steps when locations are recommended
         sort_message = (
             f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"
+            f"User most recent message/request: {message}\n\n"
             f"Locations: {output_nearby_locations}\n\n"
-            "Identify and rank, from highest to lowest ranked, the locations that best match my preference based on conversation history. "
-            "Ensure the output adheres strictly to this structure, without any prefixes, bullet points, explanation, and additional text."
+            "Rank all of the locations, from highest to lowest ranked, that best match my request based on my conversation history and bio. "
+            "Return a list of business_ids. Ensure the output adheres strictly to this structure, without any prefixes, bullet points, explanation, and additional text."
         )
         openai_client.beta.threads.messages.create(
             thread_id = thread_id,

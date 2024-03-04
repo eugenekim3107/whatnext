@@ -150,7 +150,7 @@ struct LocationRowView_Previews: PreviewProvider {
             longitude: -117.23790,
             categories: ["fitness"],
             radius: 10000,
-            curOpen: 0,
+            curOpen: 1,
             sortBy: "review_count",
             limit: 15
         )
