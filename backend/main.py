@@ -292,8 +292,6 @@ async def chatgpt_response(request: ChatRequest,
     start = time.time()
     user_id = request.user_id
     session_id = request.session_id
-    # tags = await fetch_tags(user_id)
-    # user_bio = f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"
     message = request.message
     latitude = request.latitude
     longitude = request.longitude
@@ -454,7 +452,7 @@ async def chatgpt_response(request: ChatRequest,
         
         else:
             continue
-    
+
     if output_specific_location_condition == False or output_nearby_locations is None or len(output_nearby_locations) == 0:
         print("Generating regular response...")
         chat_type = "regular"

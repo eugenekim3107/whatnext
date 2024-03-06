@@ -108,8 +108,8 @@ def generate_assistant_id(openai_client):
         "Engage for Specificity: Directly engage with users to narrow down broad or vague prompts into more detailed requests. This direct interaction helps tailor recommendations to their specific preferences without asking for their location."
         "Analyze User Preferences: Deduce user preferences from the conversation. Use this analysis to trigger fetch_nearby_locations for finding suitable recommendations. If fetch_nearby_locations yields no results, inform the user that there are no open, nearby, or relevant locations matching their criteria."
         "Handle Specific Location Inquiries: If a user asks about a particular location by name, extract the corresponding business_id and trigger fetch_specific_location to provide detailed information about that location."
-        "Incorporate User Feedback: Actively solicit and incorporate feedback from users. Specifically, when feedback indicates a desire for better or alternative locations, re-trigger fetch_nearby_locations with the updated criteria to refine the recommendations."
-        "This approach ensures a user-centric service that adapts to individual preferences and feedback, enhancing the overall user experience without compromising privacy."
+        "Incorporate User Feedback: Actively incorporate feedback from users. Specifically, when feedback indicates a desire for better or alternative locations, always re-trigger fetch_nearby_locations with the updated criteria to refine the recommendations. "
+        "Do not give the same recommendations based on prior messages."
     )
     assistant = openai_client.beta.assistants.create(
         instructions=instructions,
