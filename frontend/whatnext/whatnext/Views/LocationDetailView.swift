@@ -31,15 +31,28 @@ struct ImageView: View {
 
     var body: some View {
         if let imageUrl = imageUrl, let url = URL(string: imageUrl) {
-            AsyncImage(url: url) { image in
-                image.resizable().aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.gray.opacity(0.3)
+            AsyncImage(url: url) { phase in
+                if let image = phase.image {
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 2.2)
+                        .clipped()
+                } else if phase.error != nil {
+                    Color.gray.opacity(0.3)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 2.2)
+                } else {
+                    Color.gray.opacity(0.3)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 2.2)
+                }
             }
-            //.frame(height: 250)
+        } else {
+            Color.gray.opacity(0.3)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 2.2)
         }
     }
 }
+
 
 // BusinessInfo for displaying the business name and ratings
 struct BusinessInfo: View {

@@ -11,6 +11,7 @@ struct ProfileRowView: View {
     @ObservedObject var viewModel: ProfileRowViewModel
     let title: String
     let userId: String
+    @State private var hasFetchedProfiles = false
     
     init(viewModel: ProfileRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
@@ -29,7 +30,7 @@ struct ProfileRowView: View {
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(.black)
             }.padding(.leading)
-            if viewModel.isLoading {
+            if viewModel.isLoading || (hasFetchedProfiles && viewModel.friendsInfo.isEmpty) {
                 PlaceholderView()
             } else {
                 ScrollViewReader { scrollView in
@@ -46,6 +47,7 @@ struct ProfileRowView: View {
         }
         .onAppear {
             viewModel.fetchFriendsInfo(userId: userId)
+            self.hasFetchedProfiles = true
         }
     }
 }

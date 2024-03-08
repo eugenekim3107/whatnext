@@ -61,6 +61,7 @@ struct ProfileView: View {
                 .navigationBarTitle("Profile", displayMode: .large)
                 .padding(.bottom, 50)
             }
+            .background(Color(UIColor.systemGroupedBackground))
             .onAppear {
                 viewModel.fetchUserInfo(userId: LoginuserID)
             }

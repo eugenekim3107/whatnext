@@ -67,7 +67,7 @@ def generate_assistant_id(openai_client):
                         "cur_open": {
                             "type": "string",
                             "enum": [0, 1],
-                            "description": f"Filter based on current open status. 0 for both closed and open, while 1 is just for open. Default: {valid_cur_open[2]}."
+                            "description": f"Filter based on current open status. 0 for both closed and open, while 1 is just for open. Use 0 when seeking recommendations for future dates. Default: {valid_cur_open[2]}."
                         },
                         "tag": {
                             "type": "string",

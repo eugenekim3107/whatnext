@@ -29,6 +29,7 @@ class ChatService {
                      completion: @escaping (DecodedMessage?, Error?) -> Void) {
         
         guard let url = URL(string: "https://whatnext.live/api/chatgpt_response") else { return }
+
         
         var requestBody: [String: Any] = [
             "user_id": userId,
@@ -50,12 +51,11 @@ class ChatService {
         request.httpBody = jsonData
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            guard let data = data, error == nil else {
-                completion(nil, error ?? NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Network request failed"]))
-                return
-            }
-            
             do {
+                guard let data = data else {
+                    throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data received"])
+                }
+                
                 let genericDecoder = JSONDecoder()
                 let genericResponse = try genericDecoder.decode(GenericMessageResponse.self, from: data)
                 
@@ -71,8 +71,15 @@ class ChatService {
                     }
                 }
             } catch {
+                let errorMessageResponse = Message(
+                    session_id: "",
+                    user_id: userId,
+                    content: "An error has occurred. Please try again. Thank you!",
+                    chat_type: "regular",
+                    is_user_message: "false"
+                )
                 DispatchQueue.main.async {
-                    completion(nil, error)
+                    completion(.regular(errorMessageResponse), nil)
                 }
             }
         }.resume()

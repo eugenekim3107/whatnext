@@ -5,7 +5,7 @@ import GoogleSignIn
 struct MoreView: View {
     @AppStorage("log_status") var logStatus: Bool = false
     @AppStorage("userID") var storedUserID: String = ""
-    @State private var showingLogoutAlert = false // State to control alert presentation
+    @State private var showingLogoutAlert = false
     
 
     var settings: [SettingsSection] = [
@@ -111,6 +111,7 @@ struct MoreView: View {
                     }
                 }
         }
+        .background(Color(UIColor.systemGroupedBackground))
     }
 
     func logout() {

@@ -8,7 +8,7 @@ struct SearchView: View {
     @State private var waitingForResponse: Bool = false
     @State private var showPopup: Bool = false
     @State private var sessionId: String? = nil
-    
+
     var body: some View {
         NavigationView{
             messagesView
@@ -239,7 +239,6 @@ struct SearchView: View {
         
         ChatService.shared.postMessage(latitude: latitude, longitude: longitude, userId: userId, sessionId: sessionId, message: message) { result, error in
             DispatchQueue.main.async {
-                // Remove the typing indicator
                 self.messages.removeAll(where: {
                     if case .message(let msg) = $0, msg.chat_type == "typing" {
                         return true
@@ -287,10 +286,22 @@ struct SearchView: View {
     }
     
     private func restartConversation() {
-        messages.removeAll()
-        sessionId = nil
-        accumulatedText = ""
-        chatText = ""
+        if !waitingForResponse {
+            messages.removeAll()
+            sessionId = nil
+            accumulatedText = ""
+            chatText = ""
+            waitingForResponse = false
+        } else {
+            withAnimation {
+                showPopup = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                withAnimation {
+                    showPopup = false
+                }
+            }
+        }
     }
 }
 

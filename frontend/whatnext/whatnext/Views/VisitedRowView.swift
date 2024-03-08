@@ -12,6 +12,7 @@ struct VisitedRowView: View {
     let title: String
     let userId: String
     @State private var showingLocationDetail: Location?
+    @State private var hasFetchedLocations = false
     
     init(viewModel: LocationRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
@@ -30,7 +31,7 @@ struct VisitedRowView: View {
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(.black)
             }.padding(.leading)
-            if viewModel.isLoading {
+            if viewModel.isLoading || (hasFetchedLocations && viewModel.visitedInfo.isEmpty) {
                 PlaceholderView()
             } else {
                 ScrollViewReader { scrollView in
@@ -53,6 +54,7 @@ struct VisitedRowView: View {
         }
         .onAppear {
             viewModel.fetchVisitedInfo(userId: userId)
+            self.hasFetchedLocations = true
         }
     }
 }

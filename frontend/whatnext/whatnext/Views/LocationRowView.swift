@@ -19,6 +19,7 @@ struct LocationRowView: View {
     let sortBy: String
     let limit: Int
     @State private var showingLocationDetail: Location?
+    @State private var hasFetchedLocations = false
     
     init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
         self.viewModel = viewModel
@@ -40,7 +41,7 @@ struct LocationRowView: View {
                 .foregroundColor(.black)
                 .padding(.leading)
             
-            if viewModel.isLoading {
+            if viewModel.isLoading || (hasFetchedLocations && viewModel.locations.isEmpty) {
                 PlaceholderView()
             } else {
                 ScrollViewReader { scrollView in
@@ -70,6 +71,7 @@ struct LocationRowView: View {
                                        curOpen: curOpen,
                                        tag: tag ?? [],
                                        sortBy: self.sortBy)
+            self.hasFetchedLocations = true
         }
     }
 }
@@ -132,9 +134,9 @@ struct LocationRowSimpleView: View {
     
 struct PlaceholderView: View {
     var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(Color.gray.opacity(0.3))
-            .frame(height: 150)
+        RoundedRectangle(cornerRadius:6)
+            .fill(Color.white)
+            .frame(height: 160)
             .padding(.horizontal)
             .redacted(reason: .placeholder)
     }
