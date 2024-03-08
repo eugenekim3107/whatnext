@@ -82,32 +82,6 @@ struct LoginView: View {
                 
                 
                 HStack(spacing: 8){
-                    CustomButton()
-                        .overlay {
-                            SignInWithAppleButton { (request) in
-                                loginModel.nonce = randomNonceString()
-                                request.requestedScopes = [.email,.fullName]
-                                request.nonce = sha256(loginModel.nonce)
-                                
-                            } onCompletion: { (result) in
-                                switch result{
-                                case .success(let user):
-                                    print("success")
-                                    guard let credential = user.credential as? ASAuthorizationAppleIDCredential else{
-                                        print("error with firebase")
-                                        return
-                                    }
-                                    loginModel.appleAuthenticate(credential: credential)
-                                case.failure(let error):
-                                    print(error.localizedDescription)
-                                }
-                            }
-                            .signInWithAppleButtonStyle(.white)
-                            .frame(height: 55)
-                            .blendMode(.overlay)
-                        }
-                        .clipped()
-                    
     
                     CustomButton(isGoogle: true)
                         .overlay {
