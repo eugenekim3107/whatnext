@@ -41,12 +41,12 @@ struct ActivityView: View {
                 ZStack() {
                     Text("Activities")
                         .font(Font.custom("Inter", size: 34).weight(.semibold))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .offset(x: -40, y: -10)
                     Text("Let us know your preferences.")
                         .font(Font.custom("Inter", size: 13))
                         .lineSpacing(19.50)
-                        .foregroundColor(Color(red: 0, green: 0, blue: 0).opacity(0.70))
+                        .foregroundColor(.primary.opacity(0.70))
                         .offset(x: -20, y: 25.50)
                 }
                 .frame(width: 295, height: 71)

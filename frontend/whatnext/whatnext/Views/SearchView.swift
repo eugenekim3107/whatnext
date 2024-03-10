@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    @Environment(\.colorScheme) var colorScheme
     private let lineHeight: CGFloat = 16
     @State private var chatText = ""
     @State private var accumulatedText = ""
@@ -145,7 +146,7 @@ struct SearchView: View {
                             .padding(.leading, 50)
                     } else {
                         Text(message.content)
-                            .foregroundColor(.black)
+                            .foregroundColor(.primary)
                             .padding(.horizontal, 15)
                             .padding(.vertical, 10)
                             .background(Color.gray.opacity(0.3))
@@ -168,7 +169,8 @@ struct SearchView: View {
                     .padding(.vertical, 8)
                 TextEditor(text: $chatText)
                     .padding(.horizontal, 5)
-                    .colorMultiply(Color(UIColor.systemGroupedBackground))
+                    .colorMultiply(colorScheme == .dark ? .white : Color(UIColor.systemGroupedBackground))
+                    .foregroundColor(.primary)
                     .frame(width: geometry.size.width-36, height:geometry.size.height)
                     .opacity(chatText.isEmpty ? 0.5:1)
                     .focused($isTextEditorFocused)

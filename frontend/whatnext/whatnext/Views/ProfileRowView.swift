@@ -29,7 +29,6 @@ struct ProfileRowView: View {
                 .frame(width: 20)
                 Text(title)
                     .font(.system(size: 25, weight: .bold))
-                    .foregroundColor(.black)
             }.padding(.leading)
             if viewModel.friendsInfo.isEmpty {
                 PlaceholderView()

@@ -32,7 +32,7 @@ struct FavoritesRowView: View {
                 .frame(width: 20)
                 Text(title)
                     .font(.system(size: 25, weight: .bold))
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
             }.padding(.leading)
             if viewModel.favoritesInfo.isEmpty {
                 PlaceholderView()

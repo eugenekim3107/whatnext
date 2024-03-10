@@ -9,23 +9,23 @@ struct MoreView: View {
     @State private var selection: String?
 
     var settings: [SettingsSection] = [
-        .init(name: "Preferences", imageName: "person.crop.circle", color: .black),
-        .init(name: "Notifications", imageName: "bell.circle", color: .black),
-        .init(name: "Location", imageName: "location.circle", color: .black),
-        .init(name: "Privacy", imageName: "hand.raised.circle", color: .black),
-        .init(name: "Logout", imageName: "arrow.right.circle", color: .black)
+        .init(name: "Preferences", imageName: "person.crop.circle", color: .primary),
+        .init(name: "Notifications", imageName: "bell.circle", color: .primary),
+        .init(name: "Location", imageName: "location.circle", color: .primary),
+        .init(name: "Privacy", imageName: "hand.raised.circle", color: .primary),
+        .init(name: "Logout", imageName: "arrow.right.circle", color: .primary)
     ]
     
     var feedbacks: [FeedbackSection] = [
-        .init(name: "Overall Experience", imageName: "hand.thumbsup.circle", color: .black),
-        .init(name: "Recommendation Accuracy", imageName: "target", color: .black),
-        .init(name: "Suggestions", imageName: "lightbulb.circle", color: .black)
+        .init(name: "Overall Experience", imageName: "hand.thumbsup.circle", color: .primary),
+        .init(name: "Recommendation Accuracy", imageName: "target", color: .primary),
+        .init(name: "Suggestions", imageName: "lightbulb.circle", color: .primary)
     ]
     
     var terms: [TermsAndConditionsSection] = [
-        .init(name: "Acceptance of Terms", imageName: "doc.circle", color: .black),
-        .init(name: "Privacy Policy", imageName: "lock.circle", color: .black),
-        .init(name: "User Conduct", imageName: "figure.walk.circle", color: .black)
+        .init(name: "Acceptance of Terms", imageName: "doc.circle", color: .primary),
+        .init(name: "Privacy Policy", imageName: "lock.circle", color: .primary),
+        .init(name: "User Conduct", imageName: "figure.walk.circle", color: .primary)
     ]
 
     var body: some View {
@@ -107,17 +107,13 @@ struct MoreView: View {
 
     @ViewBuilder
     private func detailViewForSelection(_ selection: String?) -> some View {
-        if let selection = selection {
-            switch selection {
-            case "Preferences":
-                // Directly create and navigate to the view with an explicitly set title
-                ActivityView()
-            default:
-                // Using DetailedView as an example for other selections
-                DetailedView(title: " \(selection)").navigationTitle(selection)
-            }
-        } else {
-            Text("Select an option from the list.").navigationTitle("More View")
+            if let selection = selection {
+                switch selection {
+                case "Preferences":
+                    ActivityView()
+                default:
+                    DetailedView(title: " \(selection)")
+                }
         }
     }
 
