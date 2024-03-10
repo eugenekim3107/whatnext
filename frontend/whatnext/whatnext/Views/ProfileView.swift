@@ -42,7 +42,7 @@ struct ProfileView: View {
                 userViewModel.refreshDataUserProfile(userId: LoginuserID)
                 friendModel.refreshDataProfiles(userId: LoginuserID)
                 favoritesModel.refreshDataFavorites(userId: LoginuserID)
-                visitedModel.refreshDataFavorites(userId:LoginuserID)
+                visitedModel.refreshDataVisited(userId:LoginuserID)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
