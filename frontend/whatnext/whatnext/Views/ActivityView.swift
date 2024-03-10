@@ -4,7 +4,7 @@ import SwiftUI
 struct ActivityView: View {
     @StateObject private var viewModel = PreferenceViewModel()
     @State private var navigationPath = NavigationPath()
-    @State private var isSaveButtonDisabled = false
+//    @State private var isSaveButtonDisabled = false
     @AppStorage("userID") var LoginuserID: String = ""
     let tagIconLinks: [String: String] = [
         "shopping": "🍜",
@@ -69,12 +69,12 @@ struct ActivityView: View {
                 }
                 Button(action: saveButtonAction) {
                     Text("Save")
-                        .foregroundColor(isSaveButtonDisabled ? .gray : .white)
+                        .foregroundColor(/*isSaveButtonDisabled ? .gray :*/ .white)
                         .frame(width: 295, height: 56)
-                        .background(isSaveButtonDisabled ? Color.gray : Color.blue)
+                        .background(/*isSaveButtonDisabled ? Color.gray :*/ Color.blue)
                         .cornerRadius(15)
                 }
-                .disabled(isSaveButtonDisabled)
+//                .disabled(isSaveButtonDisabled)
                 .padding(.bottom,50)
             }
             .padding(.horizontal)
@@ -82,11 +82,11 @@ struct ActivityView: View {
         }
     }
     private func saveButtonAction() {
-        isSaveButtonDisabled = true
+//        isSaveButtonDisabled = true
         viewModel.saveSelectionsToDatabase(userId: LoginuserID)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            self.isSaveButtonDisabled = false
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            self.isSaveButtonDisabled = false
+//        }
     }
 }
 

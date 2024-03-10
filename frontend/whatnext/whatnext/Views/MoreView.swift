@@ -6,7 +6,7 @@ struct MoreView: View {
     @AppStorage("log_status") var logStatus: Bool = false
     @AppStorage("userID") var storedUserID: String = ""
     @State private var showingLogoutAlert = false
-    
+    @State private var selection: String?
 
     var settings: [SettingsSection] = [
         .init(name: "Preferences", imageName: "person.crop.circle", color: .black),
@@ -27,98 +27,105 @@ struct MoreView: View {
         .init(name: "Privacy Policy", imageName: "lock.circle", color: .black),
         .init(name: "User Conduct", imageName: "figure.walk.circle", color: .black)
     ]
-    
+
     var body: some View {
-        NavigationStack {
-            List {
-                Section("Settings") {
-                    ForEach(settings, id: \.name) { setting in
-                        if setting.name == "Logout" {
-                            Button(action: {
-                                showingLogoutAlert = true
-                            }) {
-                                Label(setting.name, systemImage: setting.imageName)
-                                    .foregroundColor(setting.color)
-                            }
-                            .alert(isPresented: $showingLogoutAlert) {
-                                Alert(
-                                    title: Text("Confirm Logout"),
-                                    message: Text("Are you sure you want to log out?"),
-                                    primaryButton: .destructive(Text("Logout")) {
-                                        logout()
-                                    },
-                                    secondaryButton: .cancel()
-                                )
-                            }
-                        } else if setting.name == "Preferences" {
-                            NavigationLink(destination: ActivityView()) {
-                                Label(setting.name, systemImage: setting.imageName)
-                                    .foregroundColor(setting.color)
-                            }
-                        }
-                        else {
-                            NavigationLink(value: setting) {
-                                Label(setting.name, systemImage: setting.imageName)
-                                    .foregroundColor(setting.color)
-                            }
-                        }
-                    }
-                }
-                .foregroundColor(Color.black)
-                
-                Section("Feedback") {
-                    ForEach(feedbacks, id: \.name) { feedback in
-                        NavigationLink(value: feedback) {
-                            Label(feedback.name, systemImage: feedback.imageName)
-                                .foregroundColor(feedback.color)
-                                .id(feedback.name)
-                        }
-                    }
-                }.foregroundColor(Color.black)
-                
-                Section("Terms And Conditions") {
-                    ForEach(terms, id: \.name) { term in
-                        NavigationLink(value: term) {
-                            Label(term.name, systemImage: term.imageName)
-                                .foregroundColor(term.color)
-                                .id(term.name)
-                        }
-                    }
-                }.foregroundColor(Color.black)
-                
-                Spacer().listRowBackground(Color.clear)
+        NavigationSplitView {
+            List(selection: $selection) {
+                settingsSection
+                feedbackSection
+                termsAndConditionsSection
             }
+            .listStyle(.sidebar)
             .navigationTitle("More")
-            .navigationDestination(for: SettingsSection.self) { setting in
-                    ZStack {
-                        Color.white.ignoresSafeArea()
-                        Label(setting.name, systemImage: setting.imageName)
-                            .font(.largeTitle).bold()
-                    }
-                }
-                .navigationDestination(for: FeedbackSection.self) { feedback in
-                    ZStack {
-                        Color.white.ignoresSafeArea()
-                        Label(feedback.name, systemImage: feedback.imageName)
-                            .font(.largeTitle).bold()
-                    }
-                }
-                .navigationDestination(for: TermsAndConditionsSection.self) { term in
-                    ZStack {
-                        Color.white.ignoresSafeArea()
-                        Label(term.name, systemImage: term.imageName)
-                            .font(.largeTitle).bold()
-                    }
-                }
+            .alert("Confirm Logout", isPresented: $showingLogoutAlert) {
+                Button("Logout", role: .destructive) { logout() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Are you sure you want to log out?")
+            }
+        } detail: {
+            detailViewForSelection(selection)
         }
-        .background(Color(UIColor.systemGroupedBackground))
+    }
+    
+    @ViewBuilder
+    private var settingsSection: some View {
+        Section("Settings") {
+            ForEach(settings) { setting in
+                if setting.name == "Logout" {
+                    Button(action: {
+                        showingLogoutAlert = true
+                    }) {
+                        HStack {
+                            Image(systemName: setting.imageName)
+                            Text(setting.name)
+                        }
+                        .foregroundColor(setting.color)
+                    }
+                } else {
+                    NavigationLink(value: setting.name) {
+                        HStack {
+                            Image(systemName: setting.imageName)
+                            Text(setting.name)
+                        }
+                        .foregroundColor(setting.color)
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var feedbackSection: some View {
+        Section("Feedback") {
+            ForEach(feedbacks) { feedback in
+                NavigationLink(value: feedback.name) {
+                    HStack {
+                        Image(systemName: feedback.imageName)
+                        Text(feedback.name)
+                    }
+                    .foregroundColor(feedback.color)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var termsAndConditionsSection: some View {
+        Section("Terms and Conditions") {
+            ForEach(terms) { term in
+                NavigationLink(value: term.name) {
+                    HStack {
+                        Image(systemName: term.imageName)
+                        Text(term.name)
+                    }
+                    .foregroundColor(term.color)
+                }
+            }
+        }
     }
 
-    func logout() {
+    @ViewBuilder
+    private func detailViewForSelection(_ selection: String?) -> some View {
+        if let selection = selection {
+            switch selection {
+            case "Preferences":
+                // Directly create and navigate to the view with an explicitly set title
+                ActivityView()
+            default:
+                // Using DetailedView as an example for other selections
+                DetailedView(title: " \(selection)").navigationTitle(selection)
+            }
+        } else {
+            Text("Select an option from the list.").navigationTitle("More View")
+        }
+    }
+
+    private func logout() {
         do {
             try Auth.auth().signOut()
             GIDSignIn.sharedInstance.signOut()
-            withAnimation(.easeInOut) {
+            withAnimation {
                 logStatus = false
                 storedUserID = ""
             }
@@ -128,26 +135,43 @@ struct MoreView: View {
     }
 }
 
+// Assuming your Section structs remain unchanged
+
+
 struct MoreView_Previews: PreviewProvider {
     static var previews: some View {
         MoreView()
     }
 }
 
-struct SettingsSection: Hashable {
+struct SettingsSection: Identifiable {
+    var id = UUID()
     let name: String
     let imageName: String
     let color: Color
 }
 
-struct FeedbackSection: Hashable {
+struct FeedbackSection: Identifiable {
+    var id = UUID()
     let name: String
     let imageName: String
     let color: Color
 }
 
-struct TermsAndConditionsSection: Hashable {
+struct TermsAndConditionsSection: Identifiable {
+    
+    var id = UUID()
     let name: String
     let imageName: String
-    let color: Color
+    let color:Color
+    
+    
+}
+struct DetailedView: View {
+    let title: String
+
+    var body: some View {
+        Text("Content for \(title)")
+            .navigationTitle(title) // Set the title explicitly here
+    }
 }
