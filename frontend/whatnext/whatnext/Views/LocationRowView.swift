@@ -46,7 +46,7 @@ struct LocationRowView: View {
             } else {
                 switch viewModel.fetchState {
                 case .loading, .idle, .error:
-                    PlaceholderView()
+                    PlaceholderTransparentView()
                 case .loaded:
                     ScrollViewReader { scrollView in
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -122,7 +122,17 @@ struct LocationRowSimpleView: View {
 struct PlaceholderView: View {
     var body: some View {
         RoundedRectangle(cornerRadius:6)
-            .fill(Color.white)
+            .fill(Color.gray.opacity(0.3))
+            .frame(height: 160)
+            .padding(.horizontal)
+            .redacted(reason: .placeholder)
+    }
+}
+
+struct PlaceholderTransparentView: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius:6)
+            .fill(Color(UIColor.systemGroupedBackground))
             .frame(height: 160)
             .padding(.horizontal)
             .redacted(reason: .placeholder)

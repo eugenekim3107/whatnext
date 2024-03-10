@@ -37,7 +37,7 @@ struct FavoritesRowView: View {
             } else {
                 switch viewModel.fetchState {
                 case .loading, .idle, .error:
-                    PlaceholderView()
+                    PlaceholderTransparentView()
                 case .loaded:
                     ScrollViewReader { scrollView in
                         ScrollView(.horizontal, showsIndicators: false) {

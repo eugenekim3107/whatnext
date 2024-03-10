@@ -17,10 +17,30 @@ enum Tab: String, CaseIterable {
 
 struct TabBarView: View {
     @Binding var selectedTab: Tab
+    @Environment(\.colorScheme) var colorScheme
     
     private var fillImage: String {
         selectedTab.rawValue + ".fill"
     }
+    
+    private var foregroundGradient: LinearGradient {
+        switch colorScheme {
+        case .dark:
+            return ShineColor.shinyWhite.linearGradient
+        default:
+            return ShineColor.platinum.linearGradient
+        }
+    }
+    
+    private var backgroundGradient: LinearGradient {
+        switch colorScheme {
+        case .dark:
+            return ShineColor.gold.linearGradient
+        default:
+            return ShineColor.gold.linearGradient
+        }
+    }
+
     var body: some View {
         VStack {
             HStack {
@@ -28,9 +48,9 @@ struct TabBarView: View {
                     Spacer()
                     Image(selectedTab == tab ? fillImage : tab.rawValue)
                         .symbolRenderingMode(.palette)
-                        .foregroundStyle(ShineColor.platinum.linearGradient, ShineColor.gold.linearGradient)
+                        .foregroundStyle(foregroundGradient, backgroundGradient)
                         .scaleEffect(selectedTab == tab ? 1.25 : 1.0)
-                        .font(.system(size:24))
+                        .font(.system(size: 24))
                         .onTapGesture {
                             withAnimation(.easeIn(duration: 0.1)) {
                                 selectedTab = tab
@@ -39,13 +59,15 @@ struct TabBarView: View {
                     Spacer()
                 }
             }
-            .frame(width: nil, height: 60)
+            .frame(height: 60)
             .background(.thinMaterial)
             .cornerRadius(10)
             .padding()
         }
     }
 }
+
+
 
 enum ShineColor {
     case gold
@@ -54,52 +76,67 @@ enum ShineColor {
     case emerald
     case shinyBlue
     case bronze
+    case shinyWhite
     var colors: [Color] {
         switch self {
-        case .gold: return [ Color(hex: 0xC19A6B),
-                             Color(hex: 0xD4AF37),
-                             Color(hex: 0xF7E9A0),
-                             Color(hex: 0xE6C200),
-                             Color(hex: 0xFFD700),
-                             Color(hex: 0xC19A6B),
+        case .gold: return [ 
+            Color(hex: 0xC19A6B),
+            Color(hex: 0xD4AF37),
+            Color(hex: 0xF7E9A0),
+            Color(hex: 0xE6C200),
+            Color(hex: 0xFFD700),
+            Color(hex: 0xC19A6B),
         ]
-        case .silver: return [ Color(hex: 0x70706F),
-                               Color(hex: 0x7D7D7A),
-                               Color(hex: 0xB3B6B5),
-                               Color(hex: 0x8E8D8D),
-                               Color(hex: 0xB3B6B5),
-                               Color(hex: 0xA1A2A3),
+        case .silver: return [ 
+            Color(hex: 0x70706F),
+            Color(hex: 0x7D7D7A),
+            Color(hex: 0xB3B6B5),
+            Color(hex: 0x8E8D8D),
+            Color(hex: 0xB3B6B5),
+            Color(hex: 0xA1A2A3),
         ]
-        case .platinum: return [ Color(hex: 0x000000),
-                                 Color(hex: 0x444444),
-                                 Color(hex: 0x000000),
-                                 Color(hex: 0x444444),
-                                 Color(hex: 0x111111),
-                                 Color(hex: 0x000000),
+        case .platinum: return [ 
+            Color(hex: 0x000000),
+            Color(hex: 0x444444),
+            Color(hex: 0x000000),
+            Color(hex: 0x444444),
+            Color(hex: 0x111111),
+            Color(hex: 0x000000),
         ]
         case .emerald: return [
-                                Color(hex: 0x046307),
-                                Color(hex: 0x04855A),
-                                Color(hex: 0x04B487),
-                                Color(hex: 0x03A675),
-                                Color(hex: 0x02875F),
-                                Color(hex: 0x046307),
+            Color(hex: 0x046307),
+            Color(hex: 0x04855A),
+            Color(hex: 0x04B487),
+            Color(hex: 0x03A675),
+            Color(hex: 0x02875F),
+            Color(hex: 0x046307),
         ]
         case .shinyBlue: return [
-                                Color(hex: 0x87CEFA),
-                                Color(hex: 0xB0E2FF),
-                                Color(hex: 0xE0FFFF),
-                                Color(hex: 0xB0E2FF),
-                                Color(hex: 0xADD8E6),
-                                Color(hex: 0x87CEFA),
+            Color(hex: 0x87CEFA),
+            Color(hex: 0xB0E2FF),
+            Color(hex: 0xE0FFFF),
+            Color(hex: 0xB0E2FF),
+            Color(hex: 0xADD8E6),
+            Color(hex: 0x87CEFA),
         ]
-        case .bronze: return [ Color(hex: 0x804A00),
-                               Color(hex: 0x9C7A3C),
-                               Color(hex: 0xB08D57),
-                               Color(hex: 0x895E1A),
-                               Color(hex: 0x804A00),
-                               Color(hex: 0xB08D57),
-        ]}
+        case .bronze: return [ 
+            Color(hex: 0x804A00),
+            Color(hex: 0x9C7A3C),
+            Color(hex: 0xB08D57),
+            Color(hex: 0x895E1A),
+            Color(hex: 0x804A00),
+            Color(hex: 0xB08D57),
+        ]
+        case .shinyWhite: return [
+            Color(hex: 0xFFFFFF),
+            Color(hex: 0xF0F0F0),
+            Color(hex: 0xE0E0E0),
+            Color(hex: 0xF0F0F0),
+            Color(hex: 0xFFFFFF),
+            Color(hex: 0xF0F0F0),
+            Color(hex: 0xFFFFFF)
+            ]
+        }
     }
     var linearGradient: LinearGradient
     {
