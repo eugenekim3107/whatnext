@@ -14,6 +14,8 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var locations: [Location] = []
     private let locationManager = CLLocationManager()
     private let locationService = LocationService()
+    private var initialLocationSet = false // Add a flag to check if initial location is set
+
     
     override init() {
         self.region = MKCoordinateRegion(
@@ -29,12 +31,13 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.first else { return }
+        guard let location = locations.first, !initialLocationSet else { return }
         DispatchQueue.main.async {
             self.region = MKCoordinateRegion(
                 center: location.coordinate,
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
+            self.initialLocationSet = true // Mark the initial location as set
         }
 //        loadDummyLocations()
         // Fetch locations using LocationRowViewModel
@@ -44,7 +47,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     func searchInNewArea(center: CLLocationCoordinate2D) {
         // Perform the search using the center of the map view
         print("Searching near the center location: \(center.latitude), \(center.longitude)")
-        loadDummyLocations()
+        //loadDummyLocations()
         loadLocationsForMapView(from: center)
     }
     
@@ -63,7 +66,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             limit: 10,
             radius: 30000.0,
             categories: ["all"],
-            curOpen: 1,
+            curOpen: 0,
             sortBy: "rating"
         ) { [weak self] result in
             DispatchQueue.main.async {
@@ -85,7 +88,7 @@ class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
             limit: 10,
             radius: 30000.0,
             categories: ["fitness"],
-            curOpen: 1,
+            curOpen: 0,
             sortBy: "rating"
         ) { [weak self] result in
             DispatchQueue.main.async {

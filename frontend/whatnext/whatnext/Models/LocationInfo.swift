@@ -19,20 +19,36 @@ struct Hours: Codable, Hashable {
     
     // Add a computed property to get a dictionary with formatted strings
     var formattedHours: [String: String] {
-        Dictionary(uniqueKeysWithValues: [
-            ("Monday", Monday),
-            ("Tuesday", Tuesday),
-            ("Wednesday", Wednesday),
-            ("Thursday", Thursday),
-            ("Friday", Friday),
-            ("Saturday", Saturday),
-            ("Sunday", Sunday)
-        ].compactMap { day, hours in
-            guard let hours = hours, hours.count == 2 else { return nil }
-            let openTime = String(hours[0].prefix(2) + ":" + hours[0].suffix(2)) + "AM"
-            let closeTime = String(hours[1].prefix(2) + ":" + hours[1].suffix(2)) + "PM"
-            return (day, "\(openTime) - \(closeTime)")
-        })
+        let daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        var formattedHoursDict: [String: String] = [:]
+
+        for day in daysOfWeek {
+            if let dayHours = self.hours(for: day) {
+                let openTime = dayHours.open.insert(separator: ":", every: 2)
+                let closeTime = dayHours.close.insert(separator: ":", every: 2)
+                formattedHoursDict[day] = "\(openTime) - \(closeTime)"
+            }
+        }
+
+        return formattedHoursDict
+    }
+
+    func hours(for day: String) -> (open: String, close: String)? {
+        switch day {
+            case "Monday": return formatHours(Monday)
+            case "Tuesday": return formatHours(Tuesday)
+            case "Wednesday": return formatHours(Wednesday)
+            case "Thursday": return formatHours(Thursday)
+            case "Friday": return formatHours(Friday)
+            case "Saturday": return formatHours(Saturday)
+            case "Sunday": return formatHours(Sunday)
+            default: return nil
+        }
+    }
+
+    private func formatHours(_ times: [String]?) -> (open: String, close: String)? {
+        guard let openTime = times?.first, let closeTime = times?.last else { return nil }
+        return (openTime, closeTime)
     }
 }
 

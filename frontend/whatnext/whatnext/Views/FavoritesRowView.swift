@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct FavoritesRowView: View {
     @ObservedObject var viewModel: LocationRowViewModel
     let title: String
     let userId: String
     @State private var showingLocationDetail: Location?
+    @StateObject private var locationManager = LocationManager()
     
     init(viewModel: LocationRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
@@ -50,11 +52,11 @@ struct FavoritesRowView: View {
                                 }
                             }
                         }
-                        .sheet(item: $showingLocationDetail) { location in
-                            LocationDetailView(location: location)
-                        }
-                        .padding([.leading, .trailing])
                     }
+                    .sheet(item: $showingLocationDetail) { location in
+                        LocationDetailView(location: location, userLocation: locationManager.currentUserLocation)
+                    }
+                    .padding([.leading, .trailing])
                 }
             }
         }

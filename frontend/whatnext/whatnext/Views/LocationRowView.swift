@@ -4,9 +4,8 @@
 //
 //  Created by Eugene Kim on 1/24/24.
 //
-
 import SwiftUI
-
+import CoreLocation
 struct LocationRowView: View {
     @ObservedObject var viewModel: LocationRowViewModel
     let title: String
@@ -19,6 +18,7 @@ struct LocationRowView: View {
     let sortBy: String
     let limit: Int
     @State private var showingLocationDetail: Location?
+    @StateObject private var locationManager = LocationManager()
     
     init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
         self.viewModel = viewModel
@@ -59,11 +59,11 @@ struct LocationRowView: View {
                                 }
                             }
                         }
-                        .sheet(item: $showingLocationDetail) { location in
-                            LocationDetailView(location: location)
-                        }
-                        .padding([.leading, .trailing])
                     }
+                    .sheet(item: $showingLocationDetail) { location in
+                        LocationDetailView(location: location, userLocation: locationManager.currentUserLocation)
+                    }
+                    .padding([.leading, .trailing])
                 }
             }
         }
@@ -73,7 +73,6 @@ struct LocationRowView: View {
 
 struct LocationRowSimpleView: View {
     var location: Location
-
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topLeading) {
@@ -138,7 +137,6 @@ struct PlaceholderTransparentView: View {
             .redacted(reason: .placeholder)
     }
 }
-
 struct LocationRowView_Previews: PreviewProvider {
     static var previews: some View {
         let viewModel = LocationRowViewModel()
@@ -155,3 +153,5 @@ struct LocationRowView_Previews: PreviewProvider {
         )
     }
 }
+
+

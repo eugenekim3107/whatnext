@@ -6,22 +6,52 @@
 //
 
 import SwiftUI
+import CoreLocation
+
 struct LocationDetailView: View {
     let location: Location
+    let userLocation: CLLocation?
 
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
                 ImageView(imageUrl: location.imageUrl)
                 BusinessInfo(name: location.name, stars: location.stars, reviewCount: location.reviewCount)
                 PriceAndCategoryView(price: location.price, categories: location.categories)
-                HoursView(hours: location.hours, isOpen: location.curOpen == 1)
+                HoursView(hours: location.hours)
                 ContactInfo(displayPhone: location.displayPhone, address: location.address, city: location.city, state: location.state, postalCode: location.postalCode)
+                
+                if let userLocation = userLocation, let locationLatitude = location.latitude, let locationLongitude = location.longitude {
+                    let locationCLLocation = CLLocation(latitude: locationLatitude, longitude: locationLongitude)
+                    let distanceInMeters = userLocation.distance(from: locationCLLocation)
+                    
+                    Text(String(format: "%.2f meters away", distanceInMeters))
+                        .padding()
+                }
             }
         }
-        .background(Color.white)
+        //.background(Color.white)
+        .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
         //.shadow(radius: 5)
+    }
+}
+
+struct LikeButton: View {
+    @Binding var isLiked: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: {
+            action()
+        }) {
+            Image(systemName: isLiked ? "heart.fill" : "heart")
+                .foregroundColor(isLiked ? .red : .gray)
+                .imageScale(.large)
+                .accessibility(label: Text(isLiked ? "Unlike" : "Like"))
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -65,14 +95,15 @@ struct BusinessInfo: View {
             Text(name)
                 .font(.largeTitle)
                 .bold()
-                .foregroundColor(.black)
+                .foregroundColor(Color.primary)
 
             HStack {
                 StarRatingView(stars: Int(stars ?? 0))
                 if let stars = stars, let reviewCount = reviewCount {
                     Text("\(String(format: "%.1f", stars)) (\(reviewCount) reviews)")
                         .font(.caption)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
+                        
                 }
             }
         }
@@ -83,7 +114,6 @@ struct BusinessInfo: View {
 // StarRatingView for displaying star ratings
 struct StarRatingView: View {
     let stars: Int
-
     var body: some View {
         HStack {
             ForEach(0..<5, id: \.self) { star in
@@ -103,18 +133,21 @@ struct PriceAndCategoryView: View {
         Divider()
             .background(Color.blue)
         HStack {
-            Text(price ?? "Not Applicable")
-                .bold()
-                .padding(5)
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(5)
+            if let price = price {
+                Text(price)
+                    .bold()
+                    .padding(5)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(5)
+            }
 
             ForEach(categories?.filter { $0.lowercased() != "all" } ?? [], id: \.self) { category in
                 Text(category)
                     .padding(6)
                     .background(Color.blue)
-                    .foregroundColor(.white)
+                    //.foregroundColor(.white)
                     .cornerRadius(10)
+                    .foregroundColor(.primary) // Adapts automatically to light/dark mode
             }
         }
         .padding(.vertical, 20)
@@ -125,7 +158,6 @@ struct PriceAndCategoryView: View {
 
 struct HoursView: View {
     let hours: Hours?
-    let isOpen: Bool
     @State private var isExpanded: Bool = false
 
     var body: some View {
@@ -139,17 +171,14 @@ struct HoursView: View {
             }) {
                 HStack {
                     Text("Hours")
-                        .foregroundColor(.black)
+                        .foregroundColor(Color.primary)
+                        .foregroundColor(isOpenNow(hours: hours) ? .green : .red)
                     Spacer()
-                    if isOpen {
-                        Text("Open Now")
-                            .bold()
-                            .foregroundColor(.green)
-                    } else {
-                        Text("Closed")
-                            .bold()
-                            .foregroundColor(.red)
-                    }
+                    Text(isOpenNow(hours: hours) ? "OPEN" : "CLOSED")
+                        .foregroundColor(Color.primary)
+                        .padding(5)
+                        .background(isOpenNow(hours: hours) ? Color.green : Color.red)
+                        .cornerRadius(10)
                     Image(systemName: "chevron.right")
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                         .animation(.easeOut, value: isExpanded)
@@ -175,6 +204,21 @@ struct HoursView: View {
             Divider()
                 .background(Color.blue)
         }
+        
+    }
+    private func isOpenNow(hours: Hours?) -> Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        let dayOfWeek = calendar.weekdaySymbols[calendar.component(.weekday, from: now) - 1]
+
+        guard let todayHours = hours?.hours(for: dayOfWeek) else { return false }
+        
+        let currentTime = 1400
+        //calendar.component(.hour, from: now) * 100 + calendar.component(.minute, from: now)
+        let openingTime = Int(todayHours.open.replacingOccurrences(of: ":", with: "")) ?? 0
+        let closingTime = Int(todayHours.close.replacingOccurrences(of: ":", with: "")) ?? 2400 // Use 2400 for end of day
+
+        return currentTime >= openingTime && currentTime <= closingTime
     }
 }
 
@@ -248,7 +292,7 @@ struct LocationDetailView_Previews: PreviewProvider {
             longitude: -117.254643428836,
             stars: 4.5,
             reviewCount: 2098,
-            curOpen: 1,
+            curOpen: 0,
             categories: ["New American", "Salad", "Sandwiches"],
             tag: ["coffee", "breakfast_brunch", "newamerican"],
             hours: Hours(
@@ -262,6 +306,6 @@ struct LocationDetailView_Previews: PreviewProvider {
             ),
             location: GeoJSON(type: "Point", coordinates: [-117.254643428836, 32.8539270057529]),
             price: "$$"
-        ))
+        ), userLocation: CLLocation(latitude: 32.88088, longitude: -117.2379))
     }
 }

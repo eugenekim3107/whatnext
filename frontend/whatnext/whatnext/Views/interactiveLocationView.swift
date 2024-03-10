@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct InteractiveLocationView: View {
     var locations: [Location]
@@ -17,6 +18,7 @@ struct InteractiveLocationView: View {
     @State private var topLocation: String? = nil
     @State private var bottomLocation: String? = nil
     @State private var showingLocationDetail: Location?
+    @StateObject private var locationManager = LocationManager()
     
     private enum LocationState {
         case left(offset: CGSize, zIndex: Double)
@@ -109,7 +111,7 @@ struct InteractiveLocationView: View {
             }
         }
         .sheet(item: $showingLocationDetail) { // Sheet presentation for the location detail view
-            LocationDetailView(location: $0)
+            LocationDetailView(location: $0, userLocation: locationManager.currentUserLocation)
         }
     }
     

@@ -14,6 +14,7 @@ struct MapView: View {
     @State private var selectedLocation: Location?
     @State private var userHasInteracted = false
     @GestureState private var magnification: CGFloat = 1.0
+    @StateObject private var locationManager = LocationManager()
 
     var body: some View {
         ZStack {
@@ -60,7 +61,7 @@ struct MapView: View {
             }
         }
         .sheet(item: $selectedLocation) { location in
-            LocationDetailView(location: location)
+            LocationDetailView(location: location, userLocation: locationManager.currentUserLocation)
         }
     }
 
