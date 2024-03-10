@@ -83,15 +83,10 @@ struct AnnotationView: View {
     let imageUrl: String
 
     var body: some View {
-        if let url = URL(string: imageUrl) {
-            AsyncImage(url: url) { image in
-                image.resizable()
-                     .scaledToFit()
-                     .frame(width: 60, height: 60) // Customize the size as needed
-                     .clipShape(Rectangle())
-            } placeholder: {
-                ProgressView()
-            }
+        if URL(string: imageUrl) != nil {
+            AsyncImageView(urlString: imageUrl)
+                .frame(width: 60, height: 60) // Customize the size as needed
+                .clipShape(Rectangle())
         } else {
             // Provide a fallback view in case the URL is invalid
             Image(systemName: "logo-1")

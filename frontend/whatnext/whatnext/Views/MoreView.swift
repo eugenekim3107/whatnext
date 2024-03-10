@@ -9,10 +9,10 @@ struct MoreView: View {
     
 
     var settings: [SettingsSection] = [
+        .init(name: "Preferences", imageName: "person.crop.circle", color: .black),
         .init(name: "Notifications", imageName: "bell.circle", color: .black),
         .init(name: "Location", imageName: "location.circle", color: .black),
         .init(name: "Privacy", imageName: "hand.raised.circle", color: .black),
-        .init(name: "Preferences", imageName: "person.crop.circle", color: .black),
         .init(name: "Logout", imageName: "arrow.right.circle", color: .black)
     ]
     

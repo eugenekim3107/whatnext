@@ -242,18 +242,22 @@ struct LocationSearchSimpleView: View { // add detail page here
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topLeading) {
-                if let url = URL(string: location.imageUrl ?? "") {
-                    ZStack{
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    }
-                    .frame(width: 110, height: 110)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                if URL(string: location.imageUrl ?? "") != nil {
+                    AsyncImageView(urlString: location.imageUrl ?? "")
+                        .frame(width: 110, height: 110)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+//                if let url = URL(string: location.imageUrl ?? "") {
+//                    ZStack{
+//                        AsyncImage(url: url) { image in
+//                            image
+//                                .resizable()
+//                                .scaledToFill()
+//                        } placeholder: {
+//                            ProgressView()
+//                        }
+//                    }
+//                    .frame(width: 110, height: 110)
+//                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 } else {
                     Color.gray.opacity(0.3)
                 }
@@ -304,7 +308,7 @@ struct InteractiveLocationView_Previews: PreviewProvider {
             Location(
                 businessId: "001",
                 name: "Coffee Central Park",
-                imageUrl: nil,
+                imageUrl: "https://s3-media1.fl.yelpcdn.com/bphoto/vxSx2j9gnJ-dWu9OFYyhRQ/o.jpg",
                 phone: nil,
                 displayPhone: nil,
                 address: nil,

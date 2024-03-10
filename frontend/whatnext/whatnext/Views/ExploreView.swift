@@ -26,7 +26,7 @@ struct ExploreView: View {
                         categories: ["food"],
                         radius: 5000,
                         curOpen: 0,
-                        sortBy: "review_count",
+                        sortBy: "random",
                         limit: 15
                     )
                     LocationRowView(
@@ -34,10 +34,11 @@ struct ExploreView: View {
                         title: "Coffee Spots",
                         latitude: 32.88088,
                         longitude: -117.23790,
-                        categories: ["coffee"],
+                        categories: ["food"],
                         radius: 5000,
                         curOpen: 0,
-                        sortBy: "best_match",
+                        tag: ["coffee"],
+                        sortBy: "random",
                         limit: 15
                     )
                     LocationRowView(
@@ -49,7 +50,7 @@ struct ExploreView: View {
                         radius: 5000,
                         curOpen: 0,
                         tag: ["deptstores"],
-                        sortBy: "rating",
+                        sortBy: "random",
                         limit: 15
                     )
                     LocationRowView(
@@ -60,7 +61,7 @@ struct ExploreView: View {
                         categories: ["fitness"],
                         radius: 5000,
                         curOpen: 0,
-                        sortBy: "best_match",
+                        sortBy: "random",
                         limit: 15
                     )
                 }
@@ -70,8 +71,8 @@ struct ExploreView: View {
             }
             .refreshable {
                 viewModel1.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["food"], curOpen: 0, sortBy: "random")
-                viewModel2.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["coffee"], curOpen: 0, sortBy: "random")
-                viewModel3.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["shopping"], curOpen: 0, tag: ["random"], sortBy: "rating")
+                viewModel2.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["food"], curOpen: 0, tag: ["coffee"], sortBy: "random")
+                viewModel3.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["shopping"], curOpen: 0, tag: ["deptstores"], sortBy: "random")
                 viewModel4.refreshDataLocations(latitude: 32.88088, longitude: -117.23790, limit: 15, radius: 5000, categories: ["fitness"], curOpen: 0, sortBy: "random")
             }
             .background(Color(UIColor.systemGroupedBackground))

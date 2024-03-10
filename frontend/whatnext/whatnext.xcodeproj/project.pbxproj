@@ -33,6 +33,9 @@
 		8A87046E2B5E050F00183191 /* MoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A87046D2B5E050F00183191 /* MoreViewModel.swift */; };
 		8A8704702B5E051800183191 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A87046F2B5E051800183191 /* ProfileViewModel.swift */; };
 		8A8704722B5E051F00183191 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8704712B5E051F00183191 /* SearchViewModel.swift */; };
+		8AACBC292B9D230000C10358 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AACBC282B9D230000C10358 /* ImageLoader.swift */; };
+		8AACBC2B2B9D23DE00C10358 /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AACBC2A2B9D23DE00C10358 /* AsyncImageView.swift */; };
+		8AAD72B12B9D371E00321231 /* UserInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAD72B02B9D371E00321231 /* UserInfoView.swift */; };
 		8ACD17B92B61F18A0029487A /* LocationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17B82B61F18A0029487A /* LocationInfo.swift */; };
 		8ACD17BC2B61F2030029487A /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BB2B61F2030029487A /* LocationService.swift */; };
 		8ACD17BE2B61F4C50029487A /* LocationRowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */; };
@@ -109,6 +112,9 @@
 		8A87046D2B5E050F00183191 /* MoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreViewModel.swift; sourceTree = "<group>"; };
 		8A87046F2B5E051800183191 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8A8704712B5E051F00183191 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		8AACBC282B9D230000C10358 /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		8AACBC2A2B9D23DE00C10358 /* AsyncImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
+		8AAD72B02B9D371E00321231 /* UserInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfoView.swift; sourceTree = "<group>"; };
 		8ACD17B82B61F18A0029487A /* LocationInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfo.swift; sourceTree = "<group>"; };
 		8ACD17BB2B61F2030029487A /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		8ACD17BD2B61F4C50029487A /* LocationRowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRowViewModel.swift; sourceTree = "<group>"; };
@@ -247,6 +253,8 @@
 				B908DC7B2B8B496F00AC9C59 /* UploadProfileImageView.swift */,
 				B908DC7D2B8B57DA00AC9C59 /* TagView.swift */,
 				B908DC812B8B763100AC9C59 /* SplitProgressBarView.swift */,
+				8AACBC2A2B9D23DE00C10358 /* AsyncImageView.swift */,
+				8AAD72B02B9D371E00321231 /* UserInfoView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -274,6 +282,7 @@
 				8ACD17B82B61F18A0029487A /* LocationInfo.swift */,
 				78F048132B5FEC710072AAFA /* LocationManager.swift */,
 				8ADEA55C2B85D6280031BA33 /* ProfileInfo.swift */,
+				8AACBC282B9D230000C10358 /* ImageLoader.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -457,6 +466,7 @@
 				8A86A43B2B785E13002CE48E /* ChatService.swift in Sources */,
 				8A8704642B5E043C00183191 /* ProfileView.swift in Sources */,
 				8A8704662B5E044500183191 /* SearchView.swift in Sources */,
+				8AAD72B12B9D371E00321231 /* UserInfoView.swift in Sources */,
 				8ADEA55F2B85FD340031BA33 /* FavoritesRowView.swift in Sources */,
 				8ADEA55B2B8425FC0031BA33 /* ProfileRowViewModel.swift in Sources */,
 				8A8704622B5E043300183191 /* MoreView.swift in Sources */,
@@ -482,12 +492,14 @@
 				8A87045E2B5E042200183191 /* LoadingView.swift in Sources */,
 				8A3938142B61E80900B29646 /* LocationRowView.swift in Sources */,
 				B908DC7E2B8B57DA00AC9C59 /* TagView.swift in Sources */,
+				8AACBC292B9D230000C10358 /* ImageLoader.swift in Sources */,
 				8A87042A2B5E022800183191 /* whatnextApp.swift in Sources */,
 				8ACD17B92B61F18A0029487A /* LocationInfo.swift in Sources */,
 				B9F03B522B87D6FE009A16B1 /* LoginView.swift in Sources */,
 				B9F03B542B87D728009A16B1 /* CustomTextFieldView.swift in Sources */,
 				8A87046C2B5E050700183191 /* MapViewModel.swift in Sources */,
 				8ADEA5572B83FE270031BA33 /* ProfileRowView.swift in Sources */,
+				8AACBC2B2B9D23DE00C10358 /* AsyncImageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -665,9 +677,10 @@
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -676,7 +689,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatnext.whatnext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -709,9 +723,10 @@
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -720,7 +735,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.whatnext.whatnext;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

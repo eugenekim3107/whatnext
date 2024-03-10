@@ -19,7 +19,6 @@ struct LocationRowView: View {
     let sortBy: String
     let limit: Int
     @State private var showingLocationDetail: Location?
-    @State private var hasFetchedLocations = false
     
     init(viewModel: LocationRowViewModel, title: String, latitude: Double, longitude: Double, categories: [String], radius: Double, curOpen: Int, tag: [String]? = nil, sortBy: String, limit: Int) {
         self.viewModel = viewModel
@@ -32,6 +31,8 @@ struct LocationRowView: View {
         self.tag = tag
         self.sortBy = sortBy
         self.limit = limit
+
+        viewModel.configureAndFetchLocations(latitude: latitude, longitude: longitude, limit: limit, radius: radius, categories: categories, curOpen: curOpen, tag: tag, sortBy: sortBy)
     }
  
     var body: some View {
@@ -40,41 +41,35 @@ struct LocationRowView: View {
                 .font(.system(size: 25, weight: .bold))
                 .foregroundColor(.black)
                 .padding(.leading)
-            
-            if viewModel.isLoading || (hasFetchedLocations && viewModel.locations.isEmpty) {
+            if viewModel.locations.isEmpty {
                 PlaceholderView()
             } else {
-                ScrollViewReader { scrollView in
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.locations, id: \.businessId) { location in
-                                LocationRowSimpleView(location: location)
-                                .onTapGesture {
-                                    self.showingLocationDetail = location
+                switch viewModel.fetchState {
+                case .loading, .idle, .error:
+                    PlaceholderView()
+                case .loaded:
+                    ScrollViewReader { scrollView in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 5) {
+                                ForEach(viewModel.locations, id: \.businessId) { location in
+                                    LocationRowSimpleView(location: location)
+                                        .onTapGesture {
+                                            self.showingLocationDetail = location
+                                        }
                                 }
                             }
                         }
+                        .sheet(item: $showingLocationDetail) { location in
+                            LocationDetailView(location: location)
+                        }
+                        .padding([.leading, .trailing])
                     }
-                    .sheet(item: $showingLocationDetail) { location in
-                        LocationDetailView(location: location)
-                    }
-                    .padding([.leading, .trailing])
                 }
             }
         }
-        .onAppear {
-            viewModel.fetchNearbyLocations(latitude: latitude,
-                                       longitude: longitude,
-                                       limit: self.limit,
-                                       radius: self.radius,
-                                       categories: categories,
-                                       curOpen: curOpen,
-                                       tag: tag ?? [],
-                                       sortBy: self.sortBy)
-            self.hasFetchedLocations = true
-        }
     }
 }
+
 
 struct LocationRowSimpleView: View {
     var location: Location
@@ -82,18 +77,10 @@ struct LocationRowSimpleView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topLeading) {
-                if let url = URL(string: location.imageUrl ?? "") {
-                    ZStack{
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    }
-                    .frame(width: 110, height: 110)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                if let imageUrl = location.imageUrl {
+                    AsyncImageView(urlString: imageUrl)
+                        .frame(width: 110, height: 110)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
                 } else {
                     Color.gray.opacity(0.3)
                 }
@@ -150,11 +137,11 @@ struct LocationRowView_Previews: PreviewProvider {
             title: "Let's Workout!",
             latitude: 32.88088,
             longitude: -117.23790,
-            categories: ["fitness"],
+            categories: ["food"],
             radius: 10000,
-            curOpen: 1,
-            sortBy: "review_count",
-            limit: 15
+            curOpen: 0,
+            sortBy: "random",
+            limit: 30
         )
     }
 }

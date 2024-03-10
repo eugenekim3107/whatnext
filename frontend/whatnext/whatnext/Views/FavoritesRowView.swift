@@ -12,12 +12,13 @@ struct FavoritesRowView: View {
     let title: String
     let userId: String
     @State private var showingLocationDetail: Location?
-    @State private var hasFetchedLocations = false
     
     init(viewModel: LocationRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
         self.title = title
         self.userId = userId
+        
+        viewModel.configureAndFetchFavorites(userId: userId)
     }
     
     var body: some View {
@@ -31,30 +32,31 @@ struct FavoritesRowView: View {
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(.black)
             }.padding(.leading)
-            if viewModel.isLoading || (hasFetchedLocations && viewModel.favoritesInfo.isEmpty) {
+            if viewModel.favoritesInfo.isEmpty {
                 PlaceholderView()
             } else {
-                ScrollViewReader { scrollView in
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.favoritesInfo, id: \.businessId) { location in
-                                LocationRowSimpleView(location: location)
-                                    .onTapGesture {
-                                        self.showingLocationDetail = location
-                                    }
+                switch viewModel.fetchState {
+                case .loading, .idle, .error:
+                    PlaceholderView()
+                case .loaded:
+                    ScrollViewReader { scrollView in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 5) {
+                                ForEach(viewModel.favoritesInfo, id: \.businessId) { location in
+                                    LocationRowSimpleView(location: location)
+                                        .onTapGesture {
+                                            self.showingLocationDetail = location
+                                        }
+                                }
                             }
                         }
+                        .sheet(item: $showingLocationDetail) { location in
+                            LocationDetailView(location: location)
+                        }
+                        .padding([.leading, .trailing])
                     }
-                    .sheet(item: $showingLocationDetail) { location in
-                        LocationDetailView(location: location)
-                    }
-                    .padding([.leading, .trailing])
                 }
             }
-        }
-        .onAppear {
-            viewModel.fetchFavoritesInfo(userId: userId)
-            self.hasFetchedLocations = true
         }
     }
 }

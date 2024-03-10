@@ -11,12 +11,13 @@ struct ProfileRowView: View {
     @ObservedObject var viewModel: ProfileRowViewModel
     let title: String
     let userId: String
-    @State private var hasFetchedProfiles = false
     
     init(viewModel: ProfileRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
         self.title = title
         self.userId = userId
+        
+        viewModel.configureAndFetchInfo(userId: userId)
     }
  
     var body: some View {
@@ -30,24 +31,25 @@ struct ProfileRowView: View {
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(.black)
             }.padding(.leading)
-            if viewModel.isLoading || (hasFetchedProfiles && viewModel.friendsInfo.isEmpty) {
+            if viewModel.friendsInfo.isEmpty {
                 PlaceholderView()
             } else {
-                ScrollViewReader { scrollView in
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.friendsInfo, id: \.userId) { profile in
-                                ProfileRowSimpleView(profile: profile)
+                switch viewModel.fetchState {
+                case .loading, .idle, .error:
+                    PlaceholderView()
+                case .loaded:
+                    ScrollViewReader { scrollView in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 5) {
+                                ForEach(viewModel.friendsInfo, id: \.userId) { profile in
+                                    ProfileRowSimpleView(profile: profile)
+                                }
                             }
                         }
+                        .padding([.leading, .trailing])
                     }
-                    .padding([.leading, .trailing])
                 }
             }
-        }
-        .onAppear {
-            viewModel.fetchFriendsInfo(userId: userId)
-            self.hasFetchedProfiles = true
         }
     }
 }
@@ -58,18 +60,10 @@ struct ProfileRowSimpleView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .topLeading) {
-                if let url = URL(string: profile.imageUrl ?? "") {
-                    ZStack{
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                    }
-                    .frame(width: 110, height: 110)
-                    .clipShape(Circle())
+                if let imageUrl = profile.imageUrl {
+                    AsyncImageView(urlString: imageUrl)
+                        .frame(width: 110, height: 110)
+                        .clipShape(Circle())
                 } else {
                     Color.gray.opacity(0.3)
                 }

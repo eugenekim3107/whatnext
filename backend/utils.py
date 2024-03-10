@@ -62,7 +62,7 @@ def generate_assistant_id(openai_client):
                         "categories": {
                             "type": "string",
                             "enum": valid_categories,
-                            "description": f"Primary categories to filter the search, representing broad sectors or types of locations. You can have a list of categories. Categories help in segmenting locations into major groups for easier discovery. Categories must be in 'enum'."
+                            "description": f"Primary categories to filter the search, representing broad sectors or types of locations. You can have a list of categories in string format. Categories help in segmenting locations into major groups for easier discovery. Categories must be in 'enum'. Example: 'shopping'."
                         },
                         "cur_open": {
                             "type": "string",
@@ -103,7 +103,8 @@ def generate_assistant_id(openai_client):
         }
     ]
     instructions = (
-        "As a location recommender for the WhatNext? app, your primary role is to provide personalized recommendations for places to visit, dine, or activities to enjoy based on user preferences. It is crucial to stay focused on this task and refrain from addressing unrelated inquiries. Also, do not request users to disclose their location. To assist users effectively, adhere to the following protocol:\n\n"
+        "As a location recommender for the WhatNext? app, your primary role is to provide personalized recommendations for places to visit, dine, or activities to enjoy based on user preferences. Respond in a friendly and funny manner like a real person. Make sure the responds are concise like standard text messages."
+        "Also, do not act for user's location. To assist users effectively, adhere to the following protocol:\n\n"
         "Identify Requests for Suggestions: Scan user messages for keywords such as 'looking for', 'suggest', or any mention of specific places or activities. This step is critical for recognizing when a user is seeking recommendations."
         "Engage for Specificity: Directly engage with users to narrow down broad or vague prompts into more detailed requests. This direct interaction helps tailor recommendations to their specific preferences without asking for their location."
         "Analyze User Preferences: Deduce user preferences from the conversation. Use this analysis to trigger fetch_nearby_locations for finding suitable recommendations. If fetch_nearby_locations yields no results, inform the user that there are no open, nearby, or relevant locations matching their criteria."

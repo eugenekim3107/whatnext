@@ -12,12 +12,13 @@ struct VisitedRowView: View {
     let title: String
     let userId: String
     @State private var showingLocationDetail: Location?
-    @State private var hasFetchedLocations = false
     
     init(viewModel: LocationRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
         self.title = title
         self.userId = userId
+        
+        viewModel.configureAndFetchVisited(userId: userId)
     }
     
     var body: some View {
@@ -31,30 +32,31 @@ struct VisitedRowView: View {
                     .font(.system(size: 25, weight: .bold))
                     .foregroundColor(.black)
             }.padding(.leading)
-            if viewModel.isLoading || (hasFetchedLocations && viewModel.visitedInfo.isEmpty) {
+            if viewModel.visitedInfo.isEmpty {
                 PlaceholderView()
             } else {
-                ScrollViewReader { scrollView in
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 5) {
-                            ForEach(viewModel.visitedInfo, id: \.businessId) { location in
-                                LocationRowSimpleView(location: location)
-                                    .onTapGesture {
-                                        self.showingLocationDetail = location
-                                    }
+                switch viewModel.fetchState {
+                case .loading, .idle, .error:
+                    PlaceholderView()
+                case .loaded:
+                    ScrollViewReader { scrollView in
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 5) {
+                                ForEach(viewModel.visitedInfo, id: \.businessId) { location in
+                                    LocationRowSimpleView(location: location)
+                                        .onTapGesture {
+                                            self.showingLocationDetail = location
+                                        }
+                                }
                             }
                         }
+                        .sheet(item: $showingLocationDetail) { location in
+                            LocationDetailView(location: location)
+                        }
+                        .padding([.leading, .trailing])
                     }
-                    .sheet(item: $showingLocationDetail) { location in
-                        LocationDetailView(location: location)
-                    }
-                    .padding([.leading, .trailing])
                 }
             }
-        }
-        .onAppear {
-            viewModel.fetchVisitedInfo(userId: userId)
-            self.hasFetchedLocations = true
         }
     }
 }

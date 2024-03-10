@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SearchView: View {
+    private let lineHeight: CGFloat = 16
     @State private var chatText = ""
     @State private var accumulatedText = ""
     @State private var messages: [ChatContent] = []
@@ -8,34 +9,42 @@ struct SearchView: View {
     @State private var waitingForResponse: Bool = false
     @State private var showPopup: Bool = false
     @State private var sessionId: String? = nil
+    @State private var textEditorHeight: CGFloat = 36
+    @FocusState private var isTextEditorFocused: Bool
 
     var body: some View {
         NavigationView{
-            messagesView
-                .navigationTitle("Search")
-                .navigationBarItems(trailing: refreshButton)
-                .overlay(
-                    Group {
-                        if showPopup {
-                            Text("Please wait for response")
-                                .padding()
-                                .background(Color.gray.opacity(0.8))
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                                .transition(.opacity)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            VStack(spacing:0){
+                messagesView
+                    .navigationTitle("Search")
+                    .navigationBarItems(trailing: refreshButton)
+                    .overlay(
+                        Group {
+                            if showPopup {
+                                Text("Please wait for response")
+                                    .padding()
+                                    .background(Color.gray.opacity(0.8))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(10)
+                                    .transition(.opacity)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                            }
                         }
+                    )
+                    .onChange(of: timer) { newValue in
+                        checkConditionsAndSendMessage()
                     }
-                )
-                .onChange(of: timer) { newValue in
-                    checkConditionsAndSendMessage()
-                }
-                .onChange(of: accumulatedText) { newValue in
-                    checkConditionsAndSendMessage()
-                }
-                .onChange(of: chatText) { newValue in
-                    checkConditionsAndSendMessage()
-                }
+                    .onChange(of: accumulatedText) { newValue in
+                        checkConditionsAndSendMessage()
+                    }
+                    .onChange(of: chatText) { newValue in
+                        checkConditionsAndSendMessage()
+                    }
+                    .background(Color(UIColor.systemGroupedBackground))
+                chatBottomBar
+                    .background(Color(UIColor.systemGroupedBackground))
+            }
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea(.keyboard))
         }
     }
     
@@ -94,13 +103,7 @@ struct SearchView: View {
                     }
                 }
             }
-            .background(Color(.init(white: 0.95, alpha: 1)))
-            .safeAreaInset(edge: .bottom) {
-                chatBottomBar
-                    .background(Color(
-                        .systemBackground)
-                        .ignoresSafeArea())
-            }
+            .background(Color(UIColor.systemGroupedBackground))
         }
     }
     
@@ -158,63 +161,82 @@ struct SearchView: View {
     }
     
     private var chatBottomBar: some View {
-        HStack(spacing: 16) {
-            ZStack (alignment: .bottom) {
-                
-                HStack() {
-                    ZStack () {
-                        TextField("Type your message here...", text:$chatText)
-                            .padding(.leading, 5)
-                            .padding(.bottom, 3)
-                        TextEditor(text: $chatText)
-                            .opacity(chatText.isEmpty ? 0.5:1)
-                    }
-                    .frame(height:40)
-                    if !chatText.isEmpty {
-                        Button(action: {
-                            if !waitingForResponse {
-                                let newMessage = Message(
-                                    session_id: sessionId,
-                                    user_id: "1234",
-                                    content: chatText,
-                                    chat_type: "regular",
-                                    is_user_message: "true"
-                                    )
-                                messages.append(.message(newMessage))
-                                appendText()
-                            } else {
-                                withAnimation {
-                                    showPopup = true
-                                }
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                    withAnimation {
-                                        showPopup = false
-                                    }
-                                }
-                            }
-                        }) {
-                            Image(systemName: "arrow.up.circle.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 32, height: 32)
-                                .foregroundColor(.blue)
-                        }
-                        .transition(.scale)
-                    }
-                }
-                .padding(.horizontal, 5)
-                
+        ZStack() {
+            GeometryReader { geometry in
+                Text("Type your message here...")
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                TextEditor(text: $chatText)
+                    .padding(.horizontal, 5)
+                    .colorMultiply(Color(UIColor.systemGroupedBackground))
+                    .frame(width: geometry.size.width-36, height:geometry.size.height)
+                    .opacity(chatText.isEmpty ? 0.5:1)
+                    .focused($isTextEditorFocused)
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.gray)
-                    .frame(height: 40)
+                    .frame(width: geometry.size.width, height:geometry.size.height)
+                if !chatText.isEmpty {
+                    Button(action: {
+                        if !waitingForResponse {
+                            let newMessage = Message(
+                                session_id: sessionId,
+                                user_id: "1234",
+                                content: chatText,
+                                chat_type: "regular",
+                                is_user_message: "true"
+                            )
+                            messages.append(.message(newMessage))
+                            appendText()
+                        } else {
+                            withAnimation {
+                                showPopup = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                withAnimation {
+                                    showPopup = false
+                                }
+                            }
+                        }
+                    }) {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 30, height: 30)
+                            .foregroundColor(.blue)
+                    }
+                    .position(x: geometry.size.width-18, y: geometry.size.height-18)
+                    .transition(.scale)
+                }
             }
-            .frame(width: 370, height: 40)
         }
-        .padding(.horizontal)
+        .frame(height: textEditorHeight)
+        .padding(.horizontal, 8)
         .padding(.vertical, 8)
-        .padding(.bottom, 50)
+        .padding(.bottom, isTextEditorFocused ? 6 : 50)
+        .animation(.linear, value: isTextEditorFocused)
+        .background(GeometryReader { geometry in
+            Text(chatText)
+                .lineLimit(nil)
+                .padding(.horizontal, 19)
+                .padding(.vertical, (23/3))
+                .opacity(0)
+                .frame(width: geometry.size.width - 36, height: .infinity, alignment: .leading)
+                .background(GeometryReader { textGeometry in
+                    Color.clear.preference(key: ViewHeightKey.self, value: textGeometry.size.height)
+                })
+        })
+        .onPreferenceChange(ViewHeightKey.self) { newHeight in
+            self.textEditorHeight = max(newHeight,36)
+        }
     }
     
+    struct ViewHeightKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = max(value, nextValue())
+        }
+    }
+
     private func appendText() {
         accumulatedText.append(chatText + " ")
         chatText = ""
