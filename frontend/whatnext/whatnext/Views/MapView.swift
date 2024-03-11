@@ -13,6 +13,7 @@ struct MapView: View {
     @State private var trackingMode: MapUserTrackingMode = .follow
     @State private var selectedLocation: Location?
     @State private var userHasInteracted = false
+    @State private var showRecenterButton = false
     @GestureState private var magnification: CGFloat = 1.0
     @StateObject private var locationManager = LocationManager()
 
@@ -37,27 +38,58 @@ struct MapView: View {
                     }
                 }
                 .gesture(
-                    DragGesture().onChanged({ _ in userHasInteracted = true })
+                    DragGesture().onChanged({ _ in 
+                        userHasInteracted = true
+                        showRecenterButton = true
+                    })
                 )
                 .ignoresSafeArea(edges: .all)
             
             // Only show the button if the user has interacted with the map
-            if userHasInteracted {
+            if userHasInteracted && showRecenterButton {
                 VStack {
                     Button("Search This Area") {
                         viewModel.searchInNewArea(center: viewModel.region.center)
                     }
                     .foregroundColor(.white)
                     .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
-                    .padding(.top, 20) // Add some padding from the top edge
-                    .transition(.opacity) // Smoothly fade in the button
+                    .background(Color.blue.opacity(0.8))
+                    .cornerRadius(30)
+                    .padding(.top, 50)
+                    .transition(.opacity)
                     .animation(.easeInOut, value: userHasInteracted)
-
-                    Spacer() // Push the button to the top
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .edgesIgnoringSafeArea(.top)
+                
+                
+                VStack {
+                    Spacer() // Pushes the button to the bottom
+                    HStack {
+                        Spacer() // Pushes the button to the right
+                        Button(action: {
+                            // Action to recenter the map to the user's current location
+                            if let userLocation = locationManager.currentUserLocation {
+                                withAnimation {
+                                    viewModel.region = MKCoordinateRegion(center: userLocation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                                    showRecenterButton = false // Hide recenter button after action
+                                }
+                            }
+                        }) {
+                            Image(systemName: "location.fill")
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.blue.opacity(0.8))
+                                .cornerRadius(30)
+                                .shadow(radius: 3)
+                        }
+                        .padding(.bottom, 100)
+                        .padding(.trailing, 20)
+                        .transition(.scale.combined(with: .opacity))
+                        .animation(.easeInOut, value: userHasInteracted)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
             }
         }
         .sheet(item: $selectedLocation) { location in
