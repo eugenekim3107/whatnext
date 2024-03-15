@@ -237,7 +237,7 @@ struct InteractiveLocationView: View {
 
 }
 
-struct LocationSearchSimpleView: View { // add detail page here
+struct LocationSearchSimpleView: View {
     var location: Location
     @State private var showingLocationDetail: Location?
 
@@ -246,20 +246,8 @@ struct LocationSearchSimpleView: View { // add detail page here
             ZStack(alignment: .topLeading) {
                 if URL(string: location.imageUrl ?? "") != nil {
                     AsyncImageView(urlString: location.imageUrl ?? "")
-                        .frame(width: 110, height: 110)
+                        .frame(width: 200, height: 200)
                         .clipShape(RoundedRectangle(cornerRadius: 6))
-//                if let url = URL(string: location.imageUrl ?? "") {
-//                    ZStack{
-//                        AsyncImage(url: url) { image in
-//                            image
-//                                .resizable()
-//                                .scaledToFill()
-//                        } placeholder: {
-//                            ProgressView()
-//                        }
-//                    }
-//                    .frame(width: 110, height: 110)
-//                    .clipShape(RoundedRectangle(cornerRadius: 6))
                 } else {
                     Color.gray.opacity(0.3)
                 }
@@ -267,7 +255,7 @@ struct LocationSearchSimpleView: View { // add detail page here
                 HStack(spacing: 2) {
                     Image(systemName: "star.fill")
                         .resizable()
-                        .frame(width: 10, height: 10)
+                        .frame(width: 15, height: 15)
                         .foregroundColor(.yellow)
                     Group {
                         if let stars = location.stars {
@@ -276,7 +264,7 @@ struct LocationSearchSimpleView: View { // add detail page here
                             Text("N/A")
                         }
                     }
-                    .font(.system(size: 10))
+                    .font(.system(size: 15))
                     .foregroundColor(.white)
                 }
                 .padding(3)
@@ -284,22 +272,20 @@ struct LocationSearchSimpleView: View { // add detail page here
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .padding([.top, .leading], 5)
             }
-            .frame(width: 110, height: 110)
+            .frame(width: 200, height: 200)
             .clipShape(RoundedRectangle(cornerRadius: 6))
             Text(location.name)
-                .font(.system(size: 14))
+                .font(.system(size: 20))
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .truncationMode(.tail)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(height: 50)
-                .frame(width: 110)
+                .frame(width: 180)
+                .padding([.top, .bottom])
         }
-        .padding([.top, .leading, .trailing])
         .background(Color.white)
         .shadow(color:Color.black.opacity(0.6), radius:3, x:0, y:0)
-        .padding([.top], 2)
-        .padding([.bottom], 2)
     }
 }
 
@@ -309,7 +295,7 @@ struct InteractiveLocationView_Previews: PreviewProvider {
         let exampleLocations = [
             Location(
                 businessId: "001",
-                name: "Coffee Central Park",
+                name: "Coffee Central Park Avenue",
                 imageUrl: "https://s3-media1.fl.yelpcdn.com/bphoto/vxSx2j9gnJ-dWu9OFYyhRQ/o.jpg",
                 phone: nil,
                 displayPhone: nil,

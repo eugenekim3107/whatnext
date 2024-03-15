@@ -31,10 +31,8 @@ struct LocationDetailView: View {
                 }
             }
         }
-        //.background(Color.white)
         .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
-        //.shadow(radius: 5)
     }
 }
 
@@ -213,8 +211,7 @@ struct HoursView: View {
 
         guard let todayHours = hours?.hours(for: dayOfWeek) else { return false }
         
-        let currentTime = 1400
-        //calendar.component(.hour, from: now) * 100 + calendar.component(.minute, from: now)
+        let currentTime = calendar.component(.hour, from: now) * 100 + calendar.component(.minute, from: now)
         let openingTime = Int(todayHours.open.replacingOccurrences(of: ":", with: "")) ?? 0
         let closingTime = Int(todayHours.close.replacingOccurrences(of: ":", with: "")) ?? 2400 // Use 2400 for end of day
 

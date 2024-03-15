@@ -292,9 +292,13 @@ async def chatgpt_response(request: ChatRequest,
     start = time.time()
     user_id = request.user_id
     session_id = request.session_id
-    message = request.message
+    message = "User message: " + request.message
     latitude = request.latitude
     longitude = request.longitude
+    tags = await fetch_tags(user_id)
+    if session_id is None:
+        user_bio = f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"
+        message = user_bio + message
     session_id, thread_id = retrieve_chat_info(session_id, redis_client, openai_client, assistant_id)
     print({"s": session_id, "t": thread_id, "a": assistant_id})
 
@@ -465,9 +469,6 @@ async def chatgpt_response(request: ChatRequest,
         return {"user_id": user_id, "session_id": session_id, "content": message_content, "chat_type": chat_type, "is_user_message": "false"}
     
     else:
-        # Extract user_tags
-        tags = await fetch_tags(user_id)
-
         # Additional steps when locations are recommended
         sort_message = (
             f"User bio: In terms of food and drinks, this user likes {tags['food_and_drinks_tag']}. In terms of activities, this user likes {tags['activities_tag']}.\n\n"

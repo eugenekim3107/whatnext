@@ -12,6 +12,7 @@ struct SearchView: View {
     @State private var sessionId: String? = nil
     @State private var textEditorHeight: CGFloat = 36
     @FocusState private var isTextEditorFocused: Bool
+    @AppStorage("userID") private var userID: String = ""
 
     var body: some View {
         NavigationView{
@@ -182,7 +183,7 @@ struct SearchView: View {
                         if !waitingForResponse {
                             let newMessage = Message(
                                 session_id: sessionId,
-                                user_id: "1234",
+                                user_id: userID,
                                 content: chatText,
                                 chat_type: "regular",
                                 is_user_message: "true"
@@ -248,17 +249,17 @@ struct SearchView: View {
     private func sendMessage() {
         let newMessage = Message(
             session_id: sessionId,
-            user_id: "1234",
+            user_id: userID,
             content: accumulatedText,
             chat_type: "regular",
             is_user_message: "true")
         timer = true
         waitingForResponse = true
-        let typingIndicatorMessage = Message(session_id: sessionId, user_id: "1234", content: "typingIndicator", chat_type: "typing", is_user_message: "false")
+        let typingIndicatorMessage = Message(session_id: sessionId, user_id: userID, content: "typingIndicator", chat_type: "typing", is_user_message: "false")
         messages.append(.message(typingIndicatorMessage))
         let latitude = 32.88088
         let longitude = -117.23790
-        let userId = "1234"
+        let userId = userID
         let message = newMessage.content
         
         ChatService.shared.postMessage(latitude: latitude, longitude: longitude, userId: userId, sessionId: sessionId, message: message) { result, error in
@@ -283,7 +284,7 @@ struct SearchView: View {
                     messages.append(.messageSecondary(message))
                     let followUpContent = Message(
                         session_id: sessionId,
-                        user_id: "1234",
+                        user_id: userID,
                         content: "Swipe through these handpicked spots and share your thoughts on them!",
                         chat_type: "regular",
                         is_user_message: "false"

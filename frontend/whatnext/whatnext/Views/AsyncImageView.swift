@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AsyncImageView: View {
     @StateObject private var loader = ImageLoader()
+//    @State private var size: CGFloat
     let urlString: String
     
     var body: some View {
@@ -16,16 +17,16 @@ struct AsyncImageView: View {
             if loader.isLoadingFailed {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.gray.opacity(0.3))
-                    .frame(width: 110, height: 110)
+//                    .frame(width: size, height: size)
             } else if let image = loader.image {
                 image
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 110, height: 110)
+//                    .frame(width: size, height: size)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
             } else {
                 ProgressView()
-                    .frame(width: 110, height: 110)
+//                    .frame(width: size, height: size)
             }
         }
         .onAppear {
