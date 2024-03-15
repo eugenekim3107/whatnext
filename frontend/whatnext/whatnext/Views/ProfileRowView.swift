@@ -11,6 +11,7 @@ struct ProfileRowView: View {
     @ObservedObject var viewModel: ProfileRowViewModel
     let title: String
     let userId: String
+    @State private var showingDetailForUser: UserInfo? = nil
     
     init(viewModel: ProfileRowViewModel, title: String, userId: String) {
         self.viewModel = viewModel
@@ -42,6 +43,12 @@ struct ProfileRowView: View {
                             HStack(spacing: 5) {
                                 ForEach(viewModel.friendsInfo, id: \.userId) { profile in
                                     ProfileRowSimpleView(profile: profile)
+                                        .onTapGesture {
+                                            self.showingDetailForUser = nil
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                                self.showingDetailForUser = profile
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -49,6 +56,9 @@ struct ProfileRowView: View {
                     }
                 }
             }
+        }
+        .sheet(item: $showingDetailForUser) { user in
+            UserDetailView(userInfo: user)
         }
     }
 }

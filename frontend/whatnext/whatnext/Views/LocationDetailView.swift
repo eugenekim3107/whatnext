@@ -11,14 +11,51 @@ import CoreLocation
 struct LocationDetailView: View {
     let location: Location
     let userLocation: CLLocation?
-
+    @AppStorage("userID") var loginUserID: String = ""
+    @State private var isFavorite: Bool = false
+    @State private var isVisited: Bool = false
     
+   
+    private let profileService = ProfileService()
+
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                ImageView(imageUrl: location.imageUrl)
+                ZStack(alignment: .topTrailing) {
+                    ImageView(imageUrl: location.imageUrl)
+                    
+                    // Favorite and Visited buttons placed in the top right corner
+                    HStack(spacing: 10) {
+                        // Favorite Button
+                        Button(action: {
+                            self.isFavorite.toggle()
+                            // Placeholder function to update favorite status
+                        }) {
+                            Image(systemName: isFavorite ? "heart.fill" : "heart")
+                                .foregroundColor(isFavorite ? .red : .gray)
+                                .padding(8)
+                                .background(Circle().fill(Color.white))
+                                .shadow(radius: 3)
+                        }
+
+                        // Visited Button
+                        Button(action: {
+                            self.isVisited.toggle()
+                            // Placeholder function to update visited status
+                        }) {
+                            Image(systemName: isVisited ? "checkmark.circle.fill" : "checkmark.circle")
+                                .foregroundColor(isVisited ? .green : .gray)
+                                .padding(8)
+                                .background(Circle().fill(Color.white))
+                                .shadow(radius: 3)
+                        }
+                    }
+                    .padding(8)
+                }
+                
                 BusinessInfo(name: location.name, stars: location.stars, reviewCount: location.reviewCount)
-                PriceAndCategoryView(price: location.price, categories: location.categories)
+                PriceAndCategoryView(price: location.price, tag: location.tag)
                 HoursView(hours: location.hours)
                 ContactInfo(displayPhone: location.displayPhone, address: location.address, city: location.city, state: location.state, postalCode: location.postalCode)
                 
@@ -33,25 +70,11 @@ struct LocationDetailView: View {
         }
         .background(Color(UIColor.systemBackground))
         .cornerRadius(10)
+        .navigationBarTitleDisplayMode(.inline)
     }
+
 }
 
-struct LikeButton: View {
-    @Binding var isLiked: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: {
-            action()
-        }) {
-            Image(systemName: isLiked ? "heart.fill" : "heart")
-                .foregroundColor(isLiked ? .red : .gray)
-                .imageScale(.large)
-                .accessibility(label: Text(isLiked ? "Unlike" : "Like"))
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
 
 // ImageView for displaying the location's image
 struct ImageView: View {
@@ -125,7 +148,7 @@ struct StarRatingView: View {
 // PriceAndCategoryView for displaying the price and categories
 struct PriceAndCategoryView: View {
     let price: String?
-    let categories: [String]?
+    let tag: [String]?
 
     var body: some View {
         Divider()
@@ -139,11 +162,10 @@ struct PriceAndCategoryView: View {
                     .cornerRadius(5)
             }
 
-            ForEach(categories?.filter { $0.lowercased() != "all" } ?? [], id: \.self) { category in
+            ForEach(tag?.map { $0.replacingOccurrences(of: "_", with: " ").capitalized } ?? [], id: \.self) { category in
                 Text(category)
                     .padding(6)
                     .background(Color.blue)
-                    //.foregroundColor(.white)
                     .cornerRadius(10)
                     .foregroundColor(.primary) // Adapts automatically to light/dark mode
             }
@@ -211,11 +233,19 @@ struct HoursView: View {
 
         guard let todayHours = hours?.hours(for: dayOfWeek) else { return false }
         
+        if todayHours.open == "0000" && todayHours.close == "0000" {
+            return true
+        }
+
         let currentTime = calendar.component(.hour, from: now) * 100 + calendar.component(.minute, from: now)
         let openingTime = Int(todayHours.open.replacingOccurrences(of: ":", with: "")) ?? 0
         let closingTime = Int(todayHours.close.replacingOccurrences(of: ":", with: "")) ?? 2400 // Use 2400 for end of day
 
-        return currentTime >= openingTime && currentTime <= closingTime
+        if closingTime < openingTime {
+            return currentTime >= openingTime || currentTime < closingTime
+        } else {
+            return currentTime >= openingTime && currentTime < closingTime
+        }
     }
 }
 
