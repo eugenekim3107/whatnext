@@ -21,18 +21,17 @@ import random
 ##############################
 
 # API key credentials
-API_KEY = "whatnext"
 API_KEY_NAME = "whatnext_token"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 timeout = 30
 
 # MongoDB (make sure to change the ip address to match the ec2 instance ip address)
-MONGO_DETAILS = "mongodb://eugenekim:whatnext@localhost:8000/"
+MONGO_DETAILS = os.getenv('MONGO_DETAILS')
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 db = mongo_client["locationDatabase"]
 
 # OpenAI
-openai_client = OpenAI(api_key="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")
+openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 assistant_id = generate_assistant_id(openai_client)
 
 # Redis server for chat and user history
@@ -99,7 +98,7 @@ class TagsRequest(BaseModel):
 
 # Verifies correct api key
 async def get_api_key(api_key: str = Security(api_key_header)):
-    if api_key == API_KEY:
+    if api_key == os.getenv("WHATNEXT_KEY"):
         return api_key
     else:
         raise HTTPException(
