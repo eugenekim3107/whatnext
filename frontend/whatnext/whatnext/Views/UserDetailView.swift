@@ -15,16 +15,17 @@ struct UserDetailView: View {
     var body: some View {
         ScrollView {
             VStack {
-                Spacer()
                 if let imageUrl = userInfo.imageUrl {
                     AsyncImageProfileView(urlString: imageUrl)
                         .frame(width: 110, height: 110)
                         .clipShape(Circle())
+                        .padding(.top, 25)
                 } else {
                     // Placeholder view when imageUrl is nil
                     Circle()
                         .fill(Color.gray.opacity(0.3))
                         .frame(width: 110, height: 110)
+                        .padding(.top, 25)
                 }
                 
                 Text(userInfo.displayName)
